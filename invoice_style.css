@@ -1,0 +1,120 @@
+/*
+
+Basic HTML/CSS Invoice
+ 2009 Joseph L. LeBlanc
+
+Basic HTML/CSS Invoice by Joseph LeBlanc is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License.
+	http://creativecommons.org/licenses/by-sa/3.0/us/
+
+Permissions beyond the scope of this license may be available at http://www.designvsdevelop.com/basic-html-css-invoices.
+
+*/
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+#header {
+}
+
+#invoice {
+	font-size: 6em;
+	font-family: Garamond, "Times New Roman", serif;
+	color: #777;
+	float: left;
+	display: block;
+}
+
+#date {
+	float: right;
+	margin-top: 1.5em;
+	text-align: right;
+	display: block;
+}
+
+/* Addresses */
+
+#addresses {
+	clear: both;
+}
+
+#from_business {
+	display: block;
+	float: left;
+	margin-top: 0.5em;
+}
+
+#to_business {
+	width: 17em;
+	display: block;
+	float: right;
+	text-align: right;
+	margin-top: 0.5em;
+}
+
+#to {
+	float: left;
+	display: block;
+}
+
+.contact {
+	margin-top: 0.5em;
+}
+
+/* main invoice section */
+
+#main {
+	padding-top: 2em;
+	clear: both;
+}
+
+/* tabulation */
+
+#tabulation
+{
+	width: 100%;
+}
+
+#tabulation th, #tabulation td {
+	text-align: right;
+	padding: 4px;
+}
+
+#tabulation .billable_item td {
+	font-family: Monaco, sans-serif;
+}
+
+#tabulation .first {
+	text-align: left;
+}
+
+#tabulation .totalLabel {
+	padding-right: 20px;
+}
+
+.totals {
+	border: 1px solid #000;
+}
+
+.billable_item td {
+	background-color: #EEE;
+}
+
+/* Footer */
+
+#footer {
+	font-family: Garamond, "Times New Roman", serif;
+	display: block;
+	margin-top: 2em;
+}
+
+#company {
+	display: block;
+	float: left;
+}
+
+#thanks {
+	display: block;
+	float: right;
+	vertical-align: bottom;
+}
