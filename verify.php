@@ -1,5 +1,7 @@
 <?PHP
    require_once('lib/db.inc.php');
+   require_once('lib/Members.class.php');
+   Members::SessionAllowLogin();
    $error = false;
    $success = false;
    if (isset($_GET['code']) && isset($_GET['email'])){
@@ -28,6 +30,7 @@
 <title>Verify Code</title>
 </head>
 <body>
+<?PHP Members::MenuBar(); ?>
 <?PHP
   if ($error){
      echo $error;
