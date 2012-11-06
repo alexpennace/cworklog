@@ -1,4 +1,5 @@
 <?PHP
+   require_once('lib/db.inc.php');
    $error = false;
    $success = false;
    if (isset($_GET['code']) && isset($_GET['email'])){

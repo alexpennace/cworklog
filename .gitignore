@@ -1,2 +1,3 @@
 #my first git ignore file
 gitstatus.txt
+*.bak
