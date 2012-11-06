@@ -59,8 +59,9 @@ class work_log
   }
   
   public static function AddCompany($ary){
+         $user_id = (int)(isset($ary['user_id']) ? $ary['user_id'] : $_SESSION['user_id']);
          $sql = "INSERT INTO company (id, user_id, name, street, street2, city, state, zip, country, phone, email, notes, default_hourly_rate) ".
-                "VALUES(NULL, '".mysql_real_escape_string($ary['user_id'])."', '".
+                "VALUES(NULL, ".$user_id.", '".
                 mysql_real_escape_string($ary['name'])."', '".
 				mysql_real_escape_string($ary['street'])."', '".
                 mysql_real_escape_string($ary['street2'])."', '".
