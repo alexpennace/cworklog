@@ -71,17 +71,17 @@ else if (isset($_REQUEST['company_id'])){
    if (!$company){ $warning = 'This company has already been deleted or does not exist'; }
    else{
        
-       $areyousuremessage = 'Are you sure you want to delete <b>'.$company['name'].'</b>?';
+       
        
        $stmt = $DBH->prepare('SELECT * FROM work_log WHERE user_id = :user_id AND company_id = :company_id');
        $stmt->execute(array(':company_id'=>$company['id'], ':user_id'=>$_SESSION['user_id']));
        $work_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-       if ($work_logs){
-           if (count($work_logs) > 0){
-              $warning = 'You must first delete <a href="work_log.php?company_id='.$company['id'].'">'.count($work_logs).' work log(s)</a> individually before deleting <b>'.$company['name'].'</b> company.';
-           }else{
-              //all work logs have been deleted, go ahead and allow deletion of the company
-              if (isset($_POST['company_id']) && isset($_POST['delete'])){
+       if ($work_logs && count($work_logs) > 0){
+          $warning = 'You must first delete <a href="work_log.php?company_id='.$company['id'].'">'.count($work_logs).' work log(s)</a> individually before deleting <b>'.$company['name'].'</b> company.';
+       }//end if work logs exist
+       else{
+          //all work logs have been deleted, go ahead and allow deletion of the company
+          if (isset($_POST['company_id']) && isset($_POST['delete']) && $_POST['delete'] == 'company'){
                        $stmt = $DBH->prepare('DELETE FROM company WHERE id = :company_id');
                        $deleted_company = $stmt->execute(array(':company_id'=>$company['id']));
                        if ($deleted_company && $stmt->rowCount() == 1){
@@ -90,62 +90,10 @@ else if (isset($_REQUEST['company_id'])){
                        }else{
                           $warning = 'Could not delete company, but deleted the rest of attached information';
                        }           
-              }
-           }
-           /******************* COMMENTED OUT BECAUSE WE WOULD RATHER FORCE A USER TO DELETE ALL WORK LOGS INDIVIDUALLY FIRST
-           ******** ( to prevent accidents )
-           ***********************************************************************************************
-           $unbilled_count = 0;
-           $timelogs = array();
-           foreach($work_logs as $worklog){
-              if (!isset($worklog['date_billed']) || is_null($worklog['date_billed']) || $worklog['date_billed'] == '0000-00-00'){
-                 $unbilled_count++;
-              }
-              $stmt = $DBH->prepare('SELECT * FROM time_log WHERE work_log_id = :worklog_id');
-              $stmt->execute(array(':worklog_id'=>$worklog['id']));
-              $timelogs = array_merge($timelogs, $stmt->fetchAll(PDO::FETCH_ASSOC));
-           }
-           $areyousuremessage .= '<br><b>'.count($work_logs).'</b> work log(s) (<b>'.$unbilled_count.'</b> not yet billed) and 
-               <b>'.count($timelogs).'</b> time log(s) associated with this company will be permanently deleted as well.';
-           
-           
-           if (isset($_POST['company_id']) && isset($_POST['delete'])){
-              //delete work logs and associated files_logs, note_logs, and time_logs
-              $num_deleted_work_logs = 0;
-              foreach($work_logs as $worklog){
-                  $stmt = $DBH->prepare('DELETE FROM time_log WHERE work_log_id = :worklog_id');
-                  $deleted_timelogs = $stmt->execute(array(':worklog_id'=>$worklog['id']));
-                  
-                  $stmt = $DBH->prepare('DELETE FROM files_log WHERE work_log_id = :worklog_id');
-                  $deleted_fileslogs = $stmt->execute(array(':worklog_id'=>$worklog['id']));  
-                  
-                  $stmt = $DBH->prepare('DELETE FROM note_log WHERE work_log_id = :worklog_id');
-                  $deleted_notelogs = $stmt->execute(array(':worklog_id'=>$worklog['id']));
-                 
-                  if ($deleted_timelogs && $deleted_fileslogs && $deleted_notelogs){
-                     //success deleting all attached information, now go ahead and delete the work log
-                     $stmt = $DBH->prepare('DELETE FROM work_log WHERE id = :worklog_id AND user_id = :user_id');
-                     $deleted_worklog = $stmt->execute(array(':worklog_id'=>$worklog['id'], ':user_id'=>$_SESSION['user_id']));
-                     if ($deleted_worklog){
-                       $num_deleted_work_logs += $stmt->rowCount();
-                       
-                       $stmt = $DBH->prepare('DELETE FROM company WHERE id = :company_id');
-                       $deleted_company = $stmt->execute(array(':company_id'=>$company['id']));
-                       if ($deleted_company && $stmt->rowCount() == 1){
-                          //success!!
-                       }else{
-                          $warning = 'Could not delete company, but deleted the rest of attached information';
-                       }
-                     }
-                  }else{
-                     $warning = 'Could not delete attached time logs, file change logs, or note logs of the given Work Log with id '.$worklog['id'];
-                  }
-                  
-              }//end deleting each worklog 
-              $success = 'Successfully deleted 1 company with '.$num_deleted_work_logs.' work logs and all attached information.';    
-           }
-           */
-       }//end if work logs exist
+          }else{ //not deleted yet, just confirmation
+             $areyousuremessage = 'Are you sure you want to delete <b>'.$company['name'].'</b>?';
+          }
+       }
        
    }//end if company exists
    
