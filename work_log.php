@@ -41,11 +41,13 @@
        //now do checks on the specific fields
        
        
-       $result = mysql_query("SELECT work_Log.*, company.name AS company_name 
+       $result = mysql_query("SELECT work_log.*, company.name AS company_name 
                               FROM work_log JOIN company ON company_id = company.id
                               WHERE work_log.id = $wid");
        if ($result) {
        	$original_row = mysql_fetch_assoc($result);
+       }else{
+          //die(json_encode(array('error'=>mysql_error())));
        }
        if (empty($original_row)){
           die(json_encode(array('error'=>'No work log found.')));
@@ -719,7 +721,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 
                 elLiner.innerHTML += locked ? ' <a target="_blank" href="invoice.php?wid='+oRecord.getData('id')+'&format=pdf"><img title="Create Invoice" border=0 src="images/add_invoice.png"/></a>' : '';
                 elLiner.innerHTML += inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar.png" /></a>' : '';
-                elLiner.innerHTML += !locked && !inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>' : '';
+                elLiner.innerHTML += !locked && !inprogress ? ' <a href="time_log.php?wid='+ oRecord.getData('id') +'" onclick="poptimer(\'time_log.php?wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>' : '';
                 elLiner.innerHTML += '<a target="_blank" href="time_log_show.php?wid='+oRecord.getData('id')+'"><img border=0 title="View Time Log" src="images/timelog.png" style="width: 16px; height: 16px"></a>';
                 elLiner.innerHTML += !locked ? ' <a href="#" onclick="document.frmAddFile.work_log_id.value = '+oRecord.getData('id')+'; $(\'#dlgAddFile\').dialog(\'open\'); return false;"><img title="Add File/DB Modification" src="images/add_file.png" border=0 style="width:16px"></a>' : '';
 				elLiner.innerHTML += !locked ? ' <a href="#" onclick="document.frmAddNote.work_log_id.value = '+oRecord.getData('id')+'; $(\'#dlgAddNote\').dialog(\'open\'); return false;"><img title="Add Note" src="images/note_add.png" border=0 /></a>' : '';
