@@ -11,7 +11,7 @@
             $result = mysql_query(sprintf($sql, $_GET['code'], $_GET['email']));
             if ($result && $row = mysql_fetch_assoc($result)){
                 $verify_user = $row;
-                $sql2 = "UPDATE user SET status = 1 WHERE id = %d";
+                $sql2 = "UPDATE user SET status = 1, verify_code = '', verify_param = '' WHERE id = %d";
                 $result2 = mysql_query(sprintf($sql2, $verify_user['id']));
                 if ($result2){
                    $success = 'Thank you for verifying your email address, your account has been updated';
@@ -26,7 +26,7 @@
             $result = mysql_query(sprintf($sql, mysql_real_escape_string($_GET['code']), mysql_real_escape_string($_GET['new_email'])));         
             if ($result && $row = mysql_fetch_assoc($result)){
                 $verify_user = $row;
-                $sql2 = "UPDATE user SET status = 1, email = '%s' WHERE id = %d";
+                $sql2 = "UPDATE user SET status = 1, email = '%s', verify_code = '', verify_param = '' WHERE id = %d";
                 $result2 = mysql_query(sprintf($sql2, mysql_real_escape_string($_GET['code']), $verify_user['id']));
                 if ($result2){
                    $success = 'Thank you for verifying your new email address, your account has been updated';
