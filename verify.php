@@ -6,7 +6,6 @@
    $success = false;
    if (isset($_GET['code']))
    {
-
         if (isset($_GET['email'])){
             $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(email) = LOWER('%s')";
             $result = mysql_query(sprintf($sql, $_GET['code'], $_GET['email']));
