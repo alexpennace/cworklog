@@ -25,9 +25,11 @@
 	exit;
  }
 
-?><!DOCTYPE html>
-<html>
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Contractor's Work Log</title>
 <?PHP if (!empty($_GET['mobile'])){ ?>
 <style>
@@ -36,12 +38,12 @@ img { width: 16px; }
 body { font-size: 10px; }
 input { font-size: 10px; }
 </style>
+<?PHP }else{ ?>
+<link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
 <?PHP } ?>
 </head>
 <body>
-<?PHP
-	//Members::MenuBar();
-?>
+<?PHP if (!empty($_GET['mobile'])){ ?>
 <img src="images/time_log_clipboard.png" />
 <?PHP
    if ($logged_in){
@@ -68,5 +70,33 @@ document.frmLogin.submit();
 </script>
 <?PHP } ?>
 Not registered? <a href="register.php">Register free</a>
-</body>
+<?PHP }else{ ?>
+<div id="Wrapper">
+<div class="logost"><img src="images/logo.jpg" width="412" height="136" /></div>
+<div class="Row">
+<div class="Col1">
+<h2>Welcome  to <span class="OrangeColor">Contractor's</span> <span class="GreenColor">Work Log</span></h2>
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut purus at elit malesuada euismod. Quisque quis lacus a nulla gravida sagittis. Praesent dapibus purus a lacus placerat et feugiat felis consequat. Quisque felis mi, egestas at rutrum vitae, lacinia ac nibh. Aliquam sollicitudin sapien quis mauris consequat ac consequat tortor ornare. </p><p>Praesent justo dolor, ornare sed ornare at, laoreet at sem. Donec mollis, ligula vitae varius placerat, odio ante consequat ante, ut euismod dolor enim at erat. Duis dignissim ultricies risus id tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam a quam ac risus tristique fringilla iaculis ut velit.
+</p>
+</div>
+
+<div class="Col2">
+
+<form id="LoginForm" action="index.php" method="POST">
+<h5>Username:</h5>
+<input type="text" name="username_or_email"  />
+<h5>Password:</h5>
+<input type="password" name="password"/>
+<input type="submit" />
+</form>
+<a href="register.php"><img src="images/register_btn.jpg" width="341" height="59" alt="Register" class="MrgnLft25" /></a>
+</div>
+
+</div>
+
+</div>
+
+
+<?PHP } ?></body>
 </html>

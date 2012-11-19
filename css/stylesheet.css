@@ -1,0 +1,121 @@
+@charset "utf-8";
+/* CSS Document */
+*{
+	padding:0px;
+	margin:0px;
+}
+
+html{
+	height:100%;
+}
+
+body{
+	background:#f0f0f0;	
+	height:100%;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+	color:#000
+}
+
+
+#Wrapper{
+width:880px;
+margin:5%  auto 0 auto;
+border:8px solid #ccdce3;
+background:url(../images/login_windowbg.gif) repeat-x #edf5f9;
+padding:20px 40px;
+height:auto;
+}
+
+#Wrapper h2{
+	font-size:23px;
+	color:#121212;
+	margin-bottom:15px;
+}
+
+#Wrapper p{
+	font-size:15px;
+	color:#121212;
+	margin-bottom:15px;
+	line-height:21px;
+}
+
+
+.logost{
+	text-align:center;
+	margin-bottom:50px;
+}
+
+.Row{
+	overflow:hidden;
+	height:100%;	
+}
+
+.Col1{
+	float:left;
+	width:45%;
+	padding-right:5%;
+	background:url(../images/col_seprator.jpg) no-repeat right center;
+	
+	}
+
+.Col2{
+	float:right;
+	width:45%;
+	padding-left:5%;
+	}
+	
+#LoginForm{
+	padding:0px;
+	margin:0px;
+}
+#LoginForm h5{
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:bold;
+	color:#000000;
+	margin-bottom:5px;
+	font-size:16px;
+}
+
+#LoginForm input[type="text"],#LoginForm input[type="password"]{
+	display:block;
+	width:92%;
+	padding:15px 10px;
+	border:1px solid #ccc;
+	background:#fff;
+	 -moz-border-radius: 5px; /* Firefox */
+  -webkit-border-radius: 5px; /* Safari, Chrome */
+  border-radius: 5px; /* CSS3 */
+  margin-bottom:20px;
+}
+#LoginForm input[type="submit"]{
+	display:block;
+	background:url(../images/log_inbtn.jpg) no-repeat left top;
+	width:182px;
+	height:77px;
+	margin-bottom:20px;
+	text-indent:-9000px;
+	border:none;
+	cursor:pointer;
+	margin:0 auto 15px auto;
+	
+}
+.MrgnLft25{
+	margin-left:25px;
+}
+
+.GreenColor{
+	color:#679c20;	
+}
+
+
+
+.OrangeColor{
+	color:#f79a1a;
+}
+
+
+#Header{
+	background:url(images/inr_hdrbg.jpg) repeat-x left top;
+	height:177px;	
+}
