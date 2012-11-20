@@ -217,7 +217,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
                 </p>
             </fieldset>
             <fieldset class="row2">
-                <legend title="Personal Details (used for invoicing)">Personal Details
+                <legend title="Personal Details (used for invoicing)">Invoicing Details
                 </legend>
                 <p>
                     <label class="optional">Name
