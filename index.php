@@ -77,7 +77,18 @@ Not registered? <a href="register.php">Register free</a>
 <div class="Col1">
 <h2>Welcome  to <span class="OrangeColor">Contractor's</span> <span class="GreenColor">Work Log</span></h2>
 <p>
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut purus at elit malesuada euismod. Quisque quis lacus a nulla gravida sagittis. Praesent dapibus purus a lacus placerat et feugiat felis consequat. Quisque felis mi, egestas at rutrum vitae, lacinia ac nibh. Aliquam sollicitudin sapien quis mauris consequat ac consequat tortor ornare. </p><p>Praesent justo dolor, ornare sed ornare at, laoreet at sem. Donec mollis, ligula vitae varius placerat, odio ante consequat ante, ut euismod dolor enim at erat. Duis dignissim ultricies risus id tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam a quam ac risus tristique fringilla iaculis ut velit.
+Contractor's Work Log is a tool to track billable time for clients, and then send them an invoice.
+It is easy: 
+<br><b>1. </b>Add a client work log, <b>2. </b>Log your time
+, and <b>3. </b>Send a bill. 
+<br>
+<b>Simple</b>, <b>Easy</b>, and <b>Free</b>.
+</p>
+<p>
+<h4>What is the catch?</h4>
+<p>
+If you like Contractor's Work Log, you can buy/download a business edition for your own local server running PHP/MySQL. 
+In fact, Contractor's Work Log started as a private endeavor on one local machine, and was later made available to the public after 37 weeks of testing.
 </p>
 </div>
 
@@ -90,7 +101,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut purus at elit
 <input type="password" name="password"/>
 <input type="submit" />
 </form>
-<a href="register.php"><img src="images/register_btn.jpg" width="341" height="59" alt="Register" class="MrgnLft25" /></a>
+<a href="register.php"><img border=0 src="images/register_btn.jpg" width="341" height="59" alt="Register" class="MrgnLft25" /></a>
 </div>
 
 </div>

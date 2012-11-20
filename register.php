@@ -271,7 +271,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
                 </legend>
                 <p class="agreement">
                     <input type="checkbox" name="iagree_tc" value="1" <?=isset($_POST['iagree_tc']) ? 'checked ':''?>/>
-                    <label>*  I accept the <a target="_blank" href="terms_conditions.php">Terms and Conditions</a></label>
+                    <label>*  I accept the <a target="_blank" href="terms.php">Terms and Conditions</a></label>
                 </p>
             </fieldset>
             <div><button class="button" type="submit">Register &raquo;</button></div>
