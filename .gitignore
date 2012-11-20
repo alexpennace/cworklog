@@ -1,3 +1,6 @@
 #my first git ignore file
 gitstatus.txt
 *.bak
+
+#ignore config file so that whoever is installing this on their server can change the info
+lib/config.inc.php

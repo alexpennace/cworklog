@@ -1,8 +1,9 @@
 <?PHP
-  //create user 'php'@'localhost' IDENTIFIED BY '18JdhGlIo9xGw3';
-  mysql_connect('localhost', 'php', '18JdhGlIo9xGw3');
-  mysql_select_db('work_log_db');
+  require_once(dirname(__FILE__).'/config.inc.php');
   
+  //connect to database using old mysql_ functions and also new PDO idea (to help with escaping etc)
+  mysql_connect(CFG_DB_HOST, CFG_DB_USER, '');
+  mysql_select_db(CFG_DB);
 
-  $DBH = new PDO('mysql:host=localhost;dbname=work_log_db', 'php', '18JdhGlIo9xGw3');
+  $DBH = new PDO('mysql:host='.CFG_DB_HOST.';dbname='.CFG_DB, CFG_DB_USER, CFG_DB_PASS);
 ?>

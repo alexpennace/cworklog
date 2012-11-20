@@ -16,6 +16,14 @@ body{
 	font-size:14px;
 	color:#000
 }
+a{
+	text-decoration:none;
+	color:#fff;
+}
+
+a:hover{
+	text-decoration:none;
+}
 
 
 #Wrapper{
@@ -115,8 +123,128 @@ height:auto;
 	color:#f79a1a;
 }
 
+/*inner page styling*/
 
 #Header{
 	background:url(images/inr_hdrbg.jpg) repeat-x left top;
 	height:177px;	
+}
+
+#topnavigation{
+	float:right;
+	margin-right:15px;
+	line-height:37px;
+	vertical-align:top;
+	color:#fff;
+}
+
+#topnavigation a{
+	color:#fff;
+	line-height:37px;
+	padding:0 5px 0 0;
+	margin-left:5px;	
+}
+
+#topnavigation a:hover{
+	color:#f79a1a;
+}
+
+#logoblock{
+	overflow:hidden;
+	clear:both;
+	width:98%;
+	margin:0 1%;
+	color:#fff;
+}
+#logoblock .logost{
+	margin-top:13px;
+	margin-bottom:5px;
+	
+}
+
+
+#logoblock .Col11{
+	float:left;
+	width:25%;
+	margin-right:5%;
+}
+#logoblock .Col12{
+	float:right;
+	width:65%;
+	text-align:right;
+	padding-top:10px;
+}
+
+#logoblock .Col12 a{
+	margin-left:15px;
+}
+
+#filterblock{
+	line-height:36px;
+	color:#fff;
+	clear:both;
+}
+#filterblock a{
+	padding:0 5px;
+}
+#filterblock a:hover{
+	color:#74d0f9;	
+}
+
+.dataBlk{
+	padding:15px ;
+	color:#121212;		
+}
+.dataBlk a{
+	color:#121212;	
+	text-decoration:underline;
+}
+
+.dataBlk a:hover{
+	color:#74d0f9;
+	text-decoration:none;	
+}
+
+.dataBlk h2{
+	display: block;
+	font-size: 21px;
+	font-weight: bold;
+	margin-bottom:15px;
+		
+}
+.datatable{
+	border-collapse:collapse;	
+}
+
+.datatable td {
+	border-collapse:collapse;
+	border:1px solid #9b9b9b;
+	padding:10px;
+	background:#fff;
+}
+
+.datatable th{
+	background:#e5edf1;
+	border:1px solid #9b9b9b;
+	padding:10px;
+	
+}
+
+
+.Summarytd{
+	padding:0px!important;
+	margin:0px !important;
+}
+
+.SummaryBlock{
+	font-size:14px;
+	line-height:28px;
+	font-weight:normal;
+	background:#e5edf1;
+	padding:8px 10px;	
+}
+
+.Actionlinks a{
+	margin-right:5px;
+	
 }

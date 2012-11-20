@@ -1,11 +1,12 @@
 <?PHP
+   require_once(dirname(__FILE__).'/config.inc.php');
    class Site
    {
-      public static $title = 'Contractor\'s Work Log';
-      public static $base_url = 'http://localhost/work_log/';
-      public static $use_php_mail = false;
-      public static $email_from_header = 'From: Contractor\'s Work Log <noreply@cworklog.com>';
-      public static $insert_mock_company_upon_registration = true;
+      public static $title = CFG_SITE_TITLE;
+      public static $base_url = CFG_BASE_URL;
+      public static $use_php_mail = CFG_USE_PHP_MAIL;
+      public static $email_from_header = CFG_EMAIL_FROM_HEADER;
+      public static $insert_mock_company_upon_registration = CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION;
       
       public static function CssJsYuiIncludes(){
 		  //$YUI_JS_SOURCE = 'http://yui.yahooapis.com';
@@ -43,6 +44,7 @@
 	  
 	  public static function Css(){
         ?>
+        <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
         <style>
         body { font-family: Arial; }
        .imgLinkTable a:hover{ text-decoration: none; }
