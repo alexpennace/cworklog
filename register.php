@@ -227,7 +227,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
                 <p>
                     <label class="optional">Phone
                     </label>
-                    <input  name="phone" type="text" maxlength="10" value="<?=isset($_POST['phone']) ? htmlentities($_POST['phone']):''?>"/>
+                    <input  name="phone" type="text" maxlength="25" value="<?=isset($_POST['phone']) ? htmlentities($_POST['phone']):''?>"/>
                 </p>
                 <p>
                     <label class="optional">Street 1
