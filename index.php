@@ -1,10 +1,10 @@
 <?PHP
  require_once('lib/Members.class.php');
  Members::SessionAllowLogin();
- 
+ $ERROR_MSG = '';
  if (isset($_POST['username_or_email'])){
     $logged_in = Members::Login($_POST['username_or_email'], $_POST['password']);
-	echo mysql_error();
+	$ERROR_MSG = 'Failure logging in, check your username or password, and try again';
  }
  else{
     $logged_in = false;
@@ -55,6 +55,11 @@ input { font-size: 10px; }
 <form name="frmLogin" action="index.php" method="POST">
 <?PHP
   if (isset($_GET['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_GET['goto'])?>"/><?PHP }
+  if (!empty($ERROR_MSG)){ 
+    ?><div class="error">
+    <?=$ERROR_MSG?>
+    </div><?PHP
+  }
 ?>
 <label>Username/Email <input type="text" name="username_or_email" value="<?=isset($_REQUEST['username_or_email']) ? htmlentities($_REQUEST['username_or_email']) : ''?>"/></label>
 <br />
@@ -95,11 +100,19 @@ In fact, Contractor's Work Log started as a private endeavor on one local machin
 <div class="Col2">
 
 <form id="LoginForm" action="index.php" method="POST">
+<?PHP
+  if (isset($_GET['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_GET['goto'])?>"/><?PHP }
+  if (!empty($ERROR_MSG)){ 
+    ?><div class="error">
+    <?=$ERROR_MSG?>
+    </div><?PHP
+  }
+?>
 <h5>Username:</h5>
 <input type="text" name="username_or_email"  />
 <h5>Password:</h5>
 <input type="password" name="password"/>
-<input type="submit" />
+<input type="submit" value=""/>
 </form>
 <a href="register.php"><img border=0 src="images/register_btn.jpg" width="341" height="59" alt="Register" class="MrgnLft25" /></a>
 </div>

@@ -16,6 +16,21 @@ body{
 	font-size:14px;
 	color:#000
 }
+
+.areyousure,.warning,.error{
+  font-size: 16px;
+  color: red;
+  border: 1px solid red;
+  width: 300px;
+  background-color: #ffc6c6;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
 a{
 	text-decoration:none;
 	color:#fff;
@@ -126,7 +141,7 @@ height:auto;
 /*inner page styling*/
 
 #Header{
-	background:url(images/inr_hdrbg.jpg) repeat-x left top;
+	background:url(../images/inr_hdrbg.jpg) repeat-x left top;
 	height:177px;	
 }
 

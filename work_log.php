@@ -432,46 +432,46 @@ $(document).bind('keydown', function(e) {
 </script>
 </head>
 <body class="yui-skin-sam">
-<?PHP Members::MenuBar(); ?>
-
-
-<?PHP Site::ImgLinkTable(); ?>
-<br>
-
-<select onchange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value; } else { window.location.href = 'companies.php'; }">
-<option value="">-- Company --</option>
-<option value="">[All Companies]</option>
-<?PHP
-     $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY name ASC";
-     $result = mysql_query($sql);
-     while ($row = mysql_fetch_assoc($result)){
-       ?><option <?=$specific_company_id == $row['company_id'] ? 'selected ' : ''?> value="<?=$row['company_id']?>"><?=htmlentities($row['company_name'])?></option><?PHP
-     }
+<?PHP           
+          Members::MenuBarOpenBottomLeftOpen();
+          ?>
+            <strong class="OrangeColor">Filter:</strong> <a href="<?=modQS(array('locked'=>'1'))?>">Locked</a> | <a href="<?=modQS(array('locked'=>'0'))?>">Not Locked</a> | <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | <a href="<?=modQS(array('notes'=>'full'))?>">Notes Full</a>
+          <?PHP
+          Members::MenuBarBottomLeftCloseRightOpen();
+          ?>
+          <select style="margin-top: 10px" onchange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value; } else { window.location.href = 'companies.php'; }">
+            <option value="">-- Company --</option>
+            <option value="">[All Companies]</option>
+            <?PHP
+                 $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY name ASC";
+                 $result = mysql_query($sql);
+                 while ($row = mysql_fetch_assoc($result)){
+                   ?><option <?=$specific_company_id == $row['company_id'] ? 'selected ' : ''?> value="<?=$row['company_id']?>"><?=htmlentities($row['company_name'])?></option><?PHP
+                 }
+            ?>
+          </select>
+            <?PHP
+              if (!empty($specific_company_id)){
+            ?>
+                <select onchange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&filter[]=unpaid';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
+                <option value="" selected>-- Work Log --</option>
+                <option value="" <?=!$unpaid && !$paid? 'selected' : ''?>>[All Work Logs]</option>
+                <option value="unpaid" <?=$unpaid ? 'selected' : ''?>>[Unpaid Work Logs]</option>
+                <?PHP
+                     $sql = "SELECT id, title FROM work_log WHERE company_id = ".$specific_company_id." ORDER BY id DESC";
+                     $result = mysql_query($sql);
+                     while ($row = mysql_fetch_assoc($result)){
+                       ?><option <?=$specific_work_log_id == $row['id'] ? 'selected ' : ''?> value="<?=$row['id']?>"><?=htmlentities($row['title'])?></option><?PHP
+                     }
+                ?>
+                </select>
+            <?PHP
+             }
+             ?>
+          <?PHP
+          Members::MenuBarBottomRightClose();
+          Members::MenuBarClose(); 
 ?>
-</select>
-
-<?PHP
-  if (!empty($specific_company_id)){
-?>
-
-<select onchange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&filter[]=unpaid';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
-<option value="" selected>-- Work Log --</option>
-<option value="" <?=!$unpaid && !$paid? 'selected' : ''?>>[All Work Logs]</option>
-<option value="unpaid" <?=$unpaid ? 'selected' : ''?>>[Unpaid Work Logs]</option>
-<?PHP
-     $sql = "SELECT id, title FROM work_log WHERE company_id = ".$specific_company_id." ORDER BY id DESC";
-     $result = mysql_query($sql);
-     while ($row = mysql_fetch_assoc($result)){
-       ?><option <?=$specific_work_log_id == $row['id'] ? 'selected ' : ''?> value="<?=$row['id']?>"><?=htmlentities($row['title'])?></option><?PHP
-     }
-?>
-</select>
-
-<?PHP
- }
-?>
-
-<a href="#" onclick="$('#dlgAddWorkLog').dialog('open'); return false;">Add Work Log</a>
 <?PHP
    function modQS($ary_or_qs, $ary_unset = array()){
      if (is_string($ary_or_qs)){
@@ -499,9 +499,7 @@ $(document).bind('keydown', function(e) {
      return $qs;
    }
 ?>
-<div style="margin: 2px; padding: 1px; border: 1px dashed silver">
-<b>Filter:</b> <a href="<?=modQS(array('locked'=>'1'))?>">Locked</a> | <a href="<?=modQS(array('locked'=>'0'))?>">Not Locked</a> | <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | <a href="<?=modQS(array('notes'=>'full'))?>">Notes Full</a> <br>
-</div>
+
 
 <?PHP
    if (isset($_GET['company'])){
@@ -524,8 +522,9 @@ $(document).bind('keydown', function(e) {
       }
    }
 ?>
-
+<div class="dataBlk">
 <div id="basic">
+</div>
 </div>
 
 <div id="dlgAddNote" title="Add Note" style="display: none">
@@ -641,12 +640,14 @@ Notes<br>
 </form>
 </div>
 
+<div class="SummaryBlock">
 <?PHP
- work_log::HtmlFormAddWorkLog($specific_company_id);
- echo 'Total Work Logs: '.count($rows).' 
-      <br>Total Calculated Hours: '.round($super_total_hours, 3).' 
-      <br>Total Calculated Amount: $'.round($super_total_amount, 2);
+ echo 'Total Work Logs: <strong>'.count($rows).'</strong>
+      <br>Total Calculated Hours: <strong>'.round($super_total_hours, 3).'</strong> 
+      <br>Total Calculated Amount: <strong>$'.round($super_total_amount, 2).'</strong>';
 ?>
+</div>
+
 <form name="frmDeleteNote" style="display: none" method="POST">
 <input type="hidden" name="delete_note" value="1"/>
 <input type="hidden" name="work_log_id" value=""/>

@@ -247,10 +247,6 @@
     startstop();
   </script>
   <?PHP } ?>  
-  <script>
-  var notes = document.frmStartStop.notes;
-  if (notes){ notes.focus(); }
-  </script>
   <div>
   <?PHP
     if ($time_log_id == false && !$resume_time_log)
