@@ -17,8 +17,9 @@ body{
 	color:#000
 }
 
-img{ 
-  border: 0px; 
+/* make border 0 */
+a img{ 
+  border: 0; 
 }
 
 .areyousure,.warning,.error{
