@@ -162,6 +162,7 @@
 
    $result = mysql_query($sql);
    $rows = array();
+   $columns = array();
    $super_total_seconds = 0;
    $super_total_amount = 0.0;
    if (!$result){
@@ -215,10 +216,60 @@
       $row['_calc_amount_'] = $row['_calc_hours_'] * $row['rate'];
       $super_total_amount += $row['_calc_amount_'];
       $row['_calc_hours_'] = round($row['_calc_hours_'], 3);
-      
+      if (empty($columns)){
+         $columns = array_keys($row);
+      }
       $rows[] = $row;   
    }
    $super_total_hours = $super_total_seconds / 60 / 60;   
+   if (isset($_GET['output'])){
+       if ($_GET['output'] == 'csv'){
+            /** Include PHPExcel */
+            require_once('lib/PHPExcel.php');
+
+            PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
+            
+            // Create new PHPExcel object
+            $objPHPExcel = new PHPExcel();
+
+            // Set document properties
+            $objPHPExcel->getProperties()->setCreator($_SESSION['user_row']['name'])
+                                         ->setLastModifiedBy($_SESSION['user_row']['name'])
+                                         ->setTitle("Contractor's Work Log Export")
+                                         ->setSubject("Contractor's Work Log Export")
+                                         ->setDescription("Contractor's Work Log (cworklog.com) Excel Export")
+                                         ->setKeywords("cworklog work log time logger billable")
+                                         ->setCategory("Work Log Time Clock");       
+     
+            $objPHPExcel->setActiveSheetIndex(0);
+            
+            foreach($rows as $i => $row){
+              if ($i == 0){
+                 foreach($columns as $c => $col_name){
+                    $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($c, 1, $col_name); 
+                 }
+              }
+              $col = 0;
+              foreach($row as $key => $val){
+                 $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($col, $i+2, $val);
+                 $col++;
+              }
+            }
+            $objPHPExcel->setActiveSheetIndex(0);
+
+            header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+            header("Cache-Control: no-store, no-cache, must-revalidate");
+            header("Cache-Control: post-check=0, pre-check=0", false);
+            header("Pragma: no-cache");
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            //header('Content-Disposition: attachment;filename="report.xlsx"');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+
+            $objWriter->save('php://output');
+            exit;
+       }
+   }
    
    include_once('lib/Site.class.php');
    

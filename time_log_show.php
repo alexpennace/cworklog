@@ -94,6 +94,7 @@
 <html>
 <head>
 <title>Time Log</title>
+<link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
 <link rel="stylesheet" type="text/css" href="css/theme.css" />
 <style>
 th {
