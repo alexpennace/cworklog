@@ -187,7 +187,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
               type: "GET",
               url: "companies.php",
               dataType: "json",
-              data: querystr,
+              data: querystr
             }).done(function( msg ) {
             
                  if (msg.error){
