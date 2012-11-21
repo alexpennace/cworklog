@@ -17,6 +17,10 @@ body{
 	color:#000
 }
 
+img{ 
+  border: 0px; 
+}
+
 .areyousure,.warning,.error{
   font-size: 16px;
   color: red;
