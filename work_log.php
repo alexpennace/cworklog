@@ -816,7 +816,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             {key:"_extra_", label:"Actions", formatter:formatExtra, sortable:true,resizeable:true},
             <?PHP if (!isset($_GET['wid'])) { ?>{key:"title", label: "Title", sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}, <?PHP } ?>
             <?PHP if (!isset($_GET['company']) && !isset($_GET['wid'])){ ?>{key:"company_name", label: "Company", sortable:true, resizeable: true, formatter:myCustomCompanyFormatter},<?PHP } ?>
-            {key:"description", label: "Description <br>Files Changed / Notes", formatter:formatDescriptionAndNotes, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
+            {key:"description", label: "Description <br>Files Changed / Notes", width: 167, formatter:formatDescriptionAndNotes, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
             {key:"_calc_hours_", label:"Calculated<br>Hours", sortable:true, resizeable:true},
             {key:"hours", label: "Actual<br>Hours", sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
             {key:"rate", label: "Price<br>Rate", formatter:YAHOO.widget.DataTable.formatCurrency, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
