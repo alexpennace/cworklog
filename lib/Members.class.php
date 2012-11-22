@@ -29,7 +29,7 @@
                        $time_logs_unfinished = array();
                         if ($result){
                          
-                           echo '<div id="unfinished"> &nbsp; ';
+                           echo '<div id="unfinished" style="float:left"> &nbsp; ';
                            while($row = mysql_fetch_assoc($result)){
                               $time_logs_unfinished[] = $row;
                               

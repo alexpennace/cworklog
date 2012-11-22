@@ -285,6 +285,7 @@
       }
    }
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <title>Work Log</title>

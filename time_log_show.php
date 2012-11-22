@@ -19,7 +19,12 @@
 				   " AND time_log.id = ".(int)$_REQUEST['timelog_id'];
 			$res = mysql_query($sql);
 			if ($res){
-			   $tl_row = mysql_fetch_assoc($res);
+               $tl_row = mysql_fetch_assoc($res);
+               if ($tl_row['locked']){
+                 //cannot edit a locked work log
+                 $result['error'] = 'This work log is currently locked. Cannot update.';
+		         die(json_encode($result));
+               }
 			   //ensure that stop time is > start_time
 			   $uname = $_REQUEST['name'];
 			   if (strpos($_REQUEST['name'], 'start') !== false){
@@ -52,7 +57,9 @@
 			      $sql = "SELECT * FROM time_log WHERE id = ".(int)$_REQUEST['timelog_id'];
 				  $res = mysql_query($sql);
 				  $result['time_log'] = mysql_fetch_assoc($res);
-			      $result['success'] = true;
+                  $result['time_log']['__calc_seconds__'] = strtotime($result['time_log']['stop_time']) - strtotime($result['time_log']['start_time']);
+			      $result['time_log']['__calc_minutes__'] = number_format($result['time_log']['__calc_seconds__'] / 60, 3); 
+                  $result['success'] = true;
 			   }else{
 			      $result['error'] = 'Could not update time log';
 			   }
@@ -91,6 +98,7 @@
     
    $super_total_seconds = 0;
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <title>Time Log</title>
@@ -200,33 +208,39 @@ timelog_saveOrCancelChanges = function(ipt){
               type: "GET",
               url: "time_log_show.php",
               dataType: "json",
-              data: querystr,
+              data: querystr
             }).done(function( msg ) {
                  if (msg.error){
                     //display error message                  
                     alert( "Error " + msg.error ); 
                  }else{
-					console.log(msg.time_log);
-					console.log(Date.parse(msg.time_log.start_time));
-					console.log(Date.parse(msg.time_log.stop_time));
+					//console.log(msg.time_log);
+					//console.log(Date.parse(msg.time_log.start_time));
+					//console.log(Date.parse(msg.time_log.stop_time));
 					var spn_start = document.getElementById('spn_start_time_' + msg.time_log.id);
 					if (spn_start){
 					   spn_start.innerHTML = Date.parse(msg.time_log.start_time).toString('MMM d, yyyy hh:mm:ss tt');
-					   console.log('000 start: ' + spn_start.innerHTML);
+					   //console.log('000 start: ' + spn_start.innerHTML);
 					}
 
 					var spn_stop = document.getElementById('spn_stop_time_' + msg.time_log.id);
 					if (spn_stop){
 						spn_stop.innerHTML = Date.parse(msg.time_log.stop_time).toString('MMM d, yyyy hh:mm:ss tt');	
-						console.log('000 stop: ' + spn_stop.innerHTML);					   
+						//console.log('000 stop: ' + spn_stop.innerHTML);					   
 					}
+                    
+                    var spn_duration = document.getElementById('spn_duration_' + msg.time_log.id);
+                    if (spn_duration){
+                       spn_duration.innerHTML = msg.time_log.__calc_minutes__ + ' min';
+                    }
 					
 					var td_notes = document.getElementById('timelog[notes]['+msg.time_log.id+']');
 					if (td_notes){
 						td_notes.innerHTML = msg.time_log.notes;
 						td_notes.setAttribute();
 					}
-					//window.location.href = window.location.href;
+					//refresh the page for now (we can take this out if we update the duration properly)
+                    //window.location.href = window.location.href;
                  }  
             });	
 	
@@ -241,7 +255,7 @@ timelog_ajaxVerifyDate = function(ipt){
               type: "GET",
               url: "time_log_show.php",
               dataType: "json",
-              data: querystr,
+              data: querystr
             }).done(function( msg ) {
                  if (msg.error){
                     //display error message                  
@@ -271,13 +285,13 @@ timelog_ajaxVerifyDate = function(ipt){
 							var start, stop;
 							var start_td = document.getElementById('spn_start_time_' + msg.tid);
 							var stop_td = document.getElementById('spn_stop_time_' + msg.tid);
-							console.log(start_td);
-							console.log(stop_td);
+							//console.log(start_td);
+							//console.log(stop_td);
 							
 							var dt = new Date();
 						    dt.setTime(msg.timestamp*1000);
 							var sender = dt;
-							console.log(ipt.value);
+							//console.log(ipt.value);
 							var ipt_date = new Date(Date.parse(ipt.value));
 							
 							if (time_spot == 'start' && stop_td){
@@ -287,18 +301,18 @@ timelog_ajaxVerifyDate = function(ipt){
 								start = Date.parse(start_td.innerHTML);
 								stop = ipt_date;
 							}
-							console.log('start time: ');
-							console.log(start);
-							console.log('stop time: ');
-							console.log(stop);
+							//console.log('start time: ');
+							//console.log(start);
+							//console.log('stop time: ');
+							//console.log(stop);
 							
 							var ms = stop.getTime() - start.getTime();
 							if (ms <= 0){
 								return;
 							}
 							var min = (ms / 1000 / 60).toFixed(3);
-							console.log('ms diff: ' + ms);
-							console.log('min diff: ' + min);
+							//console.log('ms diff: ' + ms);
+							//console.log('min diff: ' + min);
 							
 							if (div){ 
 							   div.title = 'Calculated Minutes'; 
@@ -312,7 +326,8 @@ timelog_ajaxVerifyDate = function(ipt){
             });
 }
 
-timelog_makeEditable = function(td, value){
+timelog_makeEditable = function(td, value, opts){
+   if (typeof(opts) !== 'object'){ opts = {saveonblur:false}; }
    if (td.getAttribute('old_innerHTML')){ return false; }
    if (value == null){
       value = td.innerHTML;
@@ -320,12 +335,41 @@ timelog_makeEditable = function(td, value){
    td.setAttribute('old_innerHTML', td.innerHTML);
    var cellid = td.getAttribute('cellid');
    td.innerHTML = '<form name="frm_'+cellid+'" onsubmit="return timelog_OnFormSubmit(this);" style="display: inline;" method="POST" style="margin: 0px; padding: 0px;">' + 
-                  '<input type="text" title="'+value+'" id="id_'+cellid+'" tid="'+ td.getAttribute('rowid') +'" name="' + td.getAttribute('cellid') + '" value="'+value+'" onchange="timelog_saveOrCancelChanges(this);" onkeyup="if (event.keyCode == 27){ timelog_cancelChanges(this); }else if(event.keyCode == 13){ timelog_saveOrCancelChanges(this); }else{ '+(cellid.indexOf('notes') ? ';' : 'timelog_ajaxVerifyDate(this);')+' }" onchange="timelog_saveOrCancelChanges(this)" onblur="timelog_cancelChanges(this);"/>' + 
+                  '<input type="text" title="'+value+'" id="id_'+cellid+'" tid="'+ td.getAttribute('rowid') +'" name="' + td.getAttribute('cellid') + '" value="'+value+'" '+ (opts.saveonblur ? 'onblur="timelog_saveOrCancelChanges(this);" ' : ' ') + 'onchange="timelog_saveOrCancelChanges(this);" onkeyup="if (event.keyCode == 27){ timelog_cancelChanges(this); }else if(event.keyCode == 13){ timelog_saveOrCancelChanges(this); }else{ '+(cellid.indexOf('notes') ? ';' : 'timelog_ajaxVerifyDate(this);')+' }" onchange="timelog_saveOrCancelChanges(this)" onblur="timelog_cancelChanges(this);"/>' + 
 				  '</form>';
    var ipt = document.getElementById('id_'+cellid);
    if (ipt){
 	  ipt.focus();
 	  ipt.select();
+   }
+}
+
+timelog_setDuration = function(rowindex, rowid, dtStartTime){
+   var dur = prompt('Set total number of minutes.\nUse m.mm or mm:ss format.\nWarning: This will replace your stop time.');
+   if (!dur){ return false; }
+    var myregexp = /^((\d\d?):(\d\d))|(\d+(\.(\d+))?)$/;
+    var match = myregexp.exec(dur);
+    if (match != null && match.length > 1) {
+        if (match[1]){
+           var mm = parseInt(match[2]);
+           var ss = parseInt(match[3]);
+           dur = mm + (ss / 60);
+           //console.log(mm + ':'+ss + ' -> duration: ' + dur);
+        }
+    } else {
+        alert('Invalid format, use x.xx or mm:ss as a format');
+        return false;
+    }
+
+   
+   var dtEndTime = new Date(dtStartTime.getTime() + dur*60000);
+   var stop_time_td = $('#stop_time_'+rowindex)[0];
+   if (stop_time_td){
+     timelog_makeEditable(stop_time_td, dtEndTime.toString('MMM d, yyyy hh:mm:ss tt'), {saveonblur:true});
+     return true;
+   }else{
+     alert('An error occurred, please contact support');
+     return false;
    }
 }
 </script>
@@ -347,7 +391,11 @@ timelog_makeEditable = function(td, value){
 <td align=right <?=is_null($row['stop_time'])?'style="color: orange;"':''?>><?PHP
    if (!is_null($row['stop_time'])){
       $total_seconds = strtotime($row['stop_time']) - strtotime($row['start_time']);
+      ?><a href="#setduration" title="Set Time Duration (rather than end time)" 
+      onclick="timelog_setDuration(<?=$i?>, <?=$row['id']?>, new Date('<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>')); return false;"><img align=left border=0 style="width: 16px" src="images/goldalarm.png"/></a>
+      &nbsp; <span id="spn_duration_<?=$row['id']?>"><?PHP
       echo number_format($total_seconds / 60, 3).' min';
+      ?></span><?PHP
       $super_total_seconds += $total_seconds; 
    }/*else if ($row['stop_time'] < $row['start_time']){
       echo '<b style="color: red">Error</b>';

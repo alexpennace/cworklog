@@ -120,6 +120,7 @@
   
 
   ?>
+  <!DOCTYPE html>
   <html>
   <head>
   <script type="text/javascript" src="js/date.js"></script>

@@ -43,6 +43,7 @@
       $error = 'No code provided, try again';
    }
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <title>Verify Code</title>

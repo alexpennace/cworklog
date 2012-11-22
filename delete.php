@@ -100,6 +100,7 @@ else if (isset($_REQUEST['company_id'])){
    
 }
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <title>Confirm Permanent Delete - <?=Site::$title?></title>

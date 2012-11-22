@@ -148,6 +148,8 @@ height:auto;
 #Header{
 	background:url(../images/inr_hdrbg.jpg) repeat-x left top;
 	height:177px;	
+    text-align: right;
+    padding-right: 1em;
 }
 
 #topnavigation{
@@ -175,6 +177,7 @@ height:auto;
 	width:98%;
 	margin:0 1%;
 	color:#fff;
+    margin-top: -142px;
 }
 #logoblock .logost{
 	margin-top:13px;
