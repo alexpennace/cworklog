@@ -222,9 +222,13 @@
   <title><?=$company_row['name']?> - Time Log</title>
   <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
   <link rel="stylesheet" type="text/css" href="css/theme.css" />
+  <?PHP
+    include_once('lib/Mobile_Detect.php');
+    $browser_detect = new Mobile_Detect();
+  ?>
   <style>
   #company_name{ font-weight: bold; }
-  .bigButton { text-align: center; width: 100%; height: 80%; height: 80vh; font-size: 75%; font-size: 30vmin; }
+  .bigButton { text-align: center; width: 100%; height: 80%; height: 80vh; <?=$browser_detect->isMobile() ? 'font-size: 270px; font-size: 75vw;' : 'font-size: 75%; font-size: 35vw;'?> }
   .smallButton { margin-top: -13px; width: 100%; height: 50px; font-size: 15px; }
   #time, #wl_time{ font-size: 10px; }
   form { display: inline; margin: 0px; padding: 0px; }
