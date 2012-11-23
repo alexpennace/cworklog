@@ -123,8 +123,15 @@
   <!DOCTYPE html>
   <html>
   <head>
+  <script src="js/jquery-1.8.0.min.js"></script>
   <script type="text/javascript" src="js/date.js"></script>
   <script type="text/javascript">
+
+    $(window).resize(function() {
+        $(".bigButton").css('z-index', 1);
+    });
+  
+  
    var total_ms = <?=$work_log_row['_calc_hours_']*60*60*1000?>;
    var hourly_rate = 0.0;
    <?PHP if (!empty($work_log_row['rate'])){?>
@@ -213,10 +220,11 @@
    
   </script>
   <title><?=$company_row['name']?> - Time Log</title>
+  <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
   <link rel="stylesheet" type="text/css" href="css/theme.css" />
   <style>
   #company_name{ font-weight: bold; }
-  .bigButton { width: 150px; height: 125px; font-size: 50px; }
+  .bigButton { text-align: center; width: 100%; height: 80%; height: 80vh; font-size: 75%; font-size: 30vmin; }
   .smallButton { margin-top: -13px; width: 100%; height: 50px; font-size: 15px; }
   #time, #wl_time{ font-size: 10px; }
   form { display: inline; margin: 0px; padding: 0px; }
@@ -238,7 +246,7 @@
   <input type="hidden" name="tid" value="<?=$time_log_id?>" />
   <input type="hidden" name="wid" value="<?=$work_log_id?>" />
   <?PHP if ($time_log_id > 0){ ?>
-  <input title="Time Log notes" style="font-size:10px; width: 100%" type="hidden" name="notes" maxlength="255" value="" /><br>
+  <input type="hidden" name="notes" maxlength="255" value="" /><br>
   <?PHP } ?>
   <input type="submit" class="<?=!empty($_GET['smallbtn']) ? 'smallButton' :'bigButton'?>" value="<?=$time_log_id == false && !$resume_time_log  ? 'Start' : 'Stop'?>"/>
   </form>
