@@ -231,9 +231,11 @@
   .bigButton { text-align: center; width: 100%; height: 80%; height: 80vh; <?=$browser_detect->isMobile() ? 'font-size: 270px; font-size: 75vw;' : 'font-size: 75%; font-size: 35vw;'?> }
   .smallButton { margin-top: -13px; width: 100%; height: 50px; font-size: 15px; }
   #time, #wl_time{ font-size: 10px; }
-  form { display: inline; margin: 0px; padding: 0px; }
+  form { display: block; margin: 0px; padding: 0px;}
   div.timelog_image_links{ border:1px dashed gray;background-color:light-gray }
   div.timelog_image_links img{ width: 16px; height: 16px; border: 0px; padding: 2px; }
+  
+  
   <?PHP
   if (!($time_log_id == false && !$resume_time_log)){
   ?>

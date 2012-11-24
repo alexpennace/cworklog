@@ -31,7 +31,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Contractor's Work Log</title>
-<?PHP if (!empty($_GET['mobile'])){ ?>
+<?PHP if (!empty($_REQUEST['mobile'])){ ?>
 <style>
 form label input { width: 100%; }
 img { width: 16px; }
@@ -43,7 +43,7 @@ input { font-size: 10px; }
 <?PHP } ?>
 </head>
 <body>
-<?PHP if (!empty($_GET['mobile'])){ ?>
+<?PHP if (!empty($_REQUEST['mobile'])){ ?>
 <img src="images/time_log_clipboard.png" />
 <?PHP
    if ($logged_in){
@@ -53,8 +53,9 @@ input { font-size: 10px; }
    }
 ?>
 <form name="frmLogin" action="index.php" method="POST">
+<input type="hidden" name="mobile" value="1" />
 <?PHP
-  if (isset($_GET['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_GET['goto'])?>"/><?PHP }
+  if (isset($_REQUEST['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_REQUEST['goto'])?>"/><?PHP }
   if (!empty($ERROR_MSG)){ 
     ?><div class="error">
     <?=$ERROR_MSG?>
