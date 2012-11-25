@@ -40,11 +40,11 @@ if (isset($_POST['username']) && isset($_POST['email']))
 	  $error = 'This username is not available';
       $error_field = 'username';
    }
-   else if ($_POST['email'] != $_POST['email_confirm']){
+   /*else if ($_POST['email'] != $_POST['email_confirm']){
       $error = 'Emails do not match';
 	  $error_field = 'email';
 	  $error_field2 = 'email_confirm';
-   }
+   }*/
    else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
       $error = 'Email is not valid';
 	  $error_field = 'email';
@@ -57,6 +57,10 @@ if (isset($_POST['username']) && isset($_POST['email']))
       $error = 'Passwords do not match';
 	  $error_field = 'password';
 	  $error_field2 = 'password_confirm';
+   }
+   else if (strpos($_POST['password'],' ') !== false){
+      $error = 'Password can not contain spaces';
+      $error_field = 'password';
    }
    else if (strlen($_POST['password']) < 4){
       $error = 'Password is too short (must be 4 to 15 characters)';
@@ -136,16 +140,17 @@ if (isset($_POST['username']) && isset($_POST['email']))
     <head>
         <title><?=Site::$title?> - Registration</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <link rel="stylesheet" type="text/css" href="css/register.css"/>
+        <link rel="stylesheet" type="text/css" href="css/stylesheet.css"/>
 		<script src="js/jquery-1.8.2.js"></script>
     </head>
     <body>
-
+    <div id="Wrapper">
+    <div class="logost" style="margin-bottom:20px"><a href="index.php"><img border=0 src="images/logo.jpg" width="412" height="136" /></a></div>
     <?PHP
 		if ($registration_complete)
 		{
 		  ?>
-		  <div style="border: 1px solid green; color: green">
+		  <div style="border: 1px solid green; color: green; padding: 10px;">
 		  Thank you for registering, please check your email to confirm your account.
           <a href="index.php?username_or_email=<?=urlencode($_POST['username'])?>">Login</a>
 		  </div>
@@ -154,7 +159,20 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		else //display registration form
 		{
     ?>	
-	<script>
+<script type="text/javascript">
+    function toggle5(showHideDiv, switchImgTag) {
+            var ele = document.getElementById(showHideDiv);
+            var imageEle = document.getElementById(switchImgTag);
+            if(ele.style.display == "block") {
+                    ele.style.display = "none";
+            imageEle.innerHTML = '<img src="images/plus.png">';
+            }
+            else {
+                    ele.style.display = "block";
+                    imageEle.innerHTML = '<img src="images/minus.png">';
+            }
+    }
+
 	function username_check(username)
 	{
 		$('#username_check').css('color', 'yellow').html('Checking...');
@@ -166,7 +184,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		  type: "GET",
 		  url: "register.php",
 		  dataType: "json",
-		  data: querystr,
+		  data: querystr
 		}).done(function( msg ) {
 		   if (msg.error){
 		      $('#username_check').css('color', 'red').html(msg.error);
@@ -179,103 +197,120 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		});
 	}
 	</script>
-        <form name="frmRegister" method="POST" class="register">
-            <h1>Registration</h1>
+      
+        
+        <form id="RegForm" name="frmRegister" method="POST" class="register">
+        <div class="Row">
+        <h2 style="border-bottom:1px solid #c7c7c7; padding-bottom:5px; margin-bottom:15px;">Registration</h2>
 		    <?PHP if ($error){
-				?><div style="border: 1px solid red; color: red; background-color: pink; padding: 3px;">
+				?><div style="border: 1px solid red; color: red; background-color: pink; padding: 3px; margin-bottom: 10px;">
 				Error: <?=$error?>
 				</div><?PHP
 			}?>
-            <fieldset class="row1">
-                <legend>Account Details
-                </legend>
-				<p><label>Username *
-				</label><input name="username" type="text" value="<?=isset($_POST['username']) ? htmlentities($_POST['username']):''?>"
+            <h3>Account Details</h3>
+             <div class="Col1" style="background:none;">
+				<h5><sup>*</sup> Username &nbsp; <span id="username_check">
+				
+				</span></h5>
+				<input name="username" type="text" value="<?=isset($_POST['username']) ? htmlentities($_POST['username']):''?>"
 				onchange="username_check(this.value);"
 				/>
-				<span id="username_check">
 				
-				</span>
-				</p>
-                <p>
-                    <label>Email *
-                    </label>
-                    <input name="email" type="text" value="<?=isset($_POST['email']) ? htmlentities($_POST['email']):''?>"/>
-                    <label>Repeat email *
-                    </label>
-                    <input name="email_confirm" type="text" value="<?=isset($_POST['email_confirm']) ? htmlentities($_POST['email_confirm']):''?>"/>
-                </p>
-                <p>
-                    <label>Password*
-                    </label>
-                    <input name="password" type="password" value=""/>
-                    <label>Repeat Password*
-                    </label>
-                    <input name="password_confirm" type="password" value=""/>
-                    <label class="obinfo">* obligatory fields
-                    </label>
-                </p>
-            </fieldset>
-            <fieldset class="row2">
-                <legend title="Personal Details (used for invoicing)">Invoicing Details
-                </legend>
-                <p>
-                    <label class="optional">Name
-                    </label>
-                    <input  name="fullname" type="text" class="long" value="<?=isset($_POST['fullname']) ? htmlentities($_POST['fullname']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">Phone
-                    </label>
-                    <input  name="phone" type="text" maxlength="25" value="<?=isset($_POST['phone']) ? htmlentities($_POST['phone']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">Street 1
-                    </label>
-                    <input name="street1" type="text" class="long" value="<?=isset($_POST['street1']) ? htmlentities($_POST['street1']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">Street 2
-                    </label>
-                    <input name="street2" type="text" class="long" value="<?=isset($_POST['street2']) ? htmlentities($_POST['street2']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">City
-                    </label>
-                    <input name="city" type="text" class="long" value="<?=isset($_POST['city']) ? htmlentities($_POST['city']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">State
-                    </label>
-                    <input name="state"  type="text" class="long" value="<?=isset($_POST['state']) ? htmlentities($_POST['state']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">Zip
-                    </label>
-                    <input name="zip" type="text" maxlength="15" value="<?=isset($_POST['zip']) ? htmlentities($_POST['zip']):''?>"/>
-                </p>
-                <p>
-                    <label class="optional">Country
-                    </label>
-                    <input name="country" type="text" class="long" value="<?=isset($_POST['country']) ? htmlentities($_POST['country']):''?>"/>
-                </p>
-            </fieldset>
-            <fieldset class="row3">
-				<legend>Other Information</legend>
-                <div class="infobox"><h4>Helpful Information</h4>
-                    <p>The fields to the left are only used privately to personalize your <a target="_blank" href="showcase_invoice.php">invoices</a>. If you do not use the <a target="_blank" href="showcase_invoice.php">invoice</a> feature, you may leave it blank.</p>
-                </div>
-            </fieldset>
-            <fieldset class="row4">
-                <legend>Terms and Mailing
-                </legend>
-                <p class="agreement">
-                    <input type="checkbox" name="iagree_tc" value="1" <?=isset($_POST['iagree_tc']) ? 'checked ':''?>/>
-                    <label>*  I accept the <a target="_blank" href="terms.php">Terms and Conditions</a></label>
-                </p>
-            </fieldset>
-            <div><button class="button" type="submit">Register &raquo;</button></div>
+                <h5><sup>*</sup> Choose a password</h5>
+                <input name="password" type="password"  />
+             </div>
+             <div class="Col2">
+
+            <h5><sup>*</sup> What's your email address?</h5>
+            <input type="text" name="email" value="<?=isset($_POST['email']) ? htmlentities($_POST['email']):''?>" />
+            <h5><sup>*</sup> Re-type password:</h5>
+            <input name="password_confirm" type="password" />
+            </div>
+
+
+            </div>
+
+            <h3 id="headerDivImg">Invoicing Details  <a id="imageDivLink" href="javascript:toggle5('contentDivImg', 'imageDivLink');"> <img src="images/plus.png"></a></h3>  
+
+            
+            <div class="Row ContPopup" id="contentDivImg" style="display: none;">
+            <p>
+            These are the details that will show up when you invoice your client
+            </p>
+            <div class="Col1" style="background:none;" >
+            <h5>Name</h5>
+            <input name="fullname" type="text" class="long" value="<?=isset($_POST['fullname']) ? htmlentities($_POST['fullname']):''?>"/>
+            <h5>Street 1</h5>
+            <input name="street1" type="text" class="long" value="<?=isset($_POST['street1']) ? htmlentities($_POST['street1']):''?>"/>
+            <h5>City</h5>
+            <input name="city" type="text" class="long" value="<?=isset($_POST['city']) ? htmlentities($_POST['city']):''?>"/>
+            <h5>Zip/Postal Code</h5>
+            <input name="zip" type="text" maxlength="15" value="<?=isset($_POST['zip']) ? htmlentities($_POST['zip']):''?>"/>
+            </div>
+
+            <div class="Col2">
+            <h5>Phone:</h5>
+            <input name="phone" type="text" maxlength="25" value="<?=isset($_POST['phone']) ? htmlentities($_POST['phone']):''?>"/>
+            <h5> Street 2</h5>
+            <input name="street2" type="text" class="long" value="<?=isset($_POST['street2']) ? htmlentities($_POST['street2']):''?>"/>
+            <h5> State/Province</h5>
+            <input name="state" type="text" class="long" value="<?=isset($_POST['state']) ? htmlentities($_POST['state']):''?>"/>
+            <h5> Country</h5>
+            <input name="country" type="text" class="long" value="<?=isset($_POST['country']) ? htmlentities($_POST['country']):''?>"/>
+            </div>
+
+            </div>
+
+            <div class="Row">
+            <div class="Col1" style="background:none;">
+            <input name="iagree_tc" type="checkbox" <?=!empty($_POST['iagree_tc']) ? 'checked=checked' : ''?>/> <sup>*</sup> I accept the <a href="terms.php" target="_blank" class="termcond">Terms and Conditions</a>. </div>
+            <div class="Col2" style="float:right;">
+            <em style="float:right;"><sup>*</sup>obligatory fields.</em>
+            </div>
+            </div>
+            <input type="submit" />
         </form>
+        
+        <script>
+        $(function() {
+             <?PHP
+             //show the invoice details if we posted a non-empty value
+             if (!empty($_POST['fullname']) || 
+                 !empty($_POST['phone']) || 
+                 !empty($_POST['street1']) || 
+                 !empty($_POST['street2']) || 
+                 !empty($_POST['city']) || 
+                 !empty($_POST['state']) || 
+                 !empty($_POST['zip']) || 
+                 !empty($_POST['country']))
+             {
+                 ?>
+                 toggle5('contentDivImg', 'imageDivLink');        
+                 <?PHP
+             }
+             ?> 
+               var tabindexize = function(index, Element, evenorodd){
+                   console.log(index+' ' + Element + evenorodd);
+                   $('input[type=text],input[type=password],input[type=checkbox]', Element).each(function(i, elm){
+                        var odd = (evenorodd == 'odd');
+                        var startindex;
+                        if (index === 0){
+                           startindex = odd ? 1 : 2;
+                        }else if (index === 1){
+                           startindex = odd ? 5 : 6;
+                        }else if (index == 2){
+                           startindex = 13;
+                        }
+                        var tabindex = i*2 + startindex;
+                        $(this).attr('tabindex', tabindex);
+                  });              
+               }
+               $('.Col1').each(function(index, Element){ tabindexize(index, Element, 'odd'); });
+               $('.Col2').each(function(index, Element){ tabindexize(index, Element, 'even'); });
+          });
+		  </script>        
+        
+        
 		<?PHP if ($error && $error_field){
 		  ?>
 		  <script>
@@ -286,7 +321,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		  if (document.frmRegister['<?=$error_field2?>']){
 		     document.frmRegister['<?=$error_field2?>'].style.border = '1px solid red';
 		   }
-		  </script>
+          </script> 
 		  <?PHP
 		}?>
 		<?PHP
