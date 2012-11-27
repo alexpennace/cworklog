@@ -68,6 +68,8 @@
           <?=$separator?><a title="All Work Logs" href="work_log.php"><img border=0 src="images/work_logs.png" style="width: <?=$width?>px"></a>
           <?PHP if (!$w){ $width = '35'; } ?>
           <?=$separator?><a title="Add Work Log" href="#" onclick="$('#dlgAddWorkLog').dialog('open'); return false;"><img border=0 src="images/add_work_log.png" style="width: <?=$width?>px"></a>
+          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+          Got Windows? <a href="downloads/WorkLogGUI.latest.zip" title="Got Windows? Download the GUI"><img border=0 src="images/windowsicon.png"></a>
          <?PHP
       }
       
