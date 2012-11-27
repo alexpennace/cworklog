@@ -6,11 +6,11 @@ class work_log
     ?>
 	<script type="text/javascript">
 	  $(document).ready(function() {
-			$("#dlgAddWorkLog").dialog({ autoOpen: false, width: 500, height: 200 });
+			$("#dlgAddWorkLog").dialog({ autoOpen: false, width: 237, height: 300 });
 	  });
 	</script>
 	<div id="dlgAddWorkLog" title="Create work log" style="display: none">
-	<form name="frmAddWorkLog" method="POST" action="work_log.php">
+	<form id="frmAddWorkLog" name="frmAddWorkLog" method="POST" action="work_log.php">
 	<label>Title<input type="text" name="title" maxlength=100 /></label>
 	<br>
 	<label>Description<input type="text" name="description"/></label>

@@ -269,7 +269,7 @@
 	?>
 	  <form method="GET">
 	  <input type="hidden" name="smallbtn" value="<?=!empty($_GET['smallbtn'])?'1':'0'?>"/>
-	  <select style="width: 100%" name="wid" <?=!empty($_GET['smallbtn']) ? 'style="font-size: 75%"':''?> onchange="if (this.value != ''){ this.form.submit(); }">
+	  <select id="selbox_unlockedunpaid_worklogs" style="width: 100%" name="wid" <?=!empty($_GET['smallbtn']) ? 'style="font-size: 75%"':''?> onchange="if (this.value != ''){ this.form.submit(); }">
 	  <option value="">-- Choose a work log --</option>
 	  <?PHP
 	  $selected = false;

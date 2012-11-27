@@ -346,8 +346,8 @@ $(document).bind('keydown', function(e) {
 </script>
 <script>
   $(document).ready(function() {
-        $("#dlgAddNote").dialog({ autoOpen: false, width: 250, height: 155 });
-		$("#dlgAddFile").dialog({ autoOpen: false, width: 250, height: 170 });
+        $("#dlgAddNote").dialog({ autoOpen: false, width: 240, height: 190 });
+		$("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
   });
 </script>
 	<style>
@@ -580,7 +580,7 @@ $(document).bind('keydown', function(e) {
 </div>
 
 <div id="dlgAddNote" title="Add Note" style="display: none">
-<form name="frmAddNote" method="POST">
+<form id="frmAddNote" name="frmAddNote" method="POST">
 <input type="hidden" name="work_log_id" value="" />
 <label><textarea name="text" rows=3 cols=25></textarea></label>
 <input type="submit" value="Add Note" />
@@ -595,10 +595,10 @@ table.tblFileMods td{ padding:2px; }
 </style>
 
 <div id="dlgAddFile" title="Add File/Database Change" style="display: none">
-<form name="frmAddFile" method="POST">
+<form id="frmAddFile" name="frmAddFile" method="POST">
 <input type="hidden" name="work_log_id" value="" />
 <label>Feature 
-<input type="text" name="feature" value="">
+<input type="text" name="feature" value="" style="width: 90%">
 <?PHP
   $sql = "SELECT feature, file, change_type, notes FROM files_log JOIN work_log ON work_log.id = work_log_id WHERE user_id = ".(int)$_SESSION['user_id'];
   if (isset($_GET['company_id'])){
@@ -685,9 +685,9 @@ table.tblFileMods td{ padding:2px; }
 </select>
 </label>
 <br>
-<label>File/Table<input type="text" name="file" value=""/></label><br>
+<label>File/Table<input type="text" name="file" value="" style="width: 90%"/></label><br>
 Notes<br>
-<textarea name="notes" style="width: 100%"></textarea><br>
+<textarea name="notes" style="width: 90%"></textarea><br>
 <input type="submit" value="Add File" />
 </form>
 </div>

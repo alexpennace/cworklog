@@ -583,7 +583,6 @@ height:auto;
   border-radius: 5px; /* CSS3 */
   margin-bottom:20px;
   color:#333;
-  font-size: 1.45em;
 }
 #RegForm input[type="submit"]{
 	display:block;
@@ -774,4 +773,21 @@ margin-top:15px;
 
 .success{
 	padding:15px 0;
+}
+
+
+.yui-skin-sam .yui-dt th {
+   background: #D8D8DA url(sprite.png) repeat-x 0 0;
+}
+
+.yui-skin-sam .yui-dt th, .yui-skin-sam .yui-dt th a {
+    font-weight: normal;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.yui-skin-sam .yui-dt th {
+text-align: left;
+font-weight: bold;
 }
