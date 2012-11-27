@@ -230,12 +230,12 @@ if (isset($_POST['username']) && isset($_POST['email']))
 
             </div>
 
-            <h3 id="headerDivImg">Invoicing Details  <a id="imageDivLink" href="javascript:toggle5('contentDivImg', 'imageDivLink');"> <img src="images/plus.png"></a></h3>  
+            <h3 id="headerDivImg"><a style="color: black" href="javascript:toggle5('contentDivImg', 'imageDivLink');">Invoicing Details</a>  <a id="imageDivLink" href="javascript:toggle5('contentDivImg', 'imageDivLink');"> <img src="images/plus.png"></a></h3>  
 
             
             <div class="Row ContPopup" id="contentDivImg" style="display: none;">
             <p>
-            These are the details that will show up when you invoice your client
+            Feel free to enter your invoicing details. These will show up when you invoice your client.
             </p>
             <div class="Col1" style="background:none;" >
             <h5>Name</h5>

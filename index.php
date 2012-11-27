@@ -93,8 +93,9 @@ It is easy:
 <p>
 <h4>What is the catch?</h4>
 <p>
-If you like Contractor's Work Log, you can buy/download a business edition for your own local server running PHP/MySQL. 
-In fact, Contractor's Work Log started as a private endeavor on one local machine, and was later made available to the public after 37 weeks of testing.
+Right now, nothing.
+In the future, CWorkLog may turn into a business endeavor charging monthly or allowing a private download to a php/mysql server. If you have any input on this or would like to help test, please post a message on the <a href="http://www.donationcoder.com/forum/index.php?topic=32772.0" target="_blank" style="color: blue">donation coder forum</a>
+Contractor's Work Log started as a private endeavor on one local machine, and was later made available to the public after 37 weeks of testing.
 </p>
 </div>
 
