@@ -5,3 +5,6 @@ deploy.sh
 
 #ignore config file so that whoever is installing this on their server can change the info
 lib/config.inc.php
+
+#ignore all tar.gz releases
+releases/*
