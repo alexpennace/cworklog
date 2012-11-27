@@ -175,7 +175,7 @@ table{ border-left: 1px solid #C1DAD7; }
 <script type="text/javascript" src="js/date.js"></script>
 </head>
 <body>
-<?PHP Members::MenuBar(); ?>
+<?PHP Members::MenuBarCompact(); ?>
 <script>
 timelog_OnFormSubmit = function(form){
   //check for valid date?

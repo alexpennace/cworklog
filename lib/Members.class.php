@@ -3,6 +3,61 @@
     require_once('lib/work_log.class.php');
 	class Members
 	{
+        public static function MenuBarCompact(){
+          $name = $_SESSION['user_row']['name'];
+          if (empty($name)){
+             $name = $_SESSION['user_row']['username'];
+          }
+          ?>
+        <style>
+        #Header2{
+            background:url(images/top_nav_block.jpg) repeat-x left top ;
+            height:37px;
+            width:98%;
+            padding:0 1%;
+            margin:0
+        }
+        </style>
+        
+        <div id="Header2">
+          <div class="Row" >
+             <div style="float:left;" ><a href="index.php"><img border=0 src="images/Inr_hdr_logo.jpg" width="122" height="37" /></a>
+ 				<?PHP if (self::IsLoggedIn()){
+                  require_once('lib/Site.class.php');
+                  ?><span style="margin-top: -10px"><?PHP
+                  Site::ImgLinks();
+                  
+                  
+                        $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 
+                                WHERE stop_time IS NULL AND work_log.user_id = ".(int)$_SESSION['user_id'];
+                        $result = mysql_query($sql);
+                       $time_logs_unfinished = array();
+                        if ($result){
+                         
+                           echo '<div id="unfinished" style="float:left"> &nbsp; ';
+                           while($row = mysql_fetch_assoc($result)){
+                              $time_logs_unfinished[] = $row;
+                              
+                           }
+                           $num_unfinished = count($time_logs_unfinished);
+                     
+                           if ($num_unfinished > 0){
+                                foreach($time_logs_unfinished as $tlrow){
+                                   $wl = new work_log($tlrow['work_log_id']);
+                                   $wlrow = $wl->getRow();
+                                   echo '<a href="#work_log.php" title="'.htmlentities($wlrow['company_name'].' - '.$wlrow['title']).'" onclick="poptimer(\'time_log.php?tid=latest&wid='.$tlrow['work_log_id'].'\'); return false;" title=" in progress"><img src="images/progressbar.png" border=0></a></div>';
+                                }
+                           }
+                           echo '</div>';
+                        }
+                    }
+                ?></span></div>   
+              <div style="float:right" id="topnavigation"><a href="settings.php"><img src="images/user_icon.jpg" width="23" height="26" alt="User Image" align="absmiddle"  /> Welcome <?=$name?></a>| <a href="settings.php"><img src="images/setting_icon.jpg" width="20" height="26" alt="Setting" align="absmiddle" /> Settings</a>| <a href="index.php?logout=1"><img src="images/logout_icon.jpg" width="18" height="26" alt="Logout" align="absmiddle" /> LogOut</a></div>                
+          </div> 
+        </div>
+           <?PHP
+        }
+        
         public static function MenuBarOpenBottomLeftOpen(){
           $name = $_SESSION['user_row']['name'];
           if (empty($name)){
