@@ -491,7 +491,7 @@ $(document).bind('keydown', function(e) {
           <?PHP
           Members::MenuBarBottomLeftCloseRightOpen();
           ?>
-          <select style="margin-top: 10px" onchange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value; } else { window.location.href = 'companies.php'; }">
+          <select style="margin-top: 10px" onChange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value; } else { window.location.href = 'companies.php'; }">
             <option value="">-- Company --</option>
             <option value="">[All Companies]</option>
             <?PHP
@@ -505,7 +505,7 @@ $(document).bind('keydown', function(e) {
             <?PHP
               if (!empty($specific_company_id)){
             ?>
-                <select onchange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&filter[]=unpaid';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
+                <select onChange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&filter[]=unpaid';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
                 <option value="" selected>-- Work Log --</option>
                 <option value="" <?=!$unpaid && !$paid? 'selected' : ''?>>[All Work Logs]</option>
                 <option value="unpaid" <?=$unpaid ? 'selected' : ''?>>[Unpaid Work Logs]</option>
@@ -551,7 +551,7 @@ $(document).bind('keydown', function(e) {
      return $qs;
    }
 ?>
-
+<div class="dataBlk">
 
 <?PHP
    if (isset($_GET['company'])){
@@ -574,15 +574,22 @@ $(document).bind('keydown', function(e) {
       }
    }
 ?>
-<div class="dataBlk">
+
 <div id="basic">
+</div>
+<div class="SummaryBlock">
+<?PHP
+ echo 'Total Work Logs: <strong>'.count($rows).'</strong>
+      <br>Total Calculated Hours: <strong>'.round($super_total_hours, 3).'</strong> 
+      <br>Total Calculated Amount: <strong>$'.round($super_total_amount, 2).'</strong>';
+?>
 </div>
 </div>
 
-<div id="dlgAddNote" title="Add Note" style="display: none">
-<form id="frmAddNote" name="frmAddNote" method="POST">
+<div id="dlgAddNote" title="Add Note" style="display: none;">
+<form name="frmAddNote" method="POST" id="frmAddNote">
 <input type="hidden" name="work_log_id" value="" />
-<label><textarea name="text" rows=3 cols=25></textarea></label>
+<textarea name="text" ></textarea>
 <input type="submit" value="Add Note" />
 </form>
 </div>
@@ -595,7 +602,7 @@ table.tblFileMods td{ padding:2px; }
 </style>
 
 <div id="dlgAddFile" title="Add File/Database Change" style="display: none">
-<form id="frmAddFile" name="frmAddFile" method="POST">
+<form name="frmAddFile" method="POST" id="frmAddFile">
 <input type="hidden" name="work_log_id" value="" />
 <label>Feature 
 <input type="text" name="feature" value="" style="width: 90%">
@@ -692,13 +699,13 @@ Notes<br>
 </form>
 </div>
 
-<div class="SummaryBlock">
+<?php /*?><div class="SummaryBlock">
 <?PHP
  echo 'Total Work Logs: <strong>'.count($rows).'</strong>
       <br>Total Calculated Hours: <strong>'.round($super_total_hours, 3).'</strong> 
       <br>Total Calculated Amount: <strong>$'.round($super_total_amount, 2).'</strong>';
 ?>
-</div>
+</div><?php */?>
 
 <form name="frmDeleteNote" style="display: none" method="POST">
 <input type="hidden" name="delete_note" value="1"/>
