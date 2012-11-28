@@ -5,7 +5,6 @@
   $start_time = false;
   $work_log_id = isset($_GET['wid']) ? (int)$_GET['wid'] : false;
   $resume_time_log = false;
-  
 
   
   //get a list of work logs that are not locked and unpaid so we can keep working on it
