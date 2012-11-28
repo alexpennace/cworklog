@@ -517,3 +517,7 @@ background-color: #FFF5EF;
 .yui-skin-sam tr.yui-dt-odd td.yui-dt-asc, .yui-skin-sam tr.yui-dt-odd td.yui-dt-desc {
 background-color: #FDE8DC;
 }
+
+.yui-skin-sam tr.yui-dt-highlighted, .yui-skin-sam tr.yui-dt-highlighted td.yui-dt-asc, .yui-skin-sam tr.yui-dt-highlighted td.yui-dt-desc, .yui-skin-sam tr.yui-dt-even td.yui-dt-highlighted, .yui-skin-sam tr.yui-dt-odd td.yui-dt-highlighted {
+background-color: #FCB279;
+}
