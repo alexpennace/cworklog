@@ -153,7 +153,7 @@ if (!empty($warning)){
 </div><?PHP
 }
 else if (!empty($areyousuremessage)){ ?>
-<form method="POST" onsubmit="if (confirm('You will permanently lose all information. Are you sure you want to continue?')){ return true; }else{ return false; }">
+<form id="Deletelog" method="POST" onsubmit="if (confirm('You will permanently lose all information. Are you sure you want to continue?')){ return true; }else{ return false; }">
 <?PHP
   foreach($hidden_elements as $he){
      foreach($he as $key => $value){
