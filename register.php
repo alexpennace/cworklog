@@ -140,8 +140,11 @@ if (isset($_POST['username']) && isset($_POST['email']))
     <head>
         <title><?=Site::$title?> - Registration</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <link rel="stylesheet" type="text/css" href="css/stylesheet.css"/>
-		<script src="js/jquery-1.8.2.js"></script>
+        <?PHP
+          Site::CssJsYuiIncludes();
+          Site::CssJsJqueryIncludes();
+          Site::Css();
+        ?>
     </head>
     <body>
     <div id="Wrapper">

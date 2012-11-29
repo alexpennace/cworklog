@@ -1,5 +1,6 @@
 <?PHP
  require_once('lib/Members.class.php');
+ require_once('lib/Site.class.php');
  Members::SessionAllowLogin();
  $ERROR_MSG = '';
  if (isset($_POST['username_or_email'])){
@@ -31,6 +32,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Contractor's Work Log</title>
+<?PHP
+  Site::CssJsYuiIncludes();
+  Site::CssJsJqueryIncludes();
+  Site::Css();
+?>
 <?PHP if (!empty($_REQUEST['mobile'])){ ?>
 <style>
 form label input { width: 100%; }
@@ -38,8 +44,6 @@ img { width: 16px; }
 body { font-size: 10px; }
 input { font-size: 10px; }
 </style>
-<?PHP }else{ ?>
-<link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
 <?PHP } ?>
 </head>
 <body>
