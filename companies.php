@@ -81,7 +81,7 @@
    
    $specific_company_id = isset($_GET['company']) ? (int)$_GET['company'] : false;
 ?>
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
 <head>
 <title>Companies</title>

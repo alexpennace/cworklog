@@ -98,7 +98,7 @@ if (isset($_POST)){
    }
 }//end if POSTing updates
 ?>
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
 <head>
 <title>Settings - <?=Site::$title?></title>
