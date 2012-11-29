@@ -1,6 +1,7 @@
 <?PHP
    require_once('lib/db.inc.php');
    require_once('lib/Members.class.php');
+   require_once('lib/Site.class.php');
    Members::SessionForceLogin();
    
    if (isset($_REQUEST['ajax'])){
@@ -98,11 +99,15 @@
     
    $super_total_seconds = 0;
 ?>
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <title>Time Log</title>
-<link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+<?PHP
+  Site::CssJsYuiIncludes();
+  Site::CssJsJqueryIncludes();
+  Site::Css();
+?>
 <link rel="stylesheet" type="text/css" href="css/theme.css" />
 <style>
 th {

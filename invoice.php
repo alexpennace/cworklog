@@ -41,6 +41,7 @@ if (empty($company_row) || !$result){
 $usetables = false;
 ob_start();
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <!-- 
 
 	Basic HTML/CSS Invoice
