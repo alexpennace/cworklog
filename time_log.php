@@ -1,6 +1,7 @@
 <?PHP
   require_once('lib/db.inc.php');
   require_once('lib/Members.class.php');
+  require_once('lib/Site.class.php');
   Members::SessionForceLogin();
   $start_time = false;
   $work_log_id = isset($_GET['wid']) ? (int)$_GET['wid'] : false;
@@ -122,7 +123,11 @@
   <!DOCTYPE html>
   <html>
   <head>
-  <script src="js/jquery-1.8.0.min.js"></script>
+<?PHP
+  Site::CssJsYuiIncludes();
+  Site::CssJsJqueryIncludes();
+  Site::Css();
+?>
   <script type="text/javascript" src="js/date.js"></script>
   <script type="text/javascript">
 

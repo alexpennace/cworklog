@@ -1,6 +1,7 @@
 <?PHP
    require_once('lib/db.inc.php');
    require_once('lib/Members.class.php');
+   require_once('lib/Site.class.php');
    Members::SessionAllowLogin();
    $error = false;
    $success = false;
@@ -47,7 +48,11 @@
 <html>
 <head>
 <title>Verify Code</title>
-<link rel="stylesheet" type="text/css" href="css/stylesheet.css" /> 
+<?PHP
+  Site::CssJsYuiIncludes();
+  Site::CssJsJqueryIncludes();
+  Site::Css();
+?>
 </head>
 <body>
 <?PHP Members::MenuBar(); ?>
