@@ -1,3 +1,18 @@
+<?PHP
+  require_once('lib/Site.class.php');
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Terms - Contractor's Work Log</title>
+<?PHP
+  Site::CssJsYuiIncludes();
+  Site::CssJsJqueryIncludes();
+  Site::Css();
+?>
+</head>
+<body>
         <h1>Terms of Service</h1>
         <p>By using Contractor's Work Log or any of its sub-domain websites ("Service"), you are agreeing to be bound by the following terms and conditions ("Terms of Service").</p>
         <p>Contractor's Work Log reserves the right to update and change the Terms of Service from time to time without notice. Any new features that augment or enhance the current Service, including the release of new tools and resources, shall be subject to the Terms of Service. Continued use of the Service after any such changes shall constitute your consent to such changes. You can review the most current version of the Terms of Service at any time at: http://www.cworklog.com/terms.php</p>
@@ -41,3 +56,5 @@
             <li>The failure of Contractor's Work Log to exercise or enforce any right or provision of the Terms of Service shall not constitute a waiver of such right or provision. The Terms of Service constitutes the entire agreement between you and Contractor's Work Log and govern your use of the Service, superseding any prior agreements between you and Contractor's Work Log (including, but not limited to, any prior versions of the Terms of Service).</li>
           </ol>
         </p>
+</body>
+</html>
