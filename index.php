@@ -39,47 +39,40 @@
 ?>
 <?PHP if (!empty($_REQUEST['mobile'])){ ?>
 <style>
-form label input { width: 100%; }
+form label input { width: 90%; }
 img { width: 16px; }
 body { font-size: 10px; }
+a { color: green; }
 input { font-size: 10px; }
 </style>
 <?PHP } ?>
 </head>
 <body>
 <?PHP if (!empty($_REQUEST['mobile'])){ ?>
-<img src="images/time_log_clipboard.png" />
-<?PHP
-   if ($logged_in){
-      echo 'Welcome '.$logged_in['first_name'];
-   }else{
-      echo 'Not logged in';
-   }
-?>
+<img src="images/time_log_clipboard.png" />Login below or <a href="register.php">Register free</a>
 <form name="frmLogin" action="index.php" method="POST">
 <input type="hidden" name="mobile" value="1" />
 <?PHP
   if (isset($_REQUEST['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_REQUEST['goto'])?>"/><?PHP }
   if (!empty($ERROR_MSG)){ 
-    ?><div class="error">
-    <?=$ERROR_MSG?>
-    </div><?PHP
+    echo '<div style="padding: 2px; margin: 3px; border: 1px dashed black;">'.$ERROR_MSG.'</div>';
   }
 ?>
 <label>Username/Email <input type="text" name="username_or_email" value="<?=isset($_REQUEST['username_or_email']) ? htmlentities($_REQUEST['username_or_email']) : ''?>"/></label>
 <br />
-<label>Password <input type="password" name="password" value="<?=isset($_REQUEST['pw'])?htmlentities($_REQUEST['pw']):''?>"/>
-<br />
+<label>Password <input type="password" name="password" value="<?=isset($_POST['pw'])?htmlentities($_POST['pw']):''?>"/>
+<div style="text-align: center">
 <input type="submit" value="Login" />
+</div>
 </form>
 <?PHP 
 //automatically log in if username and password is provided
-if (!empty($_REQUEST['username_or_email']) && !empty($_REQUEST['pw'])){ ?>
+if (!empty($_REQUEST['username_or_email']) && !empty($_POST['pw'])){ ?>
 <script>
 document.frmLogin.submit();
 </script>
 <?PHP } ?>
-Not registered? <a href="register.php">Register free</a>
+
 <?PHP }else{ ?>
 <div id="Wrapper">
 <div class="logost"><img src="images/logo.jpg" width="412" height="136" /></div>
