@@ -481,10 +481,34 @@ margin-top:15px;
 	font-weight:bold;
 	
 	}
-#formsetting input[type="text"]!important,#formsetting input[type="password"]!important{
+	#formsetting label,#formsetting1 label,#formsetting2 label {
+		font-family:Arial, Helvetica, sans-serif;
+		color:#252525;
+	}
+#formsetting input[type="text"]!important,#formsetting1 input[type="text"]!important,#formsetting2 input[type="text"]!important, #formsetting input[type="password"]!important,#formsetting1 input[type="password"]!important,#formsetting2 input[type="password"]!important {
 	width:140px;
 	padding:5px;
+	-webkit-border-radius: 5px!important;
+-moz-border-radius: 5px!important;
+border-radius: 5px!important;
 	
+}
+#formsetting  input[type="submit"],#formsetting2  input[type="submit"],#formsetting3  input[type="submit"] {
+background: #ABDA0F url(../images/overlay.png) repeat-x;
+padding: 8px 10px 8px;
+color: white;
+text-decoration: none;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+cursor: pointer;
+float: left;
+font-size: 18px;
+margin: 10px border:none;
+width: 205px;
+text-align: center;
 }
 .success{
 	padding:15px 0;
@@ -520,4 +544,11 @@ background-color: #FDE8DC;
 
 .yui-skin-sam tr.yui-dt-highlighted, .yui-skin-sam tr.yui-dt-highlighted td.yui-dt-asc, .yui-skin-sam tr.yui-dt-highlighted td.yui-dt-desc, .yui-skin-sam tr.yui-dt-even td.yui-dt-highlighted, .yui-skin-sam tr.yui-dt-odd td.yui-dt-highlighted {
 background-color: #FCB279;
+}
+
+.ui-widget #formsetting input, .ui-widget #formsetting select, .ui-widget #formsetting textarea, .ui-widget #formsetting button{
+	-webkit-border-radius: 5px!important;
+-moz-border-radius: 5px!important;
+border-radius: 5px!important;
+	
 }

@@ -98,7 +98,9 @@ if (isset($_POST)){
    }
 }//end if POSTing updates
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<!DOCTYPE html>
+
 <html>
 <head>
 <title>Settings - <?=Site::$title?></title>
@@ -134,17 +136,27 @@ if (isset($_POST)){
      echo '<div class="error">'.$error.'</div>';
   }
 ?>
-<div id="accordion">
-  <h3>Change Password</h3>
+
+<div id="accordion"  style="padding:0 1%;">
+
+  <h3><strong>Change Password</strong></h3>
+
     <div>
-        <form method="POST">
-        <label>Current Password: <input type="password" name="pw_current"/></label><br>
-        <label>New Password: <input type="password" name="pw_new"/></label><br>
-        <label>Confirm Password: <input type="password" name="pw_new_confirm"/></label><br>
+
+        <form method="POST" id="formsetting">
+
+        <label >Current Password: </label><input type="password" name="pw_current"/><br>
+
+        <label>New Password: </label><input type="password" name="pw_new"/><br>
+
+        <label>Confirm Password:</label><input type="password" name="pw_new_confirm"/><br>
+
         <input type="submit" value="Change Password"/>
         </form>
     </div>
-    <h3>Change Email 
+
+    <h3><strong>Change Email </strong>
+
     <?PHP 
     echo '('.$_SESSION['user_row']['email'].') ';
     
@@ -152,24 +164,41 @@ if (isset($_POST)){
         echo '*Pending change to '.$_SESSION['user_row']['verify_param']; 
     }?></h3>
     <div>
-        <form method="POST">
-        <label>Current Password: <input type="password" name="pw_current"/></label><br>
-        <label>New Email: <input type="text" name="email_new"/></label><br>
+
+        <form method="POST" id="formsetting">
+
+        <label>Current Password: </label><input type="password" name="pw_current"/><br>
+
+        <label>New Email: </label><input type="text" name="email_new"/><br>
+
         <input type="submit" value="Change Email Address"/>
         </form>
     </div>
-    <h3>Change Address</h3>
+
+    <h3><strong>Change Address</strong></h3>
+
     <div>
-        <form method="POST">
-        <b>This address will be used in generating a pdf invoice</b><br>
-        <label>Name<input type="text" name="name" value="<?=$user_row['name']?>"/></label><br>
-        <label>Street<input type="text" name="street" value="<?=$user_row['street']?>"/></label><br>
-        <label>Street2<input type="text" name="street2" value="<?=$user_row['street2']?>"/></label><br>
-        <label>City<input type="text" name="city" value="<?=$user_row['city']?>"/></label><br>
-        <label>State<input type="text" name="state" value="<?=$user_row['state']?>"/></label><br>
-        <label>Zip<input type="text" name="zip" value="<?=$user_row['zip']?>"/></label><br>
-        <label>Country<input type="text" name="country" value="<?=$user_row['country']?>"/></label><br>
-        <label>Phone<input type="text" name="phone" value="<?=$user_row['phone']?>"/></label><br>
+
+        <form method="POST" id="formsetting">
+
+        <b>This address will be used in generating a pdf invoice</b><br><br>
+
+        <label>Name</label><input type="text" name="name" value="<?=$user_row['name']?>"/><br>
+
+        <label>Street</label><input type="text" name="street" value="<?=$user_row['street']?>"/><br>
+
+        <label>Street2</label><input type="text" name="street2" value="<?=$user_row['street2']?>"/><br>
+
+        <label>City</label><input type="text" name="city" value="<?=$user_row['city']?>"/><br>
+
+        <label>State</label><input type="text" name="state" value="<?=$user_row['state']?>"/><br>
+
+        <label>Zip</label><input type="text" name="zip" value="<?=$user_row['zip']?>"/><br>
+
+        <label>Country</label><input type="text" name="country" value="<?=$user_row['country']?>"/><br>
+
+        <label>Phone</label><input type="text" name="phone" value="<?=$user_row['phone']?>"/><br>
+
         <input type="submit" value="Change Address"/>
         </form>
     </div>

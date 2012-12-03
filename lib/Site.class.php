@@ -35,7 +35,7 @@
 		<!-- new jquery includes -->
 		<link href="css/jqueryui/themes/smoothness/jquery-ui-1.9.1.custom.min.css" rel="stylesheet" type="text/css"/>
 		<script src="js/jquery-1.8.2.js"></script>
-		<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+	    <script src="js/jquery-ui-1.9.1.custom.min.js"></script>
         <style type="text/css">
          .ui-dialog , .ui-autocomplete{ font-size: 85%; }
         </style>
