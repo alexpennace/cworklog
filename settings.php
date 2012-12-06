@@ -171,7 +171,7 @@ if (isset($_POST)){
 
         <label>New Email: </label><input type="text" name="email_new"/><br>
 
-        <input type="submit" value="Change Email Address"/>
+        <input type="submit" value="Change Email"/>
         </form>
     </div>
 

@@ -232,7 +232,7 @@
   ?>
   <style>
   #company_name{ font-weight: bold; }
-  .bigButton { text-align: center; width: 100%; height: 80%; height: 80vh; <?=$browser_detect->isMobile() ? 'font-size: 270px; font-size: 75vw;' : 'font-size: 75%; font-size: 35vw;'?> }
+  .bigButton { text-align: center; width: 100%; <?=(strlen(strstr($_SERVER['HTTP_USER_AGENT'],"Firefox")) > 0 ? 'height: 170px;' : 'height: 80%; ')?>height: 80vh;  <?=$browser_detect->isMobile() ? 'font-size: 270px; font-size: 75vw;' : 'font-size: 75%; font-size: 35vw;'?> }
   .smallButton { margin-top: -13px; width: 100%; height: 50px; font-size: 15px; }
   #time, #wl_time{ font-size: 10px; }
   form { display: block; margin: 0px; padding: 0px;}
