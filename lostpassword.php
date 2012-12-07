@@ -24,7 +24,7 @@ if (!empty($_POST)){
               if (Site::$use_php_mail){
                  $mailed = mail($_POST['email'], 'Contractor\'s Work Log Reset Password', 
                     "Please reset your password by going to the link below:\r\n".
-                    Site::$base_url.'verify.php?resetpwcode='.$code.'&email='.htmlentities($_POST['email']), 
+                    Site::$base_url.'verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 
                     Site::$email_from_header);
                  
                  if ($mailed){
