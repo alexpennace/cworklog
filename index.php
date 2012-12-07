@@ -88,11 +88,21 @@ It is easy:
 <b>Simple</b>, <b>Easy</b>, and <b>Free</b>.
 </p>
 <p>
+<h4>Why Contractor's Work Log?</h4>
+    <ul>
+    <li> <b>Features Include: </b></li>
+    <li> - Keep track of all your clients</li>
+    <li> - Easily click Start/Stop to track billable time</li>
+    <li> - Change your hourly rate per work log (billable cycle)</li>
+    <li> - Pad your invoice if needed, despite the time worked</li>
+    <li> - One-click PDF generated invoice</li>
+    </ul>
+<br>
 <h4>What is the catch?</h4>
 <p>
-Right now, nothing.
-In the future, CWorkLog may turn into a business endeavor charging monthly or allowing a private download to a php/mysql server. If you have any input on this or would like to help test, please post a message on the <a href="http://www.donationcoder.com/forum/index.php?topic=32772.0" target="_blank" style="color: blue">donation coder forum</a>.
-Start as a private endeavor on one local machine, Contractor's Work Log was later made available to the public after 37 weeks of testing.
+Contractor's Work Log may turn into a business endeavor charging monthly or allowing a private download to a php/mysql server. If you have any input on this or would like to help test, please post a message on the <a href="http://www.donationcoder.com/forum/index.php?topic=32772.0" target="_blank" style="color: blue">donation coder forum</a>.
+It started as a private endeavor on one local machine, Contractor's Work Log was later made available to the public after 37 weeks of testing.
+It is still considered beta and the help and feedback is appreciated.
 </p>
 </div>
 
@@ -108,9 +118,9 @@ Start as a private endeavor on one local machine, Contractor's Work Log was late
   }
 ?>
 <h5>Username:</h5>
-<input type="text" name="username_or_email"  />
+<input type="text" name="username_or_email" tabindex=1/>
 <h5>Password: <a align=right class="littletext link" href="lostpassword.php">Lost your password?</a> </h5>
-<input type="password" name="password"/>
+<input type="password" name="password" tabindex=2/>
 <input type="submit" value=""/>
 </form>
 <a href="register.php"><img border=0 src="images/register_btn.jpg" width="341" height="59" alt="Register" class="MrgnLft25" /></a>
