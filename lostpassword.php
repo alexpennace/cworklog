@@ -23,7 +23,7 @@ if (!empty($_POST)){
            if (mysql_affected_rows() == 1){
               if (Site::$use_php_mail){
                  $mailed = mail($_POST['email'], 'Contractor\'s Work Log Reset Password', 
-                    "Here is your new password\r\n".
+                    "Please reset your password by going to the link below:\r\n".
                     Site::$base_url.'verify.php?resetpwcode='.$code.'&email='.htmlentities($_POST['username']), 
                     Site::$email_from_header);
                  
