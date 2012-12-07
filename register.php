@@ -76,11 +76,11 @@ if (isset($_POST['username']) && isset($_POST['email']))
    }
    else
    {
-		$sql = "INSERT INTO user (id,	username,	password,	email,	phone,	name,	street,	street2,	city,	state,	zip,	country,	status,	verify_code)
+		$sql = "INSERT INTO user (id,	username,	password,	email,	phone,	name,	street,	street2,	city,	state,	zip,	country,	status,	verify_code, date_created)
 		        VALUES (NULL, '%s', MD5('%s'), 
 				'%s', '%s', 
 				'%s', '%s', '%s', '%s', '%s', '%s', '%s', 
-				%d, '%s');";
+				%d, '%s', NOW());";
 		$verify_code = random_string(25);
         
 

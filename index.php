@@ -91,8 +91,8 @@ It is easy:
 <h4>What is the catch?</h4>
 <p>
 Right now, nothing.
-In the future, CWorkLog may turn into a business endeavor charging monthly or allowing a private download to a php/mysql server. If you have any input on this or would like to help test, please post a message on the <a href="http://www.donationcoder.com/forum/index.php?topic=32772.0" target="_blank" style="color: blue">donation coder forum</a>
-Contractor's Work Log started as a private endeavor on one local machine, and was later made available to the public after 37 weeks of testing.
+In the future, CWorkLog may turn into a business endeavor charging monthly or allowing a private download to a php/mysql server. If you have any input on this or would like to help test, please post a message on the <a href="http://www.donationcoder.com/forum/index.php?topic=32772.0" target="_blank" style="color: blue">donation coder forum</a>.
+Start as a private endeavor on one local machine, Contractor's Work Log was later made available to the public after 37 weeks of testing.
 </p>
 </div>
 
@@ -109,7 +109,7 @@ Contractor's Work Log started as a private endeavor on one local machine, and wa
 ?>
 <h5>Username:</h5>
 <input type="text" name="username_or_email"  />
-<h5>Password:</h5>
+<h5>Password: <a align=right class="littletext link" href="lostpassword.php">Lost your password?</a> </h5>
 <input type="password" name="password"/>
 <input type="submit" value=""/>
 </form>

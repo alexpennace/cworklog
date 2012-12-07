@@ -273,41 +273,42 @@ height:auto;
 	margin-right:5px;
 	
 }
-/*New Registration Pages CSS*/
-#RegForm{
+/*New Registration Page, Lost Password Page, and verify.php's Reset Passoword Page CSS*/
+#RegForm, #LostPasswordForm, #frmResetPassword{
 	padding:0px;
 	margin:0px;
 	color:#252525;
 }
-#RegForm sup{
+#RegForm sup, #LostPasswordForm sup, #frmResetPassword sup{
 	color:#f00;
 	}
 	
-#RegForm h3{
+#RegForm h3, #LostPasswordForm h3, #frmResetPassword h3{
 	font-family:Arial, Helvetica, sans-serif;
 	font-weight:600;
 	color:#333;
 	margin-bottom:10px;
 	font-size:18px;
 }
-#RegForm h5{
+#RegForm h5, #LostPasswordForm h5, #frmResetPassword h5{
 	font-family:Arial, Helvetica, sans-serif;
 	font-weight:600;
 	color:#333;
 	margin-bottom:5px;
 	font-size:13px;
 }
-#RegForm input[type="text"],#RegForm input[type="password"]{
+#RegForm input[type="text"],#RegForm input[type="password"], #LostPasswordForm input[type="text"], #LostPasswordForm input[type="password"], #frmResetPassword input[type="password"]{
 	display:block;
 	width:92%;
 	padding:15px 10px;
 	border:1px solid #ccc;
 	background:#fff;
-	 -moz-border-radius: 5px; /* Firefox */
-  -webkit-border-radius: 5px; /* Safari, Chrome */
-  border-radius: 5px; /* CSS3 */
-  margin-bottom:20px;
-  color:#333;
+	-moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari, Chrome */
+    border-radius: 5px; /* CSS3 */
+    margin-bottom:20px;
+    color:#333;
+    font-size: 1.75em;
 }
 #RegForm input[type="submit"]{
 	display:block;
@@ -321,6 +322,23 @@ height:auto;
 	margin:10px auto 15px auto;
 	
 }
+
+#frmResetPassword input[type="submit"], #LostPasswordForm input[type="submit"]{
+	display:block;
+	background:url(../images/resetpassword_btn.png) no-repeat left top;
+	width:170px;
+	height:60px;
+	margin-bottom:20px;
+	text-indent:-9000px;
+	border:none;
+	cursor:pointer;
+	margin:10px auto 15px auto;
+}
+
+#frmResetPassword input[type="submit"]:hover, #LostPasswordForm input[type="submit"]:hover{
+	background-position: left -60px;
+}
+
 #RegForm input[type="submit"]:hover{
 	background-position: left -60px;
 }
@@ -551,4 +569,11 @@ background-color: #FCB279;
 -moz-border-radius: 5px!important;
 border-radius: 5px!important;
 	
+}
+
+.littletext{
+   font-size: .62em;
+}
+.link{
+   color: blue;
 }
