@@ -77,7 +77,7 @@ if (!empty($_POST)){
 		  if (!$error){
               ?>
               <div style="border: 1px solid green; color: green; padding: 10px;">
-              Thank you for resetting your password, please check your email for your newly generated password.
+              Thank you for resetting your password, please check your email for a link to reset your password.
               <a href="index.php?username_or_email=<?=urlencode($_POST['username'])?>">Login</a>
               </div>
               <?PHP
