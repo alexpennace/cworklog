@@ -808,9 +808,10 @@ YAHOO.util.Event.addListener(window, "load", function() {
        var formatExtra = function(elLiner, oRecord, oColumn, oData) {
                 var locked = oRecord.getData('locked') == '1';
                 var inprogress = oRecord.getData('_in_progress_');
+                var id = oRecord.getData('id');
                 
                 elLiner.innerHTML = locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' 
-                                           : (!inprogress ? ' <a href="time_log.php?wid='+ oRecord.getData('id') +'" onclick="poptimer(\'time_log.php?wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>' : '');
+                                           : (inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar.png" /></a>' : ' <a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>');
                 elLiner.innerHTML += gen_jquery_uimenu(oRecord.getData('id'), locked, inprogress);
                 return; //TODO: figure out something with previous little icons
                 
