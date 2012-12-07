@@ -294,6 +294,23 @@
   Site::CssJsJqueryIncludes();
   Site::Css();
 ?>
+<style>
+.ui-menu { width: 150px; font-size: .7em; }
+.actionmenu{ 
+  margin-left: 7px;
+  width: 22px;
+  float: right; 
+}
+.ui-menu a:hover{ color: white; }
+
+.ui-state-default, .ui-widget-content .ui-state-focus{
+    border: 1px solid #f09424;
+    background: orange;
+    font-weight: normal/*{fwDefault}*/;
+    color: white;
+    outline: none;
+}
+</style>
 <script type="text/javascript" src="js/work_log_shared.js"></script>
 <script type="text/javascript">
 var FALSE_FUNCTION = new Function( "return false" );
@@ -773,11 +790,31 @@ glbUpdateWorkLogJS = function(oData, oRecord){
 YAHOO.util.Event.addListener(window, "load", function() {
 
     YAHOO.example.Basic = function() {
+       var gen_jquery_uimenu = function(id, locked, inprogress){
+        return '<ul class="actionmenu"><li class="main"><a href="#">&nbsp;</a><ul>' + 
+            (locked ? '<li><a href="#" onclick="glbAjaxUpdateWorkLog('+id+',\'locked\',0, 1); return false;"><span class="ui-icon ui-icon-unlocked"></span>Unlock</a></li>' : 
+                   '<li><a href="#" onclick="glbAjaxUpdateWorkLog('+id+',\'locked\',1, 0); return false;"><span class="ui-icon ui-icon-locked"></span>Lock</a></li>') + 
+           (locked ? '<li><a target="_blank" href="invoice.php?wid='+id+'&format=pdf"><span class="ui-icon ui-icon-document"></span>Create PDF Invoice</a></li>' : '') + 
+           (inprogress ? '<li><a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><span class="ui-icon ui-icon-refresh"></span>Show Timer in Progress</a></li>' : '') + 
+           (!locked && !inprogress ? '<li><a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><span class="ui-icon ui-icon-clock"></span>Start Timer</a></li>' : '') +
+           ' <li><a target="_blank" href="time_log_show.php?wid='+id+'"><span class="ui-icon ui-icon-calculator"></span>View Time Log</a></li>' + 
+           (!locked ? ' <li><a href="#" onclick="document.frmAddNote.work_log_id.value = '+id+'; $(\'#dlgAddNote\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-comment"></span>Add Note</a></li>' : '') + 
+           (!locked ? ' <li><a href="#" onclick="document.frmAddFile.work_log_id.value = '+id+'; $(\'#dlgAddFile\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-suitcase"></span>Add File/DB Change</a></li>' : '') + 
+        '<li><a href="work_log.php?wid='+id+'"><span class="ui-icon ui-icon-contact"></span>View Details</a></li>' +
+        (!locked ? '<li><a title="Permanently delete this work log" href="delete.php?wid='+id+'"><span class="ui-icon ui-icon-close"></span>Delete permanently</a></li>' : '') +
+        ' </ul> </li> </ul><span style="clear: both"></span>';
+       }
+       
        var formatExtra = function(elLiner, oRecord, oColumn, oData) {
                 var locked = oRecord.getData('locked') == '1';
                 var inprogress = oRecord.getData('_in_progress_');
                 
-                elLiner.innerHTML = locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' : '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',1, 0); return false;"><img border=0 title="Not locked" src="images/lock_unlock.png" /></a>';
+                elLiner.innerHTML = locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' 
+                                           : (!inprogress ? ' <a href="time_log.php?wid='+ oRecord.getData('id') +'" onclick="poptimer(\'time_log.php?wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>' : '');
+                elLiner.innerHTML += gen_jquery_uimenu(oRecord.getData('id'), locked, inprogress);
+                return; //TODO: figure out something with previous little icons
+                
+                elLiner.innerHTML += locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' : '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',1, 0); return false;"><img border=0 title="Not locked" src="images/lock_unlock.png" /></a>';
                 
                 elLiner.innerHTML += locked ? ' <a target="_blank" href="invoice.php?wid='+oRecord.getData('id')+'&format=pdf"><img title="Create Invoice" border=0 src="images/add_invoice.png"/></a>' : '';
                 elLiner.innerHTML += inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar.png" /></a>' : '';
@@ -872,7 +909,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
             //{key:"id", sortable:true, resizeable:true},
             //{key:"company_id", sortable:true, resizeable:true},
-            {key:"_extra_", label:"Actions", formatter:formatExtra, sortable:true,resizeable:true},
+            {key:"_extra_", label:"<span style='font-size: 10px'>Actions</span>", formatter:formatExtra, sortable:true,resizeable:false},
             <?PHP if (!isset($_GET['wid'])) { ?>{key:"title", label: "Title", sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}, <?PHP } ?>
             <?PHP if (!isset($_GET['company']) && !isset($_GET['wid'])){ ?>{key:"company_name", label: "Company", sortable:true, resizeable: true, formatter:myCustomCompanyFormatter},<?PHP } ?>
             {key:"description", label: "Description <br>Files Changed / Notes", width: 167, formatter:formatDescriptionAndNotes, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
@@ -1000,8 +1037,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
             glbAjaxUpdateWorkLog(record.getData('id'), column_key, oNewData, oOldData);
         });   
         // --- END EDITING FLOW --
+ 
+        myDataTable.subscribe("postRenderEvent", function () {
+                $( ".actionmenu" ).menu({ position: { my: "left top", at: "right top" } });
+        });
         
 	   glbDataTable = myDataTable;
+
+
+            
 
         return {
             oDS: myDataSource,
