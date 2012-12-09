@@ -232,7 +232,12 @@
    }
    $super_total_hours = $super_total_seconds / 60 / 60;   
    if (isset($_GET['output'])){
-       if ($_GET['output'] == 'csv'){
+       if ($_GET['output'] == 'json'){
+          header('Content-type: text/javascript');
+          die(json_encode($rows));
+       }
+       //spreadsheet output
+       else if ($_GET['output'] == 'csv' || $_GET['output'] == 'xls'|| $_GET['output'] == 'xlsx'){
             /** Include PHPExcel */
             require_once('lib/PHPExcel.php');
             
@@ -268,11 +273,31 @@
             header("Cache-Control: no-store, no-cache, must-revalidate");
             header("Cache-Control: post-check=0, pre-check=0", false);
             header("Pragma: no-cache");
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            
             //header('Content-Disposition: attachment;filename="report.xlsx"');
+            
+            if ($_GET['output'] == 'xls'){
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="'.$excel_name.'.xls"');
+                header('Cache-Control: max-age=0');
 
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-
+                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+            }
+            else if ($_GET['output'] == 'xlsx')
+            {
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            }
+            else if ($_GET['output'] == 'csv'){
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment;filename="work_log.csv"');
+                header('Cache-Control: max-age=0');                      
+                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
+                //$objWriter->setDelimiter(',');
+                //$objWriter->setEnclosure('');
+                //$objWriter->setLineEnding("\r\n");
+                //$objWriter->setSheetIndex(0);
+            }
             $objWriter->save('php://output');
             exit;
        }
@@ -529,6 +554,12 @@ $(document).bind('keydown', function(e) {
             <?PHP makeFilterLink('Paid', 'paid', '1'); ?>,<?PHP makeFilterLink('Unpaid', 'paid', '0'); ?> | 
             <?PHP makeFilterLink('Billed', 'billed', '1'); ?>,<?PHP makeFilterLink('Not Billed', 'billed', '0'); ?> | 
             <?PHP makeFilterLink('Locked', 'locked', '1'); ?>,<?PHP makeFilterLink('Unlocked', 'locked', '0'); ?>
+            &nbsp; 
+            <strong class="OrangeColor">Export:</strong>
+            <a href="<?=modQS(array('output'=>'csv'))?>" title="Export entries below to csv format"><img src="images/excel_csv.png"> csv</a>
+            <?PHP /*** DOESN'T WORK CORRECTLY <a href="<?=modQS(array('output'=>'xls'))?>" title="Export entries below to Excel xls format"><img src="images/excel_xls.png"> xls</a> **/ ?>
+            <a href="<?=modQS(array('output'=>'xlsx'))?>" title="Export entries below to Excel 2007 xlsx format"><img src="images/excel_xlsx.png"> xlsx</a>
+            <a target="_blank" href="<?=modQS(array('output'=>'json'))?>" title="Export entries below to json format"><img src="images/json.png"> json</a>
             <?PHP /** Not sure anyone even uses the notes feature right now
             <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | 
             <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | 
