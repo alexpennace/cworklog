@@ -104,6 +104,9 @@
            $result_upd = mysql_query("UPDATE time_log SET stop_time = NOW() WHERE id = $time_log_id");
            if ($result_upd){
               $done_logging_time = true;
+              //refetch work log so we get an accurate account of time
+              $work_log = new work_log($work_log_id);
+              $work_log_row = $work_log->getRow();
            }
         }
         
