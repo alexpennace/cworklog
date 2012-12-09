@@ -109,14 +109,17 @@
    if (isset($_GET['company_id'])){ $_GET['company'] = $_GET['company_id']; }
    
    if (isset($_GET['company'])){
-      $_GET['company_id'] = $_GET['company'];
       if (empty($sql_where)){ $sql_where = ' WHERE '; }
       else { $sql_where .= ' AND '; }
       
       $sql_where .= " company_id = ".(int)$_GET['company'];
    }
    
-   if (isset($_GET['filter']) && in_array('unpaid', $_GET['filter'])){
+   $unpaid = false;
+   $paid = false;
+   
+   if (isset($_GET['paid']) && $_GET['paid'] == '0' || 
+       isset($_GET['filter']) && in_array('unpaid', $_GET['filter'])){
       $unpaid = true;
 	  if (empty($sql_where)){ $sql_where = ' WHERE '; }
       else { $sql_where .= ' AND '; }
@@ -125,19 +128,25 @@
 	  //we are not using amount_paid field
       //$sql_where .= " amount_paid IS NULL ";  
 	  $sql_where .= " (date_paid IS NULL OR date_paid = '0000-00-00')";
-   }else{
-     $unpaid = false;
-   }
-   
-   if (isset($_GET['filter']) && in_array('paid', $_GET['filter'])){
+   }else if (isset($_GET['paid']) && $_GET['paid'] == '1' || 
+             isset($_GET['filter']) && in_array('paid', $_GET['filter'])){
       $paid = true;
 	  
 	  if (empty($sql_where)){ $sql_where = ' WHERE '; }
       else { $sql_where .= ' AND '; }
       
       $sql_where .= " (date_paid IS NOT NULL OR date_paid != '0000-00-00') ";  
-   }else{
-      $paid = false;
+   }
+   
+   if (isset($_GET['billed'])){
+      if (empty($sql_where)){ $sql_where = 'WHERE '; }
+      else { $sql_where .= ' AND '; }
+      
+      if ($_GET['billed']=='1'){
+         $sql_where .= " (date_billed IS NOT NULL AND date_billed != '0000-00-00') ";
+      }else{
+         $sql_where .= " (date_billed IS NULL OR date_billed = '0000-00-00') ";
+      }  
    }
    
    if (isset($_GET['locked'])){
@@ -226,8 +235,6 @@
        if ($_GET['output'] == 'csv'){
             /** Include PHPExcel */
             require_once('lib/PHPExcel.php');
-
-            PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
             
             // Create new PHPExcel object
             $objPHPExcel = new PHPExcel();
@@ -500,15 +507,47 @@ $(document).bind('keydown', function(e) {
 	});
 </script>
 </head>
+<style>
+.unfilter{
+  color: #00b000;
+}
+</style>
 <body class="yui-skin-sam">
 <?PHP           
+          function makeFilterLink($text, $key, $value)
+          {
+            ?><a <?PHP if (isset($_GET[$key]) && $_GET[$key] == $value){ 
+                ?>href="<?=modQS('',array($key))?>" class="unfilter" title="Unfilter <?=htmlentities($text)?>"<?PHP 
+            }else{
+                ?>href="<?=modQS(array($key=>$value))?>"<?PHP 
+            }?>><?=$text?></a><?PHP
+          }
+          
           Members::MenuBarOpenBottomLeftOpen();
           ?>
-            <strong class="OrangeColor">Filter:</strong> <a href="<?=modQS(array('locked'=>'1'))?>">Locked</a> | <a href="<?=modQS(array('locked'=>'0'))?>">Not Locked</a> | <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | <a href="<?=modQS(array('notes'=>'full'))?>">Notes Full</a>
+            <strong class="OrangeColor">Filter:</strong> 
+            <?PHP makeFilterLink('Paid', 'paid', '1'); ?>,<?PHP makeFilterLink('Unpaid', 'paid', '0'); ?> | 
+            <?PHP makeFilterLink('Billed', 'billed', '1'); ?>,<?PHP makeFilterLink('Not Billed', 'billed', '0'); ?> | 
+            <?PHP makeFilterLink('Locked', 'locked', '1'); ?>,<?PHP makeFilterLink('Unlocked', 'locked', '0'); ?>
+            <?PHP /** Not sure anyone even uses the notes feature right now
+            <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | 
+            <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | 
+             <a href="<?=modQS(array('notes'=>'full'))?>">Notes Full</a> | 
+             
+             <form name="frmBetween" style="display: inline;" method="GET">
+             <label><input type="checkbox" name="filter_by_date" value="1"> Filter by Date</label> 
+             <select name="date_type">
+                <option value="date_billed">Date Billed</option>
+                <option value="date_paid">Date Paid</option>
+             </select>
+             <input type="text" placeholder="Start Date" name="date_first" value="<?=isset($_REQUEST['date_end']) ? htmlentities($_REQUEST['date_end']) : ''?>" size=10> - 
+             <input type="text" placeholder="End Date" name="date_end" value="<?=isset($_REQUEST['date_end']) ? htmlentities($_REQUEST['date_end']) : ''?>" size=10>
+             </form>
+             ***/ ?>
           <?PHP
           Members::MenuBarBottomLeftCloseRightOpen();
           ?>
-          <select style="margin-top: 10px" onChange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value; } else { window.location.href = 'companies.php'; }">
+          <select style="margin-top: 10px" onChange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value + '<?=modQS('',array('company','company_id','wid'))?>'.replace('?','&'); } else { window.location.href = 'work_log.php<?=modQS('',array('company','company_id'))?>'; }">
             <option value="">-- Company --</option>
             <option value="">[All Companies]</option>
             <?PHP
@@ -547,14 +586,14 @@ $(document).bind('keydown', function(e) {
        $ary_or_qs = parse_str($ary_or_qs);
      }
      if (!is_array($ary_or_qs)) {
-     	  return '';
+     	  $ary_or_qs = array();
      }
      
      $CURQS = array_merge($_GET, $ary_or_qs);
      $qs = '';
      foreach($CURQS as $key => $val)
      {
-        if (in_array($key, $ary_unset)){ unset($CURQS[$key]); }
+        if (in_array($key, $ary_unset)){ unset($CURQS[$key]); continue; }
         if (isset($ary_or_qs[$key])) {
         	   $CURQS[$key] = $ary_or_qs[$key];
         }
