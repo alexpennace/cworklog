@@ -21,7 +21,7 @@
         <p>
           <ol>
             <li>You must be 13 years or older to use this Service.</li>
-            <li>You must be a human. Accounts registered by “bots” or other automated methods are not permitted.</li>
+            <li>You must be a human. Accounts registered by "bots" or other automated methods are not permitted.</li>
             <li>You must provide your legal full name, a valid email address, and any other information requested in order to complete the signup process.</li>
             <li>Your login may only be used by one person – a single login shared by multiple people is not permitted. You may create separate logins for as many people as you'd like.</li>
             <li>You are responsible for maintaining the security of your account and password. Contractor's Work Log cannot and will not be liable for any loss or damage from your failure to comply with this security obligation.</li>
@@ -46,7 +46,7 @@
         <h2>General Conditions</h2>
         <p>
           <ol>
-            <li>Your use of the Service is at your sole risk. The service is provided on an “as is” and “as available” basis.</li>
+            <li>Your use of the Service is at your sole risk. The service is provided on an "as is" and "as available" basis.</li>
             <li>You understand that Contractor's Work Log maintains the hardware and software required to run the cworklog.com service in order to provide maximum uptime. Scheduled and unscheduled downtime may occur, and Contractor's Work Log will attempt to notify you in such cases if possible.</li>
             <li>You must not modify, adapt or hack the Service or modify another website so as to falsely imply that it is associated with the Service, Contractor's Work Log, or any other Contractor's Work Log service.</li>
             <li>You agree not to reproduce, duplicate, copy, sell, resell or exploit any portion of the Service, use of the Service, or access to the Service without the express written permission by Contractor's Work Log.</li>
