@@ -861,7 +861,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
     YAHOO.example.Basic = function() {
        var gen_jquery_uimenu = function(id, locked, inprogress){
-        return '<ul class="actionmenu"><li class="main"><a href="#">&nbsp;</a><ul>' + 
+        return '<ul class="actionmenu"><li class="main"><a href="#" onclick="return false;">&nbsp;</a><ul>' + 
             (locked ? '<li><a href="#" onclick="glbAjaxUpdateWorkLog('+id+',\'locked\',0, 1); return false;"><span class="ui-icon ui-icon-unlocked"></span>Unlock</a></li>' : 
                    '<li><a href="#" onclick="glbAjaxUpdateWorkLog('+id+',\'locked\',1, 0); return false;"><span class="ui-icon ui-icon-locked"></span>Lock</a></li>') + 
            (locked ? '<li><a target="_blank" href="invoice.php?wid='+id+'&format=pdf"><span class="ui-icon ui-icon-document"></span>Create PDF Invoice</a></li>' : '') + 
