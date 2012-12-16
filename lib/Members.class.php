@@ -22,7 +22,7 @@
         <div id="Header2">
           <div class="Row" >
 
-             <div style="float:left; line-height:37px; vertical-align:top;color:#fff" ><a href="index.php"><img border=0 src="images/Inr_hdr_logo.jpg" width="122" height="37" /></a>
+             <div style="float:left; line-height:37px; vertical-align:top;color:#fff" ><a href="index.php" title="Work Logs"><img border=0 src="images/Inr_hdr_logo.jpg" width="122" height="37" /></a>
 
  				<?PHP if (self::IsLoggedIn()){
                   require_once('lib/Site.class.php');
@@ -112,11 +112,11 @@
 
 
 <div style="float:right;">
-              <a href="settings.php"><img src="images/user_icon.jpg" width="23" height="26" alt="User Image" align="absmiddle"  /> Welcome <?=$name?></a>| <a href="settings.php"><img src="images/setting_icon.jpg" width="20" height="26" alt="Setting" align="absmiddle" /> Settings</a>| <a href="index.php?logout=1"><img src="images/logout_icon.jpg" width="18" height="26" alt="Logout" align="absmiddle" /> LogOut</a> </div>
+              <a href="settings.php" title="Settings"><img src="images/user_icon.jpg" width="23" height="26" alt="User Image" align="absmiddle"  /> Welcome <?=$name?></a>| <a href="settings.php"><img src="images/setting_icon.jpg" width="20" height="26" alt="Setting" align="absmiddle" /> Settings</a>| <a href="index.php?logout=1"><img src="images/logout_icon.jpg" width="18" height="26" alt="Logout" align="absmiddle" /> LogOut</a> </div>
               </div>
 
               <div id="logoblock">
-                <div class="Col11" ><a href="index.php"><img border=0 src="images/inner_logo.jpg" width="297" height="83" class="logost" /></a> </div>
+                <div class="Col11" ><a href="index.php"title="Work Logs"><img border=0 src="images/inner_logo.jpg" width="297" height="83" class="logost" /></a> </div>
                 <div class="Col12"> <a href="<?=$_SERVER['REQUEST_URI']?>" onclick="window.location.href = window.location.href; return false;"><img border=0 src="images/refres.jpg" width="49" height="72"  /></a><a href="companies.php"><img border=0 src="images/companies.jpg" width="72" height="72" /></a><a href="work_log.php"><img border=0 src="images/work_logs.jpg" width="68" height="72" /></a><a href="#" onclick="$('#dlgAddWorkLog').dialog('open'); return false;"><img src="images/addworklog.jpg" width="88" height="72" /></a> </div>
                 <div id="filterblock">
                   <div  style="float:left">
