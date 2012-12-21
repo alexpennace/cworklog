@@ -91,7 +91,7 @@ It is easy:
 <p>
 <h4>Watch an example of how to edit your tracked time: </h4>
 <br>
-<iframe width="320" height="180" src="https://www.youtube.com/embed/Hl9zjlxUhT4?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
+<iframe width="420" height="280" src="https://www.youtube.com/embed/Hl9zjlxUhT4?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
 </p>
 <p>
 <h4>Why Contractor's Work Log?</h4>
