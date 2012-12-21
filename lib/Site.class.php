@@ -80,7 +80,9 @@
           <?PHP if (!$w){ $width = '35'; } ?>
           <?=$separator?><a title="Add Work Log" href="#" onclick="$('#dlgAddWorkLog').dialog('open'); return false;"><img border=0 src="images/add_work_log.png" style="width: <?=$width?>px; margin-top:5px;" align="top"></a>
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-          Got Windows? <a href="downloads/WorkLogGUI.latest.zip" title="Got Windows? Download the GUI"><img border=0 src="images/windowsicon.png"></a>
+          <a href="downloads/WorkLogGUI.latest.zip" title="Got Windows? Download the GUI"><img border=0 src="images/windowsicon.png"></a>
+          <a target="_blank" href="<?PHP if (!file_exists('issues.php')){ echo 'https://cworklog.com/'; }?>issues.php" title="Submit a bug or new feature"><img border=0 src="images/bug.png" style="width: 16px; height: auto;"></a>
+          &nbsp; &nbsp; &nbsp; 
          <?PHP
       }
       

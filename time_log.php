@@ -6,6 +6,7 @@
   $start_time = false;
   $work_log_id = isset($_GET['wid']) ? (int)$_GET['wid'] : false;
   $resume_time_log = false;
+  $USING_GUI = !empty($_GET['smallbtn']);
 
   
   //get a list of work logs that are not locked and unpaid so we can keep working on it
@@ -48,6 +49,9 @@
 	 $result = mysql_query("SELECT * FROM time_log WHERE work_log_id = $work_log_id AND stop_time IS NULL ORDER BY start_time DESC LIMIT 1");
 	 if ($result && $time_log_row = mysql_fetch_assoc($result)){
 		   $time_log_id = $time_log_row['id'];
+         //redirect to latest time log
+         //header('Location: time_log.php?tid='.$time_log_id);
+         //exit;
 	 }
 	 else{
 	    die('There is no latest time log for this work log');
@@ -315,9 +319,9 @@
 	}
   </script>
   <div class="timelog_image_links">
-  <a target="_blank" title="All Companies" href="companies.php"><img src="images/companies.png"/></a>
-  <a target="_blank" title="View Work Log" href="work_log.php?wid=<?=$work_log_id?>"><img src="images/view_details.gif"/></a> 
-  <a target="_blank" title="View Detailed Time Log" href="time_log_show.php?wid=<?=$work_log_id?>"><img src="images/timelog.png"/></a>
+  <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="All Companies" href="companies.php"><img src="images/companies.png"/></a>
+  <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="View Work Log" href="work_log.php?wid=<?=$work_log_id?>"><img src="images/view_details.gif"/></a> 
+  <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="View Detailed Time Log" href="time_log_show.php?wid=<?=$work_log_id?>"><img src="images/timelog.png"/></a>
  </div>
   </body>
   </html>

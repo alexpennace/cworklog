@@ -6,7 +6,7 @@ class work_log
     ?>
 	<script type="text/javascript">
 	  $(document).ready(function() {
-         $("#dlgAddWorkLog").dialog({ autoOpen: false, width: 258, height: 250});
+         $("#dlgAddWorkLog").dialog({ autoOpen: false, width: 258, height: 250}).parent().height(250);
 	  });
 	</script>
 	<div id="dlgAddWorkLog" title="Create work log" style="display: none; height: 250px">
