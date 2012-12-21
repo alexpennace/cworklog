@@ -85,7 +85,13 @@ It is easy:
 <br><b>1. </b>Add a client work log, <b>2. </b>Log your time
 , and <b>3. </b>Send a bill. 
 <br>
-<b>Simple</b>, <b>Easy</b>, and <b>Free</b>.
+</p>
+
+
+<p>
+<h4>Watch an example of how to edit your tracked time: </h4>
+<br>
+<iframe width="320" height="180" src="https://www.youtube.com/embed/Hl9zjlxUhT4?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
 </p>
 <p>
 <h4>Why Contractor's Work Log?</h4>
@@ -93,17 +99,12 @@ It is easy:
     <li> <b>Features Include: </b></li>
     <li> - Keep track of all your clients</li>
     <li> - Easily click Start/Stop to track billable time</li>
-    <li> - Change your hourly rate per work log (billable cycle)</li>
     <li> - Pad your invoice if needed, despite the time worked</li>
     <li> - One-click PDF generated invoice</li>
     </ul>
 <br>
-<h4>What is the catch?</h4>
-<p>
-Contractor's Work Log may turn into a business endeavor charging monthly or allowing a private download to a php/mysql server. If you have any input on this or would like to help test, please post a message on the <a href="http://www.donationcoder.com/forum/index.php?topic=32772.0" target="_blank" style="color: blue">donation coder forum</a>.
-It started as a private endeavor on one local machine, Contractor's Work Log was later made available to the public after 37 weeks of testing.
-It is still considered beta and the help and feedback is appreciated.
 </p>
+
 </div>
 
 <div class="Col2">
