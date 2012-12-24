@@ -230,7 +230,8 @@
 		{
 		   session_start();
 		   if (!self::IsLoggedIn()){
-		      header('Location: index.php?goto='.urlencode(self::makeUrl($_SERVER['PHP_SELF'],$_SERVER['QUERY_STRING'])));
+		      if (!empty($_GET['mobile'])){ $mobile = 'mobile=1&'; } else { $mobile = ''; }
+            header('Location: index.php?'.$mobile.'goto='.urlencode(self::makeUrl($_SERVER['PHP_SELF'],$_SERVER['QUERY_STRING'])));
 			  exit;
 		   }else{
 		      //do nothing, user is logged in!
