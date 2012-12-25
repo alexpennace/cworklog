@@ -1,4 +1,4 @@
-<?PHP
+<?PHP 
   require_once('lib/db.inc.php');
   require_once('lib/Members.class.php');
   require_once('lib/Site.class.php');
