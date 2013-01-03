@@ -88,7 +88,8 @@ It is easy:
 </p>
 <p>
 Look at the main screen showing all your work logs
-<a href="images/screenshots/ss2013-01-03.png" target=_blank><img src="images/screenshots/ss2013-01-03_thumb.png"></a>
+<a href="images/screenshots/ss2013-01-03.png" target=_blank><img border=0 src="images/screenshots/ss2013-01-03_thumb.png" /></a>
+<a href="images/screenshots/maccworklog_lg.png" target=_blank><img border=0 src="images/screenshots/maccworklog_sm.png" /></a>
 </p>
 
 <p>
