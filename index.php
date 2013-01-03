@@ -86,7 +86,10 @@ It is easy:
 , and <b>3. </b>Send a bill. 
 <br>
 </p>
-
+<p>
+Look at the main screen showing all your work logs
+<a href="images/screenshots/ss2013-01-03.png" target=_blank><img src="images/screenshots/ss2013-01-03_thumb.png"></a>
+</p>
 
 <p>
 <h4>Watch an example of how to edit your tracked time: </h4>
