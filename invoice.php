@@ -21,7 +21,7 @@ require_once('lib/work_log.class.php');
 
 $wl_row = $work_log->getRow();
 if (!$wl_row['locked']){
-   die('This work log is unlocked, must lock before invoicing');
+   //die('This work log is unlocked, must lock before invoicing');
 }
 
 if (!empty($wl_row['_in_progress_'])){
@@ -37,6 +37,9 @@ if ($result){
 if (empty($company_row) || !$result){
   die('No company associated with this work_log');
 }
+
+$currency_symbol = !empty($_GET['currency_symbol']) ? $_GET['currency_symbol'] : '$';
+
 
 $usetables = false;
 ob_start();
@@ -79,7 +82,8 @@ ob_start();
 			INVOICE
 		</div>
 		<div id="date" style="position: absolute; top: 70px; right: 0px;">
-			Date: <?=date('M j, Y', strtotime($wl_row['date_billed']))?>
+			<?PHP $date = !empty($wl_row['date_billed']) ? $wl_row['date_billed'] : 'now'; ?>
+         Date: <?=date('M j, Y', strtotime($date))?>
 		</div>
 	</div>
 	
@@ -97,18 +101,30 @@ ob_start();
     ?>
 		<div id="from_business" style="position: absolute; left: 0px; top: 125px;">
 			<div>
-				<?=$from_user_row['name']?><br />
-				<?=$from_user_row['street']?><br />
-				<?PHP if (isset($from_user_row['street2'])) { ?>
-	         <?=$from_user_row['street2']?>
+				<?PHP if (!empty($from_user_row['name'])){ ?><?=$from_user_row['name']?><br /><?PHP } ?>
+				<?PHP if (!empty($from_user_row['street'])){ ?><?=$from_user_row['street']?><br /><?PHP } ?>
+				<?PHP if (!empty($from_user_row['street2'])) { ?>
+               <?=$from_user_row['street2']?><br />
 				<?PHP } ?>
-				<?=$from_user_row['city']?>, <?=$from_user_row['state']?> <?=$from_user_row['zip']?><br />
-				<?=$from_user_row['country']?>
+				<?PHP if (!empty($from_user_row['city'])){ ?><?=$from_user_row['city']?>, <?PHP } ?><?PHP if (!empty($from_user_row['state'])){ ?><?=$from_user_row['state']?><?PHP } ?> <?PHP if (!empty($from_user_row['zip'])){ ?><?=$from_user_row['zip']?><?PHP } ?>
+            <?PHP if (!empty($from_user_row['country'])){ ?><br /><?=$from_user_row['country']?><?PHP } ?>
 			</div>
+         <?PHP if (!empty($from_user_row['email']) || !empty($from_user_row['phone'])){ 
+            $contact_html = '';
+            if (!empty($from_user_row['phone'])){
+               $contact_html .= $from_user_row['phone']; 
+            }
+            if (!empty($contact_html)){
+               $contact_html .= '<br>';
+            }
+            if (!empty($from_user_row['email'])){
+               $contact_html .= $from_user_row['email']; 
+            }
+         ?>
 			<div class="contact">
-				<?=$from_user_row['phone']?><br />
-				<?=$from_user_row['email']?>
+				<?=$contact_html?>
 			</div>
+         <?PHP } ?>
 		</div>
 		<?PHP if ($usetables){ ?></td><td align="right" width="50%"><?PHP } ?>
 		<div id="to_business" style="position: absolute; right: 0px; top: 125px;">
@@ -116,14 +132,36 @@ ob_start();
 				TO:
 			</div>
 			<div>
-				<?=$company_row['name']?><br />
-				<?=$company_row['street']?><br />
-				<?PHP
-               if (!empty($company_row['street2'])){
-            ?><?=$company_row['street2']?><br />
-            <?PHP } ?>
-				<?=$company_row['city']?>, <?=$company_row['state']?> <?=$company_row['zip']?><br />
-				<?=$company_row['country']?>
+         <?PHP
+            $str = $company_row['name'];
+            
+            if (!empty($company_row['street'])){
+               if (!empty($str)){ $str .= '<br>'; }
+               $str .= $company_row['street'];
+            }
+            if (!empty($company_row['street2'])){
+               if (!empty($str)){ $str .= '<br>'; }
+               $str .= $company_row['street2'];
+            }
+            if (!empty($company_row['city'])){ 
+               if (!empty($str)){ $str .= '<br>'; }
+               $str = $company_row['city'];
+            }
+            if (!empty($company_row['state'])){
+               if (!empty($company_row['city'])){ $str .= ', '; }
+               $str .= $company_row['state'];
+            }
+            if (!empty($company_row['zip'])){
+               if (!empty($company_row['state'])){ $str .= ' '; }
+               $str .= $company_row['zip'];
+            }
+         
+				if (!empty($company_row['country'])){
+               if (!empty($str)){ $str .= '<br>'; }
+               $str .= $company_row['country'];
+            }
+           ?> 
+           <?=$str?>
 			</div>
 			<div class="contact">
 				<?=$company_row['phone']?>
@@ -146,17 +184,17 @@ ob_start();
 	<div id="main">
 		<table id="tabulation">
 			<tr> <th class="first">Service</th> <th>Hours</th> <th>Rate</th> <th>Total</th> </tr>
-			<tr class="billable_item"> <td class="first"><?=htmlentities($wl_row['description'])?></td> <td><?=$wl_row['hours']?></td> <td>$<?=number_format($wl_row['rate'], 2)?></td> <td>$<?=number_format($wl_row['amount_billed'], 2)?></td> </tr>
+			<tr class="billable_item"> <td class="first"><?=htmlentities($wl_row['description'])?></td> <td><?=!empty($wl_row['hours']) ? $wl_row['hours'] : number_format($wl_row['_calc_hours_'], 3)?></td> <td><?=$currency_symbol?><?=number_format($wl_row['rate'], 2)?></td> <td><?=$currency_symbol?><?=!empty($wl_row['amount_billed']) ? number_format($wl_row['amount_billed'], 2) : number_format($wl_row['_calc_amount_'], 2)?></td> </tr>
 			<?PHP
-			   $total_amount = $wl_row['amount_billed'];
+			   $total_amount = !empty($wl_row['amount_billed']) ? $wl_row['amount_billed'] : $wl_row['_calc_amount_'];
 			   $paid_amount = isset($_GET['paid_amount']) ? $_GET['paid_amount'] : 0.0;
 			   if ($paid_amount === 0.0 && !empty($wl_row['date_paid'])){
 			      $paid_amount = $total_amount;
 			   }
 			?>
-         <tr id="total"><td colspan="2">&nbsp;</td><td class="totalLabel">Total</td><td class="totals">$<?=number_format($total_amount, 2)?></td></tr>
-			<tr id="paid"><td colspan="2">&nbsp;</td><td class="totalLabel">Paid</td><td class="totals">$<?=number_format($paid_amount, 2)?></td></tr>
-			<tr id="due"><td colspan="2">&nbsp;</td><td class="totalLabel">Due</td><td class="totals">$<?=number_format($total_amount - $paid_amount, 2)?></td></tr>
+         <tr id="total"><td colspan="2">&nbsp;</td><td class="totalLabel">Total</td><td class="totals"><?=$currency_symbol?><?=number_format($total_amount, 2)?></td></tr>
+			<tr id="paid"><td colspan="2">&nbsp;</td><td class="totalLabel">Paid</td><td class="totals"><?=$currency_symbol?><?=number_format($paid_amount, 2)?></td></tr>
+			<tr id="due"><td colspan="2">&nbsp;</td><td class="totalLabel">Due</td><td class="totals"><?=$currency_symbol?><?=number_format($total_amount - $paid_amount, 2)?></td></tr>
 		</table>
 	</div>
 	
@@ -192,7 +230,7 @@ else if ($_GET['format'] == 'pdf')
    //$dompdf->set_paper('paper', 'landscape');
    $dompdf->render();
    
-   $dompdf->stream("dompdf_out.pdf", array("Attachment" => false));
+   $dompdf->stream("Invoice", array("Attachment" => false));
    exit(0);
 }
 ?>
