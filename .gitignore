@@ -9,3 +9,6 @@ lib/config.inc.php
 
 #ignore all tar.gz releases
 releases/*
+
+#ignore the dompdf log file
+lib/dompdf/lib/fonts/log.*

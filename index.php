@@ -136,5 +136,9 @@ Look at the main screen showing all your work logs
 </div>
 
 
-<?PHP } ?></body>
+<?PHP } ?>
+<br>
+<br>
+<br>
+</body>
 </html>
