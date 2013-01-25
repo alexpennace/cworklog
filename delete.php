@@ -147,34 +147,6 @@ else if (isset($_REQUEST['company_id'])){
   Site::CssJsJqueryIncludes();
   Site::Css();
 ?>
-<style>
-.areyousure,.warning{
-  font-size: 16px;
-  color: red;
-  border: 1px solid red;
-  width: 400px;
-  background-color: #ffc6c6;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding: 5px;
-}
-.success{
-  font-size: 16px;
-  color: green;
-  border: 1px solid green;
-  width: 400px;
-  background-color: #80ff80;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding: 5px;
-}
-</style>
 <script type="text/javascript" src="js/work_log_shared.js"></script>
 </head>
 <body class="yui-skin-sam">

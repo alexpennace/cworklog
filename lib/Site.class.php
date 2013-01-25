@@ -64,7 +64,36 @@
        .imgLinkTable table { margin-bottom: 15px; } 
        .imgLinkTableSmall img{ width: 16px; }
        .imgLinkTableSmall { display: inline; margin-top: 2px; float: left;}
-        </style>
+
+       /*warnings and errors and successes*/
+       
+         .areyousure,.warning,.error{
+           font-size: 16px;
+           color: red;
+           border: 1px solid red;
+           width: 400px;
+           background-color: #ffc6c6;
+           text-align: center;
+           margin-left: auto;
+           margin-right: auto;
+           margin-top: 0px;
+           margin-bottom: 0px;
+           padding: 5px;
+         }
+         .success{
+           font-size: 16px;
+           color: green;
+           border: 1px solid green;
+           width: 400px;
+           background-color: #80ff80;
+           text-align: center;
+           margin-left: auto;
+           margin-right: auto;
+           margin-top: 0px;
+           margin-bottom: 0px;
+           padding: 5px;
+         }
+         </style>
         <?PHP
       }
       
