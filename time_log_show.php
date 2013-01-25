@@ -4,6 +4,8 @@
    require_once('lib/Site.class.php');
    Members::SessionForceLogin();
    
+
+   
    if (isset($_REQUEST['ajax'])){
 		$result = array();
 		
@@ -92,9 +94,23 @@
    {
      die('Invalid work log');
    }
-   
    $wl_row = $work_log->getRow(); 
    
+   if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+     if (!empty($_POST['add_entry'])){
+        if (!$wl_row['locked']){    
+           $prep = $DBH->prepare('INSERT INTO time_log (id, work_log_id, start_time, stop_time) 
+                                                   VALUES (NULL, :wid, NOW(), NOW());');
+           if ($prep->execute(array(':wid'=>$wl_row['id']))){
+             $success = 'Time log entry added for 00:00:00 hours, please double click to edit';
+           }else{
+             $error = 'Error adding time log entry';
+           }
+        }else{
+           $error = 'Work log is locked, cannot add time log entry';
+        }
+     }
+   }  
    $time_log = $work_log->fetchTimeLog();
     
    $super_total_seconds = 0;
@@ -365,11 +381,19 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 }
 </script>
 <div class="dataBlk" >
+<?PHP if (!empty($error)){ ?>
+<div class="error"><?=$error?></div>
+<?PHP } ?>
+
+<?PHP if (!empty($success)){ ?>
+<div class="success"><?=$success?></div>
+<?PHP } ?>
+
 <h2><?=$wl_row['title']?></h2>
 <h3>Billing To: <?=$wl_row['company_name']?></h3>
 <table border=0 cellpadding=2 cellspacing=0 class="datatable">
 <thead>
-<tr><th>&nbsp;</th><th>Start Time</th><th>Stop Time</th><th>Duration</th><th>Notes</th></tr>
+<tr><th><form method="POST" style="display:inline"><input title="Add Time Log Entry" type="image" name="add_entry" value="1" style="width: 22px" src="images/plus_sign.png"></form></th><th>Start Time</th><th>Stop Time</th><th>Duration</th><th>Notes</th></tr>
 </thead>
 <tbody>
 <?PHP foreach($time_log as $i => $row){ ?>
