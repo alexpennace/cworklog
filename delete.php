@@ -62,6 +62,44 @@ if (isset($_REQUEST['wid'])){
        $warning = 'This work log has already been deleted or does not exist'; 
    }
 }
+else if (isset($_REQUEST['time_log_id'])){
+   $hidden_elements[] = array('delete'=>'time_log');
+   $hidden_elements[] = array('time_log_id'=> (int)$_REQUEST['time_log_id']);
+   
+   $prep = $DBH->prepare('SELECT * FROM time_log 
+                          WHERE id = :time_log_id 
+                            AND work_log_id 
+                             IN (SELECT id FROM work_log WHERE user_id = :user_id)');
+   $prep->execute(array(':time_log_id'=>$_REQUEST['time_log_id'], ':user_id'=>$_SESSION['user_id']));
+   $time_log = $prep->fetch(PDO::FETCH_ASSOC);
+   
+   if (empty($time_log)){
+      $warning = 'This time log has already been deleted or does not exist'; 
+   }else{
+     $wl = new work_log($time_log['work_log_id']);
+     $wl_row = $wl->getRow();
+     if ($wl_row['locked']){
+       $warning = 'The work log is locked and must be unlocked before child time log can be deleted.';
+     }else{
+        //work log not locked
+        if (isset($_POST['delete']) && $_POST['delete'] == 'time_log'){
+           $prep2 = $DBH->prepare('DELETE FROM time_log WHERE id = :tid');
+           $prep2->execute(array(':tid'=>$time_log['id']));
+           $duration = is_null($time_log['stop_time']) ? 'unfinished' : work_log::sec2hms(strtotime($time_log['stop_time']) - strtotime($time_log['start_time']));
+           $success = 'Successfully deleted <b>'.$duration.'</b> time log. <br>
+               <a href="time_log_show.php?wid='.$wl_row['id'].'">Go back to time logs</a>';  
+        }else{
+           if (is_null($time_log['stop_time'])){
+             $areyousuremessage = 'Are you sure you want to delete the unfinished time log starting at '.date('M j g:i:s a',strtotime($time_log['start_time']));
+           }else{
+              $areyousuremessage = 'Are you sure you want to delete the time log containing <b>'.
+                       work_log::sec2hms(strtotime($time_log['stop_time']) - strtotime($time_log['start_time'])).'</b> hours of work time?';
+           }
+        }
+     }
+   
+   }
+}
 else if (isset($_REQUEST['company_id'])){
    $hidden_elements[] = array('delete'=>'company');
    $hidden_elements[] = array('company_id'=> (int)$_REQUEST['company_id']);

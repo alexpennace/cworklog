@@ -2,6 +2,21 @@
 class work_log
 {
   public static $last_error = '';
+  
+  //thanks to http://stackoverflow.com/questions/7127204/converting-seconds-to-hhmmss
+  public static function sec2hms ($sec, $padHours = true) {
+      $hms = "";
+      $hours = intval(intval($sec) / 3600);
+      $hms .= ($padHours)
+      ? str_pad($hours, 2, "0", STR_PAD_LEFT). ':'
+      : $hours. ':';
+      $minutes = intval(($sec / 60) % 60);
+      $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT). ':';
+      $seconds = intval($sec % 60);
+      $hms .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
+      return $hms;
+  }
+  
   public static function HtmlFormAddWorkLog($specific_company_id){
     ?>
 	<script type="text/javascript">

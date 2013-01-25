@@ -369,11 +369,14 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 <h3>Billing To: <?=$wl_row['company_name']?></h3>
 <table border=0 cellpadding=2 cellspacing=0 class="datatable">
 <thead>
-<tr><th>Start Time</th><th>Stop Time</th><th>Duration</th><th>Notes</th></tr>
+<tr><th>&nbsp;</th><th>Start Time</th><th>Stop Time</th><th>Duration</th><th>Notes</th></tr>
 </thead>
 <tbody>
 <?PHP foreach($time_log as $i => $row){ ?>
 <tr>
+<td>
+<a title="Delete this time log entry" href="delete.php?time_log_id=<?=$row['id']?>"><img src="images/delete.png" style="border: 0px; width: 16px;"/></a>
+</td>
 <td class="editable" rowid="<?=$row['id']?>" cellid="timelog[start_time][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>');"><span id="spn_start_time_<?=$row['id']?>"><?=date('M j, Y g:i:s A', strtotime($row['start_time']))?></span></td>
 <?PHP
       $now_res = mysql_query("SELECT NOW()");
