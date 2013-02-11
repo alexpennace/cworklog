@@ -20,36 +20,36 @@ class work_log
   public static function HtmlFormAddWorkLog($specific_company_id){
     ?>
 	<script type="text/javascript">
-	  $(document).ready(function() {
-         $("#dlgAddWorkLog").dialog({ autoOpen: false, width: 258, height: 250}).parent().height(250);
+	  $(function() {
+         $("#dlgAddWorkLog").dialog({ autoOpen: false, width: 300, height: 250 });
 	  });
 	</script>
-	<div id="dlgAddWorkLog" title="Create work log" style="display: none; height: 250px">
+	<div id="dlgAddWorkLog" title="Create work log" style="display: none;">
 	<form id="frmAddWorkLog" name="frmAddWorkLog" method="POST" action="work_log.php">
 	<label>Title<input type="text" name="title" maxlength=100 /></label>
 	<br>
 	<label>Description<input type="text" name="description"/></label>
 	<br>
-	<label>Company
-	<select name="company_id" onchange="if (this.value == 'new'){ $('#new_company').toggle(true); $('#dlgAddWorkLog').dialog('option', 'height', 425); }else{ $('#new_company').toggle(false); $('#dlgAddWorkLog').dialog('option', 'height', 180); }">
+	<label>Client
+	<select name="company_id" onchange="if (this.value == 'new'){ $('#new_company').toggle(true); $('#dlgAddWorkLog').dialog('option', 'height', 400); }else{ $('#new_company').toggle(false); $('#dlgAddWorkLog').dialog('option', 'height', 'auto'); }">
 	<?PHP
 	  $result = mysql_query("SELECT id, name, default_hourly_rate FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY id ASC");
 	  while ($row = mysql_fetch_assoc($result)) {
 		  ?><option value="<?=$row['id']?>"<?PHP if ($specific_company_id == $row['id']){ echo ' selected '; }?>><?=htmlentities($row['name'].($row['default_hourly_rate'] > 0 ? ' ($'.$row['default_hourly_rate'].'/hr)':''))?></option><?PHP
 	  }
 	?>
-	<option value="new">-- New Company--</option>
+	<option value="new">-- New Client--</option>
 	</select>
     <script>
      $(document).ready(function() {
-          //trigger the onchange event just in case there are no companies yet.
+          //trigger the onchange event just in case there are no clients yet.
           $(frmAddWorkLog.company_id).trigger('change');
      });
     </script>
 	</label>
 	<div id="new_company" style="display: none">
 	<fieldset>
-	<legend>Add new company</legend>
+	<legend>Add new client</legend>
 	<label>Name<input type="text" name="name" maxlength=255 /></label><br>
 	<label>Default Hourly Rate $<input type="text" name="default_hourly_rate" value="" size=8/></label><br>
 	<label>Street <input type="text" name="street" maxlength=90 /></label><br>

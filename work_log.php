@@ -579,8 +579,8 @@ $(document).bind('keydown', function(e) {
           Members::MenuBarBottomLeftCloseRightOpen();
           ?>
           <select style="margin-top: 10px" onChange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value + '<?=modQS('',array('company','company_id','wid'))?>'.replace('?','&'); } else { window.location.href = 'work_log.php<?=modQS('',array('company','company_id'))?>'; }">
-            <option value="">-- Company --</option>
-            <option value="">[All Companies]</option>
+            <option value="">-- Client --</option>
+            <option value="">[All Clients]</option>
             <?PHP
                  $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY name ASC";
                  $result = mysql_query($sql);

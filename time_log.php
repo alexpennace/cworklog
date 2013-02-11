@@ -319,7 +319,7 @@
 	}
   </script>
   <div class="timelog_image_links">
-  <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="All Companies" href="companies.php"><img src="images/companies.png"/></a>
+  <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="All Companies" href="companies.php"><img src="images/clients_dk_26x26.png"/></a>
   <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="View Work Log" href="work_log.php?wid=<?=$work_log_id?>"><img src="images/view_details.gif"/></a> 
   <a <?=!$USING_GUI ? 'target="_blank"' : ''?> title="View Detailed Time Log" href="time_log_show.php?wid=<?=$work_log_id?>"><img src="images/timelog.png"/></a>
  </div>

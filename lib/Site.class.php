@@ -14,9 +14,11 @@
 		?>
 		<link rel="stylesheet" type="text/css" href="<?=$YUI_JS_SOURCE?>/2.9.0/build/fonts/fonts-min.css" />
 		<link rel="stylesheet" type="text/css" href="<?=$YUI_JS_SOURCE?>/2.9.0/build/datatable/assets/skins/sam/datatable.css" />
+      <link rel="stylesheet" type="text/css" href="<?=$YUI_JS_SOURCE?>/2.9.0/build/calendar/assets/skins/sam/calendar.css" />
 		<script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
 		<script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/dragdrop/dragdrop-min.js"></script>
 		<script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/element/element-min.js"></script>
+      <script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/calendar/calendar-min.js"></script>
 		<script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/datasource/datasource-min.js"></script>
 		<script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/event-delegate/event-delegate-min.js"></script>
 		<script type="text/javascript" src="<?=$YUI_JS_SOURCE?>/2.9.0/build/datatable/datatable-min.js"></script>
@@ -33,9 +35,9 @@
 	  public static function CssJsJqueryIncludes(){
 		?>
 		<!-- new jquery includes -->
-		<link href="css/jqueryui/themes/smoothness/jquery-ui-1.9.1.custom.min.css" rel="stylesheet" type="text/css"/>
-		<script src="js/jquery-1.8.2.js"></script>
-	    <script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+		<link href="css/jqueryui/themes/smoothness/jquery-ui-1.10.0.custom.min.css" rel="stylesheet" type="text/css"/>
+		<script src="js/jquery-1.9.0.js"></script>
+	    <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
         <style type="text/css">
          .ui-dialog , .ui-autocomplete{ font-size: 85%; }
         </style>
@@ -103,7 +105,7 @@
           <?PHP if (!$w){ $width = '26'; } ?>
           <a href="#" title="Refresh Content" onclick="window.location.href = window.location.href; return false"><img border=0 src="images/refresh.png" style="width: <?=$width?>px; margin-top:5px;" align="top"></a>
           <?PHP if (!$w){ $width = '24'; } ?>
-          <?=$separator?><a title="Companies" href="companies.php"><img border=0 src="images/companies.png" style="width: <?=$width?>px; margin-top:5px;" align="top"></a>
+          <?=$separator?><a title="Clients" href="companies.php"><img border=0 src="images/clients_26x26.png" style="width: <?=$width?>px; margin-top:5px;" align="top"></a>
           <?PHP if (!$w){ $width = '27'; } ?>
           <?=$separator?><a title="All Work Logs" href="work_log.php"><img border=0 src="images/work_logs.png" style="width: <?=$width?>px;margin-top:5px;" align="top"></a>
           <?PHP if (!$w){ $width = '35'; } ?>
@@ -131,7 +133,7 @@
       <a href="#" title="Refresh Content" onclick="window.location.href = window.location.href; return false"><img border=0 src="images/refresh.png" style="width: 60px"></a>
       </td>
       <td align=center>
-      <a title="Companies" href="companies.php"><img border=0 src="images/companies.png" style="width: 60px"></a>
+      <a title="Clients" href="companies.php"><img border=0 src="images/clients_26x26.png" style="width: 60px"></a>
       </td>
       <td align=center>
       <a title="All Work Logs" href="work_log.php"><img border=0 src="images/work_logs.png" style="width: 60px"></a>
@@ -145,7 +147,7 @@
       <a href="#" title="Refresh Content" onclick="window.location.href = window.location.href; return false">Refresh</a>
       </td>
       <td>
-      <a title="Companies" href="companies.php">Companies</a>
+      <a title="Companies" href="companies.php">Clients</a>
       </td>
       <td>
       <a title="Work Logs" href="work_log.php">Work Logs</a>
