@@ -1,4 +1,7 @@
 <?PHP
+  error_reporting(E_ALL);
+  ini_set('display_errors', 1);
+
 require_once('lib/db.inc.php');
 require_once('lib/Members.class.php');
 Members::SessionForceLogin();
@@ -9,38 +12,72 @@ if ($wid === false){
    die('Work log id needed');
 }
 
+
+if (strpos($wid, ',') !== false){
+   //calculating multiple work logs
+   $wl_ids = explode(',',$wid);
+}else{
+   $wl_ids = array($wid);
+}
+
 require_once('lib/work_log.class.php');
-//try
-{
- $work_log = new work_log($wid);
-}
-//catch(Exception $e)
-{
-  //die('Invalid work log');
-}
 
-$wl_row = $work_log->getRow();
-if (!$wl_row['locked']){
-   //die('This work log is unlocked, must lock before invoicing');
-}
+$companies = array();
+$num = 0;
+$wl_final['amount_billed'] = 0;
+$wl_final['description'] = count($wl_ids) > 0 ? count($wl_ids).' work logs<br>' : '';
+$wl_final['hours'] = 0;
+$wl_final['rate'] = 0;
+$wl_final['sum_rates'] = 0;
 
-if (!empty($wl_row['_in_progress_'])){
-   die('This work log is in progress, cannot invoice.');
-}
+foreach($wl_ids as $wid){
+   $num++;
+   $work_log = new work_log($wid);
+   $wl_row = $work_log->getRow();
+   
+   if (count($companies) > 1){
+      die('You are attempting to bill multiple work logs with differing companies.
+           Each invoice may have only one client');
+   }
+   
+   if (!$wl_row['locked']){
+      //die('This work log is unlocked, must lock before invoicing');
+   }
 
-//name	street	street2	city	state	zip	country	phone	email	notes
-$result = mysql_query("SELECT name, street, street2, city, state, zip, country, phone, email FROM company WHERE id = ".(int)$wl_row['company_id']);
-if ($result){
-  $company_row = mysql_fetch_assoc($result);
-}
+   if (!empty($wl_row['_in_progress_'])){
+      die('This work log is in progress, cannot invoice.');
+   }
 
-if (empty($company_row) || !$result){
-  die('No company associated with this work_log');
-}
+   //name	street	street2	city	state	zip	country	phone	email	notes
+   $result = mysql_query("SELECT id, name, street, street2, city, state, zip, country, phone, email FROM company WHERE id = ".(int)$wl_row['company_id']);
+   if ($result){
+     $company_row = mysql_fetch_assoc($result);
+     $companies[$wl_row['company_id']] = $company_row;
+   }
 
+   if (empty($company_row) || !$result){
+     die('No company associated with this work_log');
+   }
+   
+   if (!isset($wl_final['date_billed'])){ 
+      $wl_final['date_billed'] = !empty($wl_row['date_billed']) ? $wl_row['date_billed'] : '0000-00-00'; 
+   }
+   
+   //calculate most recent date
+   $wl_final['date_billed'] = !empty($wl_row['date_billed']) && $wl_row['date_billed'] > $wl_final['date_billed'] ? $wl_row['date_billed'] : '0000-00-00';
+   
+   if (!empty($wl_row['description'])){
+      $wl_final['description'] .= $wl_row['description'].'<br>';
+   }
+   $wl_final['hours'] += !empty($wl_row['hours']) ? $wl_row['hours'] : $wl_row['_calc_hours_'];
+   $wl_final['amount_billed'] += !empty($wl_row['amount_billed']) ? $wl_row['amount_billed'] : $wl_row['_calc_amount_'];
+   
+   //calculate average rate
+   $wl_final['sum_rates'] += $wl_row['rate'];
+   
+   $wl_final['rate'] = $wl_final['sum_rates'] / $num;
+}
 $currency_symbol = !empty($_GET['currency_symbol']) ? $_GET['currency_symbol'] : '$';
-
-
 $usetables = false;
 ob_start();
 ?>
@@ -82,7 +119,7 @@ ob_start();
 			INVOICE
 		</div>
 		<div id="date" style="position: absolute; top: 70px; right: 0px;">
-			<?PHP $date = !empty($wl_row['date_billed']) ? $wl_row['date_billed'] : 'now'; ?>
+			<?PHP $date = !empty($wl_final['date_billed']) && strtotime($wl_final['date_billed']) !== false ? $wl_final['date_billed'] : 'now'; ?>
          Date: <?=date('M j, Y', strtotime($date))?>
 		</div>
 	</div>
@@ -183,12 +220,12 @@ ob_start();
 	?>
 	<div id="main">
 		<table id="tabulation">
-			<tr> <th class="first">Service</th> <th>Hours</th> <th>Rate</th> <th>Total</th> </tr>
-			<tr class="billable_item"> <td class="first"><?=htmlentities($wl_row['description'])?></td> <td><?=!empty($wl_row['hours']) ? $wl_row['hours'] : number_format($wl_row['_calc_hours_'], 3)?></td> <td><?=$currency_symbol?><?=number_format($wl_row['rate'], 2)?></td> <td><?=$currency_symbol?><?=!empty($wl_row['amount_billed']) ? number_format($wl_row['amount_billed'], 2) : number_format($wl_row['_calc_amount_'], 2)?></td> </tr>
+			<tr> <th class="first">Service<?=count($wl_ids) > 1 ? 's' : ''?></th> <th><?=count($wl_ids) > 1 ? 'Total ' : ''?>Hours</th> <th><?=count($wl_ids) > 1 ? 'Avg. ' : ''?>Rate</th> <th>Total</th> </tr>
+			<tr class="billable_item"> <td class="first"><?=($wl_final['description'])?></td> <td><?=!empty($wl_final['hours']) ? $wl_final['hours'] : number_format($wl_final['_calc_hours_'], 3)?></td> <td><?=$currency_symbol?><?=number_format($wl_final['rate'], 2)?></td> <td><?=$currency_symbol?><?=!empty($wl_final['amount_billed']) ? number_format($wl_final['amount_billed'], 2) : number_format($wl_final['_calc_amount_'], 2)?></td> </tr>
 			<?PHP
-			   $total_amount = !empty($wl_row['amount_billed']) ? $wl_row['amount_billed'] : $wl_row['_calc_amount_'];
+			   $total_amount = !empty($wl_final['amount_billed']) ? $wl_final['amount_billed'] : $wl_final['_calc_amount_'];
 			   $paid_amount = isset($_GET['paid_amount']) ? $_GET['paid_amount'] : 0.0;
-			   if ($paid_amount === 0.0 && !empty($wl_row['date_paid'])){
+			   if ($paid_amount === 0.0 && !empty($wl_final['date_paid'])){
 			      $paid_amount = $total_amount;
 			   }
 			?>

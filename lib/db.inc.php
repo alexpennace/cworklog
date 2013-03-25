@@ -1,4 +1,6 @@
 <?PHP
+
+  
   require_once(dirname(__FILE__).'/config.inc.php');
   
   //connect to database using old mysql_ functions and also new PDO idea (to help with escaping etc)

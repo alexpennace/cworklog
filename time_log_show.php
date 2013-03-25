@@ -469,6 +469,46 @@ if (!empty($dynamic_time_id)){
 	</script>
 <?PHP
 }
+
+
+//select all features that this user worked on for this particular client
+$prep = $DBH->prepare('SELECT feature, date_modified FROM files_log 
+                      WHERE work_log_id = :wid
+                      GROUP BY feature
+                      ORDER BY date_modified DESC');
+$prep->execute(array(':wid'=>$wid));
+$features = $prep->fetchAll(PDO::FETCH_ASSOC);
+
+
+$assoc_w_this_work_log = 0;
+
+
+foreach($features as &$feature){
+   $prep2 = $DBH->prepare('SELECT file, change_type, notes, date_modified, work_log_id 
+                      FROM files_log 
+                     WHERE feature = :feature 
+                       AND work_log_id IN (SELECT id FROM work_log WHERE company_id = :company_id)');
+   $prep2->execute(array(':feature'=>$feature['feature'], ':company_id'=>$wl_row['company_id'])); 
+   $files = $prep2->fetchAll(PDO::FETCH_ASSOC);
+   
+   $feature['_files_'] = $files; 
+      
+}
+
+?><br><br>
+<h3><?=count($features)?> features for this worklog</h3><?PHP
+  if (count($features) > 0){
+     foreach($features as $i => $feature){
+       ?><br><h2><?=$feature['feature']?></h2><?PHP
+       ?><table border=0><tr><th>Type</th><th>File</th><th>Last modified</th></tr><?PHP
+       foreach($feature['_files_'] as $j => $file_log){
+          ?><tr><td><?=$file_log['change_type']?></td>
+                <td <?=$wid == $file_log['work_log_id'] ? 'style="color: red"':''?>><?=$file_log['file']?></td>
+                <td><?=$file_log['date_modified']?></td></tr><?PHP
+       }
+       ?></table><?PHP       
+     }
+  }
 ?>
 </div>
 </body>

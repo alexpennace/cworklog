@@ -159,6 +159,24 @@
          $sql_where .= " locked = 0 ";
       }
    }
+   
+   $stt_aft_date_billed = false;
+   if (isset($_GET['after_date_billed']) && ($stt_aft_date_billed = strtotime($_GET['after_date_billed'])) !== false){
+      if (empty($sql_where)){ $sql_where = 'WHERE '; }
+      else { $sql_where .= ' AND '; }
+      
+      $sql_where .= " date_billed >= '".date('Y-m-d', $stt_aft_date_billed)."'";
+   }
+   
+   
+   $stt_bef_date_billed = false;
+   if (isset($_GET['before_date_billed']) && ($stt_bef_date_billed = strtotime($_GET['before_date_billed'])) !== false){
+      if (empty($sql_where)){ $sql_where = 'WHERE '; }
+      else { $sql_where .= ' AND '; }
+      
+      $sql_where .= " date_billed <= '".date('Y-m-d', $stt_bef_date_billed)."'";
+   }
+   
    if (isset($_GET['wid'])) {
       if (empty($sql_where)){ $sql_where = 'WHERE '; }
       else { $sql_where .= ' AND '; }
@@ -169,6 +187,8 @@
    
    $sql .= $sql_where." ORDER BY work_log.id DESC";
 
+   //echo $sql;
+   
    $result = mysql_query($sql);
    $rows = array();
    $columns = array();
@@ -394,9 +414,24 @@ $(document).bind('keydown', function(e) {
 
 </script>
 <script>
+  function updateWLChecked(){
+     var checkedCount = $('.wlcbxes:checked').length;
+     
+     if (checkedCount == 0){
+        $('#selbox_with_wlchecked').hide();
+        $('#selbox_with_wlchecked option[value=""]').text('With checked: ');
+     }else{
+        $('#selbox_with_wlchecked').show();
+        $('#selbox_with_wlchecked option[value=""]').text('With ('+checkedCount+') checked: ');
+        
+     }       
+  }
+  
   $(document).ready(function() {
         $("#dlgAddNote").dialog({ autoOpen: false, width: 240, height: 190 });
-		$("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
+		  $("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
+        
+        updateWLChecked();
   });
 </script>
 	<style>
@@ -536,6 +571,10 @@ $(document).bind('keydown', function(e) {
 .unfilter{
   color: #00b000;
 }
+#selbox_with_wlchecked{
+  font-size: 11px;
+  margin-right: 5px;
+}
 </style>
 <body class="yui-skin-sam">
 <?PHP           
@@ -550,11 +589,67 @@ $(document).bind('keydown', function(e) {
           
           Members::MenuBarOpenBottomLeftOpen();
           ?>
+          <select id="selbox_with_wlchecked">
+            <option value="">With checked:</option>
+            <option value="generate-invoice"> &nbsp; &nbsp; Generate PDF Invoice</option>
+            </select>
             <strong class="OrangeColor">Filter:</strong> 
             <?PHP makeFilterLink('Paid', 'paid', '1'); ?>,<?PHP makeFilterLink('Unpaid', 'paid', '0'); ?> | 
             <?PHP makeFilterLink('Billed', 'billed', '1'); ?>,<?PHP makeFilterLink('Not Billed', 'billed', '0'); ?> | 
             <?PHP makeFilterLink('Locked', 'locked', '1'); ?>,<?PHP makeFilterLink('Unlocked', 'locked', '0'); ?>
             &nbsp; 
+            <span id="seldate_short">
+            <select>
+               <option value="">--- Filter by Date Billed ---</option>
+               <option value="show-all" data-after-date-billed="" data-before-date-billed="">Show All</option>
+               <option value="30-days-ago" data-after-date-billed="30 days ago" data-before-date-billed="">30 days ago</option>
+               <option value="60-days-ago" data-after-date-billed="60 days ago" data-before-date-billed="">60 days ago</option>
+               <option value="90-days-ago" data-after-date-billed="90 days ago" data-before-date-billed="">90 days ago</option>
+               <option value="between">Between Dates</option>
+               <option value="2012" data-after-date-billed="1/1/2012" data-before-date-billed="12/31/2012">2012 Report</option>
+            </select>
+            </span>
+            <span id="datebill_between" style="display: none">
+            <span id="datebill_label" title="Filter dates billed between these dates"><strong>Date Billed:</strong></span>
+            <input type="text" size=8 id="after_date_billed" value="<?=$stt_aft_date_billed !== false ? date('Y-m-d', $stt_aft_date_billed) : ''?>" onkeydown="if (event.which == 13){ $('#btn_date_billed').click(); }"/>
+            -
+            <input type="text" size=8 id="before_date_billed" value="<?=$stt_bef_date_billed !== false ? date('Y-m-d', $stt_bef_date_billed) : ''?>" onkeydown="if (event.which == 13){ $('#btn_date_billed').click(); }"/>
+            <button id="btn_date_billed" onclick="var uri = window.location.href; uri = updateQueryStringParameter(uri,'before_date_billed', $('#before_date_billed').val()); uri = updateQueryStringParameter(uri,'after_date_billed', $('#after_date_billed').val()); window.location.href = uri;">Go</button>
+            </span>
+            <script>
+            $(function(){
+               $('#datebill_label').click(function(){
+                  $('#seldate_short').show();
+                  $('#datebill_between').hide();                 
+               });
+               
+               $('#seldate_short select').change(function(){
+                  if ($(this).val() == ''){ return; }
+                  
+                  if ($(this).val() == 'between'){
+                      $(this).parent().hide();
+                      $('#datebill_between').show();
+                  }else{
+                     var after = $(this.options[this.selectedIndex]).data('after-date-billed');
+                     var before = $(this.options[this.selectedIndex]).data('before-date-billed');
+                     $('#after_date_billed').val(after);
+                     $('#before_date_billed').val(before);
+                     $('#btn_date_billed').click();
+                  }
+                  $(this).val('');
+               });
+               
+               if ($('#after_date_billed').val() != '' || $('#before_date_billed').val() != ''){
+                  $('#seldate_short').hide();
+                  $('#datebill_between').show();
+               }else{
+                  $('#seldate_short').show();
+                  $('#datebill_between').hide();
+               }
+            });
+            
+            </script>
+            &nbsp;
             <strong class="OrangeColor">Export:</strong>
             <a href="<?=modQS(array('output'=>'csv'))?>" title="Export entries below to csv format"><img src="images/excel_csv.png"> csv</a>
             <?PHP /*** DOESN'T WORK CORRECTLY <a href="<?=modQS(array('output'=>'xls'))?>" title="Export entries below to Excel xls format"><img src="images/excel_xls.png"> xls</a> **/ ?>
@@ -639,7 +734,30 @@ $(document).bind('keydown', function(e) {
    }
 ?>
 <div class="dataBlk">
-
+<script>
+$(function(){
+    $('#selbox_with_wlchecked').change(function(){
+       var action = $(this).val();
+       $(this).val('');
+       if (action != ''){
+           if ($('.wlcbxes:checked').length == 0){
+              alert('Please check a worklog before trying to perform an action');
+              return;
+           }
+           var s = '';
+           $('.wlcbxes:checked').each(function(){
+              if (s != ''){ s += ','; }
+              s += $(this).val();
+           });
+           
+           if (action == 'generate-invoice'){
+               window.location.href = 'invoice.php?wid='+s+'&format=pdf';
+               return;
+           }
+       }
+    });
+});
+</script>
 <?PHP
    if (isset($_GET['company'])){
       $result = mysql_query("SELECT name,phone FROM company WHERE id = ".(int)$_GET['company']);
@@ -879,8 +997,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 var locked = oRecord.getData('locked') == '1';
                 var inprogress = oRecord.getData('_in_progress_');
                 var id = oRecord.getData('id');
-                
-                elLiner.innerHTML = locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' 
+                elLiner.innerHTML = '<input type=checkbox onclick="updateWLChecked();" class="wlcbxes" name="cbx_wl_'+id+'" value="'+id+'"> &nbsp;';
+                elLiner.innerHTML += locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' 
                                            : (inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar.png" /></a>' : ' <a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>');
                 elLiner.innerHTML += gen_jquery_uimenu(oRecord.getData('id'), locked, inprogress);
                 return; //TODO: figure out something with previous little icons
@@ -980,6 +1098,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
             //{key:"id", sortable:true, resizeable:true},
             //{key:"company_id", sortable:true, resizeable:true},
+            //<input type=checkbox onclick='var self = this; $(\".wlcbxes\").each(function(){ $(this).prop(\"checked\", !!self.checked); }); updateWLChecked();'>
             {key:"_extra_", label:"<span style='font-size: 10px'>Actions</span>", formatter:formatExtra, sortable:true,resizeable:false},
             <?PHP if (!isset($_GET['wid'])) { ?>{key:"title", label: "Title", sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}, <?PHP } ?>
             <?PHP if (!isset($_GET['company']) && !isset($_GET['wid'])){ ?>{key:"company_name", label: "Company", sortable:true, resizeable: true, formatter:myCustomCompanyFormatter},<?PHP } ?>
