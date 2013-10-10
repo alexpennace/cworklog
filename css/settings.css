@@ -1,0 +1,38 @@
+td.selected_plan{
+  background-color: #ffe5a0;
+  border: 2px dashed black;
+   -webkit-border-radius: 15px;
+   -moz-border-radius: 15px;
+   border-radius: 15px;
+   margin: 6px;
+}
+
+td.nonselected_plan{
+  border: 2px dashed gray;
+   -webkit-border-radius: 15px;
+   -moz-border-radius: 15px;
+   border-radius: 15px;
+   margin: 6px;
+}
+
+
+td.nonselected_plan:hover{
+  background-color: #FFFFD4;
+  border: 2px dashed gray;
+   -webkit-border-radius: 15px;
+   -moz-border-radius: 15px;
+   border-radius: 15px;
+   margin: 6px;
+}
+
+td.betapro{
+ -moz-box-shadow:    3px 3px 5px 6px #ccc;
+  -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+  box-shadow:         3px 3px 5px 6px #ccc;
+}
+td.betastarter{
+ -moz-box-shadow:    1px 1px 2px 3px #ccc;
+  -webkit-box-shadow: 1px 1px 2px 3px #ccc;
+  box-shadow:         1px 1px 2px 3px #ccc;
+}
+
