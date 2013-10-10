@@ -1,4 +1,7 @@
 <?PHP
+require_once(dirname(__FILE__).'/db.inc.php');
+require_once(dirname(__FILE__).'/CWLUser.class.php');
+
 class work_log
 {
   public static $last_error = '';
@@ -74,7 +77,15 @@ class work_log
   }
   
   public static function AddCompany($ary){
-         $user_id = (int)(isset($ary['user_id']) ? $ary['user_id'] : $_SESSION['user_id']);
+       $user_id = (int)(isset($ary['user_id']) ? $ary['user_id'] : $_SESSION['user_id']);
+       
+       $cwluser = new CWLUser($user_id);
+       if ($cwluser->planExceedsClients(true)){
+          self::$last_error = 'Your plan can not have any more clients. Please upgrade or contact support';
+          return false;
+       }
+  
+         
          $sql = "INSERT INTO company (id, user_id, name, street, street2, city, state, zip, country, phone, email, notes, default_hourly_rate) ".
                 "VALUES(NULL, ".$user_id.", '".
                 mysql_real_escape_string($ary['name'])."', '".
@@ -100,10 +111,10 @@ class work_log
   
   public static function Add($ary){
       if ($ary['company_id'] == 'new'){
-		$ary['company_id'] = self::AddCompany($ary);
-		if ($ary['company_id'] === false){
-		   return false;
-		}
+         $ary['company_id'] = self::AddCompany($ary);
+         if ($ary['company_id'] === false){
+            return false;
+         }
       }
       $user_id = false;
       if (isset($_SESSION['user_id'])){
@@ -111,6 +122,12 @@ class work_log
       }else{
           $user_id = $ary['user_id'];
       }
+      $cwluser = new CWLUser($user_id);
+      if ($cwluser->planExceedsActiveWorkLogs(true)){
+          self::$last_error = 'Your plan can not have any more active work logs. Please upgrade or contact support';
+          return false;
+      }
+      
       $result = mysql_query("SELECT name, default_hourly_rate FROM company WHERE id = ".(int)$ary['company_id']." AND user_id = ".(int)$user_id);
       if ($result && $row = mysql_fetch_assoc($result)){
          //company exists!!!

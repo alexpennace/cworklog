@@ -1,13 +1,19 @@
 <?PHP
-   require_once('lib/db.inc.php');
-   require_once('lib/Members.class.php');
+   require_once(dirname(__FILE__).'/lib/db.inc.php');
+   require_once(dirname(__FILE__).'/lib/Members.class.php');
    Members::SessionForceLogin();
-   require_once('lib/work_log.class.php');
-   
+   $cwluser = new CWLUser($_SESSION['user_id']);
+   if (!$cwluser->isValid()){
+      die('User not found error');
+   }else{
+      //echo 'unlocked: '.$cwluser->countUnlockedWorkLogs();
+   }
+   require_once(dirname(__FILE__).'/lib/work_log.class.php');
+   require_once(dirname(__FILE__).'/lib/CWLUser.class.php');
    
    if (isset($_POST['title'])){
       if (!work_log::Add($_POST)){
-         die(work_log::$last_error);
+         $ERROR_MSG = work_log::$last_error;
       }
    }else if (isset($_POST['delete_note'])){
       $wl = new work_log($_POST['work_log_id']);
@@ -105,6 +111,23 @@
                           FROM work_log JOIN company ON company_id = company.id ";
    //only allow logged in user to see this work log
    $sql_where = " WHERE work_log.user_id = ".(int)$_SESSION['user_id'];
+   
+   if (isset($_GET['search'])){ 
+      $s = $_GET['search'];
+      
+      if (empty($sql_where)){ $sql_where = ' WHERE '; }
+      else { $sql_where .= ' AND '; }
+      $like_search = "'%".mysql_real_escape_string($_GET['search'])."%'";
+      $sql_where .= " ( title LIKE $like_search OR description LIKE $like_search OR company.name LIKE $like_search ";
+
+      if (is_numeric($s)){
+         $s /= 1.0;
+         $sql_where .= ' OR (amount_billed >= '.round($s, 2).' AND amount_billed < '.(round($s, 2)+.01).') ';
+         $sql_where .= ' OR (hours >= '.round($s, 2).' AND hours < '.(round($s, 2)+.01).') ';
+      }
+      
+      $sql_where .= " ) ";
+   }
    
    if (isset($_GET['company_id'])){ $_GET['company'] = $_GET['company_id']; }
    
@@ -323,7 +346,7 @@
        }
    }
    
-   include_once('lib/Site.class.php');
+   include_once(dirname(__FILE__).'/lib/Site.class.php');
    
    $specific_company_id = isset($_GET['company']) ? (int)$_GET['company'] : false;
    $specific_work_log_id = isset($_GET['wid']) ? (int)$_GET['wid'] : false;
@@ -414,23 +437,115 @@ $(document).bind('keydown', function(e) {
 
 </script>
 <script>
-  function updateWLChecked(){
+  function sumCheckedAmounts(){
+     if (typeof(glbDataTable) != 'undefined'){
+        //find record
+        var recordSet = glbDataTable.getRecordSet();
+        var records = recordSet.getRecords();
+        var record = false;
+        var total_calc_hours = 0;
+        var total_calc_amount = 0;
+        
+        var array_details = [];
+        
+        for (var i = 0; i < records.length; ++i){
+            if ($('input[name=cbx_wl_' + records[i].getData('id') + ']').prop('checked')){
+                   if (records[i].getData('_calc_hours_')){
+                       total_calc_hours += records[i].getData('_calc_hours_');
+                   }                
+                   if (records[i].getData('_calc_amount_')){
+                       total_calc_amount += records[i].getData('_calc_amount_');
+                   }
+                   
+                   array_details.push(records[i].getData());
+             }
+        }   
+        return { total_calc_hours: total_calc_hours, total_calc_amount: total_calc_amount, details: array_details };
+     }  
+  }
+  
+  function updateWLChecked(cbx, id){
+     if (typeof(cbx) != 'undefined' && typeof(id) != 'undefined'){
+        //update the checked data value so we don't lose the checkbox
+        var record = glbFindRecordById(id);
+        if (record){
+               record.setData('__checked__', $(cbx).prop('checked') );
+               glbDataTable.getRecordSet(record).updateRecordValue ( record , '__checked__' , $(cbx).prop('checked') ); 
+               //glbDataTable.render();  
+        }                      
+     }
      var checkedCount = $('.wlcbxes:checked').length;
-     
+     var tot_calc_hours;
+     var tot_calc_amount;
+     var details = [];
+        
      if (checkedCount == 0){
         $('#selbox_with_wlchecked').hide();
         $('#selbox_with_wlchecked option[value=""]').text('With checked: ');
+        tot_calc_hours = 0;
+        tot_calc_amount = 0;
      }else{
         $('#selbox_with_wlchecked').show();
-        $('#selbox_with_wlchecked option[value=""]').text('With ('+checkedCount+') checked: ');
+        var res = sumCheckedAmounts();
+        $('#selbox_with_wlchecked option[value=""]').text('With ('+checkedCount+') checked: ' );
+        tot_calc_hours = res.total_calc_hours;
+        tot_calc_amount = res.total_calc_amount;
+        details = res.details;
+        //$('#selbox_with_wlchecked option[value=""]').text('With ('+checkedCount+') checked (' + res.total_calc_hours.toFixed(2) + 'hr => $' + res.total_calc_amount.toFixed(2) + '): ' );
+     }
+     
+     if (checkedCount == 0 || (tot_calc_hours == 0 && tot_calc_amount == 0)){
+         $('#divCheckedSummary').hide();
+         
+     }else{
+        //$('#spnCheckedNum').text(checkedCount);
+        //$('#spnCheckedTotalCalcHours').text(tot_calc_hours.toFixed(2)+' hr');
+        //$('#spnCheckedTotalCalcAmount').text(tot_calc_amount.toFixed(2));
+        $('#divCheckedSummary').show();
         
-     }       
+        var s = '';
+        var sum_rate = 0;
+        if (details.length > 0){
+           s = '<table border=0 cellspacing=3 cellpadding=3>';
+           //s += '<tr><td>Work Log</td><td>Calc Hours</td><td>Rate</td><td>Calc Amount</td><td>&nbsp;</td></tr>';
+           s += '<tr><td colspan=5><b>' + checkedCount +'</b> Work Logs Selected</td></tr>';
+           for(var i = 0; i < details.length; ++i){
+              sum_rate += details[i]['rate'];
+              s += '<tr><td align=left>'+details[i]['title']+'</td><td align=right>'+details[i]['_calc_hours_'].toFixed(3) + ' hr' + '</td><td align=right>@ $' + (details[i]['rate'] ? parseFloat(details[i]['rate']).toFixed(2) : '0.00') + '/hr</td><td align=right> $' + details[i]['_calc_amount_'].toFixed(2) + '</td><td>&nbsp;</td></tr>';
+           }
+           s += '<tr class="totals"><td align=right><b>Total: </b></td><td align=right><b>' + tot_calc_hours.toFixed(3)+' hr</b></td><td align=center> =&gt; </td><td align=right><b>$'+ tot_calc_amount.toFixed(2) +'</b></td><td align=right style="border-top: none;"><button onclick="glbDoWithChecked(\'generate-invoice\');">PDF Invoice</button></tr>';
+           s += '</table>';
+        }
+        $('#divCheckedDetailed').html(s);
+     }
   }
   
   $(document).ready(function() {
         $("#dlgAddNote").dialog({ autoOpen: false, width: 240, height: 190 });
 		  $("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
-        
+         
+                 function clearSelection() {
+                      if(document.selection && document.selection.empty) {
+                          document.selection.empty();
+                      } else if(window.getSelection) {
+                          var sel = window.getSelection();
+                          sel.removeAllRanges();
+                      }
+                  }
+        //can't make draggable because then you can't select text
+        var flip = false;
+        $( "#divCheckedSummary" ).dblclick(function(){ 
+                 if (flip){ 
+                    $(this).draggable('destroy').css('cursor', 'pointer'); 
+                 } else{ 
+                    $(this).draggable().css('cursor', 'move');
+                    
+                 }
+                 flip = !flip;
+                 clearSelection();
+
+              } );
+ 
         updateWLChecked();
   });
 </script>
@@ -592,7 +707,20 @@ $(document).bind('keydown', function(e) {
           <select id="selbox_with_wlchecked">
             <option value="">With checked:</option>
             <option value="generate-invoice"> &nbsp; &nbsp; Generate PDF Invoice</option>
+            <option value="lock-worklogs"> &nbsp; &nbsp; Lock</option>
+            <option value="unlock-worklogs"> &nbsp; &nbsp; Unlock</option>
+            <option value="invoice-date-today"> &nbsp; &nbsp; Mark Billed Today</option>
+            <option value="mark-paid-today"> &nbsp; &nbsp; Mark Paid Today</option>
             </select>
+            
+            
+            <form action method="GET" style="display: inline" onsubmit="var uri; if ($(this.search_method).val() == 'within'){ uri = window.location.href; uri = updateQueryStringParameter(uri,'search', $(this.search).val()); }else{ uri = '?search=' + encodeURIComponent($(this.search).val()); }window.location.href = uri; return false;">
+               <input type="text" name="search" value="<?=!empty($_GET['search']) ? htmlentities($_GET['search']) : ''?>" title="Search Work Logs" placeholder="Search..." size=10 />
+               <input type="submit" title="Search all worklogs " ="all" value=" All "/>
+               <input type="submit" title="Search within filter" name="within" value=" Within " onclick="this.form.search_method.value = 'within';"/>
+               <input type="hidden" name="search_method" value="all">
+            </form>
+
             <strong class="OrangeColor">Filter:</strong> 
             <?PHP makeFilterLink('Paid', 'paid', '1'); ?>,<?PHP makeFilterLink('Unpaid', 'paid', '0'); ?> | 
             <?PHP makeFilterLink('Billed', 'billed', '1'); ?>,<?PHP makeFilterLink('Not Billed', 'billed', '0'); ?> | 
@@ -600,7 +728,7 @@ $(document).bind('keydown', function(e) {
             &nbsp; 
             <span id="seldate_short">
             <select>
-               <option value="">--- Filter by Date Billed ---</option>
+               <option value="">--- Date Billed ---</option>
                <option value="show-all" data-after-date-billed="" data-before-date-billed="">Show All</option>
                <option value="30-days-ago" data-after-date-billed="30 days ago" data-before-date-billed="">30 days ago</option>
                <option value="60-days-ago" data-after-date-billed="60 days ago" data-before-date-billed="">60 days ago</option>
@@ -649,12 +777,13 @@ $(document).bind('keydown', function(e) {
             });
             
             </script>
+            
             &nbsp;
-            <strong class="OrangeColor">Export:</strong>
-            <a href="<?=modQS(array('output'=>'csv'))?>" title="Export entries below to csv format"><img src="images/excel_csv.png"> csv</a>
+            <a href="<?=modQS(array('output'=>'csv'))?>" title="Export entries below to csv format"><img src="images/excel_csv.png"></a>
+            <a href="<?=modQS(array('output'=>'xlsx'))?>" title="Export entries below to Excel 2007 xlsx format"><img src="images/excel_xlsx.png"></a>
             <?PHP /*** DOESN'T WORK CORRECTLY <a href="<?=modQS(array('output'=>'xls'))?>" title="Export entries below to Excel xls format"><img src="images/excel_xls.png"> xls</a> **/ ?>
-            <a href="<?=modQS(array('output'=>'xlsx'))?>" title="Export entries below to Excel 2007 xlsx format"><img src="images/excel_xlsx.png"> xlsx</a>
-            <a target="_blank" href="<?=modQS(array('output'=>'json'))?>" title="Export entries below to json format"><img src="images/json.png"> json</a>
+            
+            <?PHP /** <a target="_blank" href="<?=modQS(array('output'=>'json'))?>" title="Export entries below to json format"><img src="images/json.png"> json</a> **/ ?>
             <?PHP /** Not sure anyone even uses the notes feature right now
             <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | 
             <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | 
@@ -687,7 +816,7 @@ $(document).bind('keydown', function(e) {
             <?PHP
               if (!empty($specific_company_id)){
             ?>
-                <select onChange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&filter[]=unpaid';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
+                <select onChange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&paid=0';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
                 <option value="" selected>-- Work Log --</option>
                 <option value="" <?=!$unpaid && !$paid? 'selected' : ''?>>[All Work Logs]</option>
                 <option value="unpaid" <?=$unpaid ? 'selected' : ''?>>[Unpaid Work Logs]</option>
@@ -715,26 +844,133 @@ $(document).bind('keydown', function(e) {
      	  $ary_or_qs = array();
      }
      
-     $CURQS = array_merge($_GET, $ary_or_qs);
-     $qs = '';
-     foreach($CURQS as $key => $val)
-     {
-        if (in_array($key, $ary_unset)){ unset($CURQS[$key]); continue; }
-        if (isset($ary_or_qs[$key])) {
-        	   $CURQS[$key] = $ary_or_qs[$key];
-        }
-        if ($qs == ''){ $qs = '?'; }
-        else { $qs .= '&'; }
-        
-		if (is_string($key) && is_string($CURQS[$key])){
-           $qs .= urlencode($key).'='.urlencode($CURQS[$key]);
-		}
+     if (!is_array($ary_unset)){
+        $ary_unset = array($ary_unset);
      }
-     return $qs;
+     
+    
+     $CURQS = array_merge($_GET, $ary_or_qs);
+     
+     //actually generate the query string
+     $qs = '';
+     foreach($CURQS as $key => $val){
+     
+         if (in_array($key, $ary_unset)){
+            continue; //ignore this key
+         }
+
+         if (isset($ary_or_qs[$key])) {
+            $CURQS[$key] = $ary_or_qs[$key];
+         }
+         
+         if (is_string($key) && is_string($CURQS[$key])){
+            if ($qs == ''){ $qs = '?'; }
+            else { $qs .= '&'; }
+            $qs .= urlencode($key).'='.urlencode($CURQS[$key]);
+         }
+     }
+     //if the query string is empty, we need to specify the page
+     if (empty($qs)){
+         return $_SERVER['PHP_SELF'];
+     }else{
+        return $qs;
+     }
    }
 ?>
+<style>
+#divCheckedSummary{
+   /*position: fixed;*/
+   background-color: #ffe6cc;
+   border: 1px solid silver;
+   margin-left: 1em;
+   width: 40em;
+   padding_top: 2px;
+   
+   
+   display: block;
+   position: absolute;
+   left: 345px;
+   top: 39px;
+   filter: alpha(opacity=90);
+   opacity: 0.9;
+}
+
+/*draw pretty line to separate totals*/
+#divCheckedDetailed table tr.totals td{
+  border-top: 1px solid black;
+}
+
+#divCheckedDetailed button{ padding: 4px; }
+#divCheckedDetailed table td{
+   padding-left: 3px;
+   padding-right: 3px;
+}
+
+
+</style>
+<div id="divCheckedSummary">
+<div id="divCheckedDetailed">
+</div>
+</div>
 <div class="dataBlk">
 <script>
+function glbGetCheckedCSVids(){
+     var s = '';
+     $('.wlcbxes:checked').each(function(){
+        if (s != ''){ s += ','; }
+        s += $(this).val();
+     });
+     return s;
+}
+
+function glbPostAction(action, csv_worklog_ids, callback){
+        $.post('ajax_service.php', {'action': action, 'csv_worklog_ids':csv_worklog_ids}, 
+        function (data){
+          if (typeof(callback) == 'function'){ callback(data); }
+        }, 'json');
+}
+
+function glbDoWithChecked(action){
+   var s = glbGetCheckedCSVids();
+   var ids = s.split(',');
+   if (action == 'generate-invoice'){
+        window.location.href = 'invoice.php?wid='+s+'&format=pdf';
+        return;
+   }else if (action == 'lock-worklogs'){
+       glbPostAction(action, s, function(data){
+          if (!data.error){
+             for (var i = 0; i < data.work_logs.length; ++i){
+                glbUpdateWorkLogJS(data.work_logs[i]);
+             }
+          }
+       });
+   }else if (action == 'unlock-worklogs'){
+       glbPostAction(action, s, function(data){
+          if (!data.error){
+             for (var i = 0; i < data.work_logs.length; ++i){
+                glbUpdateWorkLogJS(data.work_logs[i]);
+             }
+          }
+       });
+   }else if (action == 'invoice-date-today'){
+       glbPostAction(action, s, function(data){
+          if (!data.error){
+             for (var i = 0; i < data.work_logs.length; ++i){
+                glbUpdateWorkLogJS(data.work_logs[i]);
+             }
+          }
+       });
+   }else if (action == 'mark-paid-today'){
+       glbPostAction(action, s, function(data){
+          if (!data.error){
+             for (var i = 0; i < data.work_logs.length; ++i){
+                glbUpdateWorkLogJS(data.work_logs[i]);
+             }
+          }
+       });
+   }
+}
+
 $(function(){
     $('#selbox_with_wlchecked').change(function(){
        var action = $(this).val();
@@ -744,16 +980,7 @@ $(function(){
               alert('Please check a worklog before trying to perform an action');
               return;
            }
-           var s = '';
-           $('.wlcbxes:checked').each(function(){
-              if (s != ''){ s += ','; }
-              s += $(this).val();
-           });
-           
-           if (action == 'generate-invoice'){
-               window.location.href = 'invoice.php?wid='+s+'&format=pdf';
-               return;
-           }
+           glbDoWithChecked(action);
        }
     });
 });
@@ -779,7 +1006,14 @@ $(function(){
       }
    }
 ?>
-
+<?PHP
+  if (!empty($ERROR_MSG)){
+?>
+<div class="error">
+<?=$ERROR_MSG?>
+</div>
+<br><br>
+<?PHP } ?>
 <div id="basic">
 </div>
 <div class="SummaryBlock">
@@ -944,6 +1178,22 @@ glbDeleteNote = function(wid, note_id){
   f.submit();
 }
 
+
+glbFindRecordById = function(id){
+   //find record by oData.id
+   var recordSet = glbDataTable.getRecordSet();
+   var records = recordSet.getRecords();
+   var record = false;
+
+   for (var i = 0; i < records.length; ++i){
+      if (records[i].getData('id') == id){
+         record = records[i];
+         break;
+      }
+   }
+   return record;
+}
+
 /**
  * Update the datatable row with data by a given record 
  *(it will attempt to find the record if oRecord is undefined)
@@ -997,7 +1247,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 var locked = oRecord.getData('locked') == '1';
                 var inprogress = oRecord.getData('_in_progress_');
                 var id = oRecord.getData('id');
-                elLiner.innerHTML = '<input type=checkbox onclick="updateWLChecked();" class="wlcbxes" name="cbx_wl_'+id+'" value="'+id+'"> &nbsp;';
+                elLiner.innerHTML = '<input type=checkbox onclick="updateWLChecked(this, '+id+');" onchange="updateWLChecked(this, '+id+');" class="wlcbxes" name="cbx_wl_'+id+'" value="'+id+'"' + (oRecord.getData('__checked__') ? 'checked="checked"' : '') + '> &nbsp;';
                 elLiner.innerHTML += locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' 
                                            : (inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar.png" /></a>' : ' <a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>');
                 elLiner.innerHTML += gen_jquery_uimenu(oRecord.getData('id'), locked, inprogress);
@@ -1099,25 +1349,29 @@ YAHOO.util.Event.addListener(window, "load", function() {
             //{key:"id", sortable:true, resizeable:true},
             //{key:"company_id", sortable:true, resizeable:true},
             //<input type=checkbox onclick='var self = this; $(\".wlcbxes\").each(function(){ $(this).prop(\"checked\", !!self.checked); }); updateWLChecked();'>
-            {key:"_extra_", label:"<span style='font-size: 10px'>Actions</span>", formatter:formatExtra, sortable:true,resizeable:false},
+            {key:"_extra_", label:"<span style='font-size: 10px'><input type='checkbox' id='cbxCheckAll' onchange='checkAllWorkLogs(this.checked)'> Actions</span>", formatter:formatExtra, sortable:false,resizeable:false},
             <?PHP if (!isset($_GET['wid'])) { ?>{key:"title", label: "Title", sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}, <?PHP } ?>
-            <?PHP if (!isset($_GET['company']) && !isset($_GET['wid'])){ ?>{key:"company_name", label: "Company", sortable:true, resizeable: true, formatter:myCustomCompanyFormatter},<?PHP } ?>
-            {key:"description", label: "Description <br>Files Changed / Notes", width: 167, formatter:formatDescriptionAndNotes, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
-            {key:"_calc_hours_", label:"Calculated<br>Hours", sortable:true, resizeable:true},
+            <?PHP if (!isset($_GET['company']) && !isset($_GET['wid'])){ ?>{key:"company_name", label: "Client", sortable:true, resizeable: true, formatter:myCustomCompanyFormatter},<?PHP } ?>
+           {key:"_calc_hours_", label:"Calculated<br>Hours", sortable:true, resizeable:true},
             {key:"hours", label: "Actual<br>Hours", sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
             {key:"rate", label: "Price<br>Rate", formatter:YAHOO.widget.DataTable.formatCurrency, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
             {key:"_calc_amount_", label: "Calculated<br>Amount", formatter:YAHOO.widget.DataTable.formatCurrency, sortable:true, resizeable:true},
             {key:"amount_billed", label: "Actual<br>Amount Billed", formatter:YAHOO.widget.DataTable.formatCurrency, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
             {key:"date_billed", label: "Date<br>Billed", formatter:YAHOO.widget.DataTable.formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC},resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
-            {key:"date_paid", label: "Date<br>Paid", formatter:YAHOO.widget.DataTable.formatDate, formatter:YAHOO.widget.DataTable.formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC},resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}
-                 
+            {key:"date_paid", label: "Date<br>Paid", formatter:YAHOO.widget.DataTable.formatDate, formatter:YAHOO.widget.DataTable.formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC},resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
+            {key:"description", label: "Description <br>Files Changed / Notes", width: 25, formatter:formatDescriptionAndNotes, sortable:true, resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}
+                  
         ];	
 
         var myDataSource = new YAHOO.util.DataSource(<?=json_encode($rows)?>);
 
         myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
         myDataSource.responseSchema = {
-            fields: ["id","locked", "company_id","company_name","title","description", "files_log", "note_log","_calc_hours_","hours","rate","_calc_amount_","_in_progress_", "_extra", "amount_billed","date_billed","date_paid"]
+            fields: ["__checked__", //is the field checked or not
+                     "id","locked", "company_id","company_name","title","description", 
+                     "files_log", "note_log",
+                     "_calc_hours_","hours","rate","_calc_amount_",
+                     "_in_progress_", "_extra", "amount_billed","date_billed","date_paid"]
         };
 
 
@@ -1254,138 +1508,91 @@ var gridHelper = {
 
      if (action == 'select'){
 
-	glbDataTable.selectRow(oRecord);
-
-	oRecord.setData("check", true);        
+      glbDataTable.selectRow(oRecord);
+      oRecord.setData("check", true);        
 
      }else if (action == 'unselect'){
-
         glbDataTable.unselectRow(oRecord);
-
         oRecord.setData("check", false);
-
      }
-
    },
 
    doWithRowsWhere : function(action, column, comparison, value){
 
 	var num_selected = 0;
-
 	var length = glbDataTable.getRecordSet().getLength();
 
-        for (var i = 0; i < length; ++i){
+   for (var i = 0; i < length; ++i){
 
 		var oRecord = glbDataTable.getRecord(i);
 
-                var data = oRecord.getData();
+      var data = oRecord.getData();
 
 		if (comparison == 'csv_has'){
-
-       
-
-                     var dc_ary = data[column].slice(',');
-
-                     for (var j = 0; j < dc_ary.length; ++j){
-
-			if (dc_ary[j] == value){
-
-                           gridHelper.doWithRow(action, oRecord);
-
-			   num_selected++;
-
-			   break;
-
-                        }
-
-		     }
-
+            var dc_ary = data[column].slice(',');
+            for (var j = 0; j < dc_ary.length; ++j){
+               if (dc_ary[j] == value){
+                                 gridHelper.doWithRow(action, oRecord);
+                  num_selected++;
+                  break;
+               }
+		      }
 		}		
 
 		else if (comparison == 'contains'){
 
                    if (data[column].indexOf(value) >= 0){
-
                        gridHelper.doWithRow(action, oRecord);
-
                        num_selected++;
-
                     }
-
                 }else if (comparison == '='){
 
 		    if (data[column] == value){
-
                        gridHelper.doWithRow(action, oRecord);
-
                        num_selected++;
-
                     }
 
 		}else if (comparison == '>='){
 
 		    if (data[column] >= value){
-
                        gridHelper.doWithRow(action, oRecord);
-
                        num_selected++;
-
                     }
 
 		}else if (comparison == '>'){
 
 		    if (data[column] > value){
-
                        gridHelper.doWithRow(action, oRecord);
-
                        num_selected++;
-
                     }
-
 		}else if (comparison == '<='){
-
 		    if (data[column] <= value){
-
                        gridHelper.doWithRow(action, oRecord);
-
                        num_selected++;
-
                     }
-
 		}else if (comparison == '<'){
-
 		    if (data[column] < value){
-
                        gridHelper.doWithRow(action, oRecord);
-
                        num_selected++;
-
                     }
-
 		}
-
 	}
 
 	if (num_selected > 0){
-
      	   glbDataTable.render();
-
 	}
-
-
 
    },
 
-
-
    selectRowsWhere : function(column, comparison, value) { 
-
        gridHelper.doWithRowsWhere('select', column, comparison, value);
-
    }
 
 };
 
+checkAllWorkLogs = function(checked){
+   $('.wlcbxes').prop('checked', checked).change();
+}
 
 </script>
 <?PHP

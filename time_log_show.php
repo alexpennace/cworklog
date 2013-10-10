@@ -1,7 +1,7 @@
 <?PHP
-   require_once('lib/db.inc.php');
-   require_once('lib/Members.class.php');
-   require_once('lib/Site.class.php');
+   require_once(dirname(__FILE__).'/lib/db.inc.php');
+   require_once(dirname(__FILE__).'/lib/Members.class.php');
+   require_once(dirname(__FILE__).'/lib/Site.class.php');
    Members::SessionForceLogin();
    
 
@@ -186,6 +186,7 @@ table{ border-left: 1px solid #c7c7c7; }
 <link href="css/jqueryui/themes/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css"/>
 <script src="js/jquery-1.8.0.min.js"></script>
 <script src="js/jquery-ui-1.8.23.custom.min.js"></script>
+<script src="js/jquery.dialogPrompt.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
 </head>
 <body>
@@ -391,6 +392,110 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 
 <h2><?=$wl_row['title']?></h2>
 <h3>Billing To: <?=$wl_row['company_name']?></h3>
+
+<select id="selTimeLogsChecked">
+<option value="">With checked</option>
+<option value="move_to_worklog"> &nbsp; Move to another work log</option>
+</select>
+
+
+
+<script>
+$(function(){
+   countCheckedTimeLogs = function(){
+      return $('.cbxTimeLog:checked').length;
+   };
+   
+   getCheckedTimeLogsCSV = function(){
+       var s = '';
+       $('.cbxTimeLog:checked').each(function(){
+          if (s != ''){ s += ','; }
+          s += $(this).val();
+       });
+       return s;
+   }
+   
+   
+   $('.cbxTimeLog').click(function(){
+       var count = countCheckedTimeLogs();
+       $('#selTimeLogsChecked option:eq(0)').text('With ('+count+') checked').prop('selected', true);
+   });
+   
+   
+   glbPostAction = function(action, csv_timelog_ids, ex_obj, callback){
+        if (csv_timelog_ids == ''){
+           alert('Please choose a timelog');
+           return false;
+        }
+        var obj = {'action': action, 'csv_timelog_ids':csv_timelog_ids};
+        if (typeof(ex_obj) == 'object'){
+           $.extend(obj, ex_obj);
+        }
+        $.post('ajax_service.php', obj , 
+        function (data){
+          if (typeof(callback) == 'function'){ callback(data); }
+        }, 'json');
+   };
+   <?PHP
+       //grab all unlocked work logs
+       $prep = $DBH->prepare("SELECT work_log.id AS value, CONCAT(company.name, ' - ', work_log.title) AS text 
+                                FROM work_log JOIN company ON company.id = work_log.company_id 
+                                WHERE work_log.id != :cur_wl_id AND work_log.user_id = :uid AND !locked");  
+       $prep->execute(array(':cur_wl_id'=>$wl_row['id'],':uid'=>$_SESSION['user_id']));
+       $unlocked_worklogs = $prep->fetchAll(PDO::FETCH_ASSOC);
+   ?>
+   unlocked_worklog_options = <?=json_encode($unlocked_worklogs)?>;
+    
+   doWithSelectedTimeLogs = {
+      move_to_worklog:function(){
+         if (unlocked_worklog_options.length == 0){
+            alert('You have no other unlocked work logs');
+            return;
+         }
+         var options = [];//[{value:'',text:'Choose a work log'}];
+
+         for(var i = 0; i < unlocked_worklog_options.length; ++i){
+            options.push(unlocked_worklog_options[i]);
+         }
+         var size = options.length;
+         if (size > 30){ size = 30; }
+         
+         $.dialogPrompt({title:'Move ' + countCheckedTimeLogs() + ' time logs to work log', type:{type:'select',options:options, size:size}, 
+            success:function(value){
+                 if (value != ''){
+                    glbPostAction('move_timelogs_to_worklog', getCheckedTimeLogsCSV(), {worklog_id: value}, 
+                       function(data){
+                         if (data.error){
+                            alert('Error occurred');
+                            console.log(data);
+                         }
+                         else{
+                            alert('Work logs moved =)');
+                         }
+                         window.location.href = window.location.href;
+                       });
+                 }else{
+                    alert('You have to choose a work log');
+                    return false;
+                 }
+            }});
+      }
+   };
+   
+   $('#selTimeLogsChecked').change(function(){
+     if (countCheckedTimeLogs() > 0){
+        var doo = doWithSelectedTimeLogs[$(this).val()];
+        if (typeof(doo) == 'function'){
+            doo();    
+        }
+     }else{
+       alert('You must check a time log first');
+     }
+     $(this).val('');
+   });
+});
+</script>
+
 <table border=0 cellpadding=2 cellspacing=0 class="datatable">
 <thead>
 <tr><th><form method="POST" style="display:inline"><input title="Add Time Log Entry" type="image" name="add_entry" value="1" style="width: 22px" src="images/plus_sign.png"></form></th><th>Start Time</th><th>Stop Time</th><th>Duration</th><th>Notes</th></tr>
@@ -399,14 +504,16 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 <?PHP foreach($time_log as $i => $row){ ?>
 <tr>
 <td>
+<input class="cbxTimeLog" type="checkbox" name="timelogs_checked[]" value="<?=$row['id']?>"/>
+
 <a title="Delete this time log entry" href="delete.php?time_log_id=<?=$row['id']?>"><img src="images/delete.png" style="border: 0px; width: 16px;"/></a>
 </td>
-<td class="editable" rowid="<?=$row['id']?>" cellid="timelog[start_time][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>');"><span id="spn_start_time_<?=$row['id']?>"><?=date('M j, Y g:i:s A', strtotime($row['start_time']))?></span></td>
+<td class="editable" rowid="<?=$row['id']?>" cellid="timelog[start_time][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>');"><span id="spn_start_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', strtotime($row['start_time']))?></span></td>
 <?PHP
       $now_res = mysql_query("SELECT NOW()");
 	  $now_row = mysql_fetch_assoc($now_res); 
 ?>
-<td class="editable" rowid="<?=$row['id']?>" cellid="timelog[stop_time][<?=$row['id']?>]" title="Double-Click to edit stop time" id="stop_time_<?=$i?>" <?=is_null($row['stop_time'])?'style="color: orange;"':''?> ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['stop_time']))?>');"><span style="display: none;"><input type="text" name="time[stop_time][<?=$row['id']?>]" value="<?=date('M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?>"/><br><a href="#save" onclick="alert('saved'); return false;">Save</a> <a href="#cancel" onclick="this.parentNode.style.display = 'none'; this.parentNode.parentNode.getElementsByTagName('SPAN')[1].style.display = 'inline'; return false;">Cancel</a>  </span><span id="spn_stop_time_<?=$row['id']?>"><?=date('M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?></span></td>
+<td class="editable" rowid="<?=$row['id']?>" cellid="timelog[stop_time][<?=$row['id']?>]" title="Double-Click to edit stop time" id="stop_time_<?=$i?>" <?=is_null($row['stop_time'])?'style="color: orange;"':''?> ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['stop_time']))?>');"><span style="display: none;"><input type="text" name="time[stop_time][<?=$row['id']?>]" value="<?=date('M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?>"/><br><a href="#save" onclick="alert('saved'); return false;">Save</a> <a href="#cancel" onclick="this.parentNode.style.display = 'none'; this.parentNode.parentNode.getElementsByTagName('SPAN')[1].style.display = 'inline'; return false;">Cancel</a>  </span><span id="spn_stop_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?></span></td>
 <td align=right <?=is_null($row['stop_time'])?'style="color: orange;"':''?>><?PHP
    if (!is_null($row['stop_time'])){
       $total_seconds = strtotime($row['stop_time']) - strtotime($row['start_time']);
@@ -431,7 +538,7 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 	  $super_total_seconds += $total_seconds;
    }
 ?><div id="calculated_minutes_<?=$row['id']?>" style="display: none"></div></td>
-<td class="editable" id="timelog[notes][<?=$row['id']?>]" rowid="<?=$row['id']?>" cellid="timelog[notes][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, null);"
+<td class="editable" id="timelog[notes][<?=$row['id']?>]" rowid="<?=$row['id']?>" cellid="timelog[notes][<?=$row['id']?>]" title="Double-Click to edit notes" ondblclick="timelog_makeEditable(this, null);"
 ><?=!empty($row['notes']) ? htmlentities($row['notes']) : '&nbsp;'?></td>
 </tr>
 <?PHP } ?>
@@ -495,6 +602,7 @@ foreach($features as &$feature){
       
 }
 
+if (count($features) > 0){
 ?><br><br>
 <h3><?=count($features)?> features for this worklog</h3><?PHP
   if (count($features) > 0){
@@ -509,6 +617,7 @@ foreach($features as &$feature){
        ?></table><?PHP       
      }
   }
+}
 ?>
 </div>
 </body>

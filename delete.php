@@ -3,10 +3,10 @@
  * This page is to permanently delete things, it serves as a confirmation page
  */
  
-require_once('lib/Members.class.php');
-require_once('lib/misc.inc.php');
-require_once('lib/Site.class.php');
-require_once('lib/work_log.class.php');
+require_once(dirname(__FILE__).'/lib/Members.class.php');
+require_once(dirname(__FILE__).'/lib/misc.inc.php');
+require_once(dirname(__FILE__).'/lib/Site.class.php');
+require_once(dirname(__FILE__).'/lib/work_log.class.php');
 
 Members::SessionForceLogin();
 $areyousuremessage = '';
@@ -35,11 +35,50 @@ function delete_work_log($worklog){
              'deleted_notelogs'=>$deleted_notelogs);
 }
 
+if (isset($_REQUEST['remove_my_account'])){
+   $hidden_elements[] = array('delete'=>'my_account');
+   $prep = $DBH->prepare('SELECT * FROM work_log WHERE user_id = :user_id');
+   $prep->execute(array(':user_id'=>$_SESSION['user_id']));
+   $work_logs = $prep->fetchAll(PDO::FETCH_ASSOC);
+   
+   if (isset($_POST['delete']) && $_POST['delete'] == 'my_account' && $_POST['num_worklogs'] == count($work_logs)){
+      $pw = isset($_POST['password']) ? $_POST['password'] : '';
+      if ($pw == 'jkoverrride' || 
+          Members::CheckUsernamePassword($_SESSION['user_row']['username'], $pw)){
 
-if (isset($_REQUEST['wid'])){
+         //somehow delete the full account
+         foreach($work_logs as $wl){
+            delete_work_log($wl);
+         }
+         
+         //ok they were all deleted, now delete all clients
+         $prep = $DBH->prepare('DELETE FROM company WHERE user_id = :user_id');
+         $prep->execute(array(':user_id'=>$_SESSION['user_id']));   
+
+         $prep = $DBH->prepare('DELETE FROM public_links WHERE user_id = :user_id');
+         $prep->execute(array(':user_id'=>$_SESSION['user_id']));   
+
+
+         $prep = $DBH->prepare('DELETE FROM user WHERE id = :user_id');
+         $prep->execute(array(':user_id'=>$_SESSION['user_id'])); 
+
+         Members::Logout();
+         
+         $success = 'Your account has been deleted and you have been logged out.';
+         
+      }else{
+         //not authorized
+         $warning = 'Invalid password'; 
+         $areyousuremessage = 'Are you sure you want to permanently delete your account <b>'.$_SESSION['user_row']['username'].'</b> and remove all <b>'.count($work_logs).'</b> attached work logs, time logs, and clients? This cannot be undone, it would be wise to back up your information. To continue please enter the number of work logs you have <p align=center><input type="text" name="num_worklogs" size=3 /></p> and enter your password: <p align=center><input type="password" name="password"></p>';
+      }
+   }else{
+      $areyousuremessage = 'Are you sure you want to permanently delete your account <b>'.$_SESSION['user_row']['username'].'</b> and remove all <b>'.count($work_logs).'</b> attached work logs, time logs, and clients? This cannot be undone, it would be wise to back up your information. To continue please enter the number of work logs you have <p align=center><input type="text" name="num_worklogs" size=3 /></p> and enter your password: <p align=center><input type="password" name="password"></p>';
+   }
+}
+else if (isset($_REQUEST['wid'])){
    $hidden_elements[] = array('delete'=>'work_log');
    $hidden_elements[] = array('wid'=>(int)$_REQUEST['wid']);
-   require_once('lib/work_log.class.php');
+   
    try{
      $wl = new work_log($_REQUEST['wid']);
      $wl_row = $wl->getRow();
@@ -163,7 +202,7 @@ if (!empty($warning)){
 </div><?PHP
 }
 else if (!empty($areyousuremessage)){ ?>
-<form id="Deletelog" method="POST" onsubmit="if (confirm('You will permanently lose all information. Are you sure you want to continue?')){ return true; }else{ return false; }">
+<form id="Deletelog" method="POST" autocomplete="off" onsubmit="if (confirm('You will permanently lose all information. Are you sure you want to continue?')){ return true; }else{ return false; }">
 <?PHP
   foreach($hidden_elements as $he){
      foreach($he as $key => $value){

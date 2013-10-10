@@ -57,25 +57,47 @@
    $total_dollars = 0;
    $total_rate = 0;  
    performExtraTimeLogCalculations($month_timelogs, $total_rate, $total_seconds, $total_dollars);
-   $avg_rate = $total_rate / count($month_timelogs);
+   if (count($month_timelogs) == 0){
+      $avg_rate = 0;
+   }else{
+      $avg_rate = $total_rate / count($month_timelogs);
+   }
    
    echo 'Total Hours (hh:mm:ss) '.work_log::sec2hms($total_seconds).' @ avg $'.number_format($avg_rate, 2).'/hr =&gt; $'.number_format($total_dollars, 2);
  
-  
+   $total_month_seconds = 0;
+   $total_month_dollars = 0;
+   $total_month_rate = 0; 
+   $total_month_timelogs = 0;   
    for ($m = 1; $m <= $last_day_of_month; ++$m){
       $curday = $month." $m, ".$year;
       echo '<div class="curday">'.date('l M j, Y', strtotime($curday)).'</div>';
       $day_timelogs = $timeDetails->getAllTimeLogsBetween($curday, $curday);
+      
+      
       $total_seconds = 0;
       $total_dollars = 0;
       $total_rate = 0;  
       performExtraTimeLogCalculations($day_timelogs, $total_rate, $total_seconds, $total_dollars);
       $avg_rate = count($day_timelogs) > 0 ? $total_rate / count($day_timelogs) : 0;
+      
+      
+      $total_month_seconds += $total_seconds;
+      $total_month_dollars += $total_dollars;
+      $total_month_rate += $total_rate;
+      $total_month_timelogs += count($day_timelogs);
+      
+      
       echo array2table($day_timelogs);
       echo 'Total Hours (hh:mm:ss) '.work_log::sec2hms($total_seconds).' @ avg $'.number_format($avg_rate, 2).'/hr =&gt; $'.number_format($total_dollars, 2);
       echo '<br>';
    }
-  
+   
+   $total_month_avg_rate = $total_month_timelogs > 0 ? $total_month_rate / $total_month_timelogs : 0;
+   echo '<h2>Monthly Summary</h2>';
+   echo 'Total Hours (hh:mm:ss) '.work_log::sec2hms($total_month_seconds).' @ avg $'.number_format($total_month_avg_rate, 2).'/hr =&gt; $'.number_format($total_month_dollars, 2);
+
+   
    //array2table($month_timelogs);
   
   /**

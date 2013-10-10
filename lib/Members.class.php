@@ -61,9 +61,10 @@
         }
         
         public static function MenuBarOpenBottomLeftOpen(){
-          $name = $_SESSION['user_row']['name'];
+        
+          $name = isset($_SESSION['user_row']['name']) ? $_SESSION['user_row']['name'] : '';
           if (empty($name)){
-             $name = $_SESSION['user_row']['username'];
+             $name = isset($_SESSION['user_row']['username']) ? $_SESSION['user_row']['username'] : '';
           }
           ?>
             <style>
@@ -228,6 +229,7 @@
 		}
 		public static function SessionForceLogin()
 		{
+         session_set_cookie_params(3600*24*7); // sessions lasts 7 days
 		   session_start();
 		   if (!self::IsLoggedIn()){
 		      if (!empty($_GET['mobile'])){ $mobile = 'mobile=1&'; } else { $mobile = ''; }
@@ -239,7 +241,8 @@
 		}
 		
 		public static function SessionAllowLogin(){
-		   session_start();
+		   session_set_cookie_params(3600*24*7); // sessions lasts 7 days
+         session_start();
 		}
 		
 		public static function GetUserByUsername($username)
@@ -264,8 +267,29 @@
 		   }
 		}
 		
-		public static function Login($username_or_email, $password)
-		{
+      public static function SuperLogin($username_or_email_or_id){
+		   $sql = "SELECT * FROM user WHERE ";
+		   if (is_numeric($username_or_email_or_id)){
+             $sql .= ' id = %d ';
+         }
+         else if (strpos($username_or_email_or_id, '@') !== false){
+			      $sql .= "LOWER(email) = '%s'";
+			}else{
+				  $sql .= "LOWER(username) = '%s'";
+			}
+			$sql .= " LIMIT 1";
+			$result = mysql_query(sprintf($sql, strtolower($username_or_email_or_id)));
+			if ($result && $row = mysql_fetch_assoc($result)){
+				$_SESSION['user_row'] = $row;
+				$_SESSION['user_id'] = $row['id'];
+			}else{
+			    $_SESSION['user_row'] = false;
+			}
+			return $_SESSION['user_row'];      
+      }
+      
+      public static function CheckUsernamePassword($username_or_email, $password)
+      {
 		    $sql = "SELECT * FROM user WHERE password = MD5('%s') AND ";
 		    if (strpos($username_or_email, '@') !== false){
 			      $sql .= "LOWER(email) = '%s'";
@@ -275,6 +299,16 @@
 			$sql .= " LIMIT 1";
 			$result = mysql_query(sprintf($sql, $password, strtolower($username_or_email)));
 			if ($result && $row = mysql_fetch_assoc($result)){
+            return $row;
+         }else{
+            return false;
+         }
+       
+      }
+      
+		public static function Login($username_or_email, $password)
+		{
+         if ($row = self::CheckUsernamePassword($username_or_email, $password)){
 				$_SESSION['user_row'] = $row;
 				$_SESSION['user_id'] = $row['id'];
 			}else{

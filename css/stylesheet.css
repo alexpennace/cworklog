@@ -510,7 +510,7 @@ margin-top:15px;
 border-radius: 5px!important;
 	
 }
-#formsetting  input[type="submit"],#formsetting2  input[type="submit"],#formsetting3  input[type="submit"] {
+.settings input[type="submit"], #formsetting  input[type="submit"],#formsetting2  input[type="submit"],#formsetting3  input[type="submit"] {
 background: #ABDA0F url(../images/overlay.png) repeat-x;
 padding: 8px 10px 8px;
 color: white;
@@ -608,3 +608,5 @@ width: 160px;
 padding: 5px;
 margin-bottom: 10px;
 }
+
+
