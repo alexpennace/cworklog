@@ -1,0 +1,14 @@
+@charset "utf-8";
+/* CSS Document */
+
+@font-face {
+    font-family: 'sansfatregular';
+    src: url('../fontface/sansfat-webfont.eot');
+    src: url('../fontface/sansfat-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fontface/sansfat-webfont.woff') format('woff'),
+         url('../fontface/sansfat-webfont.ttf') format('truetype'),
+         url('../fontface/sansfat-webfont.svg#sansfatregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}

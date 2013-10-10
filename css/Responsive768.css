@@ -1,0 +1,125 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media screen and (max-width: 768px)
+{
+	img.beta, #right, a.laptop_small
+	{
+		display: none !important;
+	}
+	
+	span.register
+	{
+		margin: 3.5em 3% 0 !important;
+		
+	}
+	
+	ul.nav
+	{
+		top: 0.5em !important;
+		right: 0 !important;
+	}
+	
+	#middle-wrapper h1
+	{
+		width: 75% !important;
+		font-size: 200%;
+	}
+	
+	p
+	{
+		width: 70%!important;
+	}
+	
+	#left
+	{
+		width: 65% !important;
+	}
+	
+	#left a img
+	{
+		margin-left: 28%;
+	}
+	
+	.steps
+	{
+		width: 50% !important;
+		margin-left: 17% !important;
+		margin-top: 4em !important;
+	}
+	
+	.steps ul li.two, .steps ul li.three
+	{
+		margin-left: 0 !important;
+		clear: left !important;
+	}
+	
+	#features ul li, #features ul li.second, #features ul li.third
+	{
+		float: left !important;
+		clear: left !important;
+		margin: 0.25em 0 !important;
+	}
+	
+	#features ul
+	{
+		margin-bottom: 0 !important;
+	}
+	
+	#features ul.bottom
+	{
+		padding: 0 0 0 2.5em !important;
+		margin-top: 0 !important;
+	}
+	
+	#offer-left, #offer-center, #offer-right
+	{
+		width: 26% !important;
+	}
+	
+	#offer-left img, #offer-center img, #offer-right img
+	{
+		width: 100% !important;
+	}
+	
+	#offer-left
+	{
+		left: 18px !important;
+	}
+	
+	#offer-center
+	{
+		left: 25.5% !important;
+	}
+	
+	#offer-right
+	{
+		left: 49%;
+	}
+	
+	#lower-wrapper h1
+	{
+		width: 75% !important;
+	}
+	
+	#offers h1
+	{
+		width: 100% !important;
+	}
+	
+	p.copy
+	{
+		width: 20% !important;
+		padding-right: 10%;
+	}
+	
+	.footer-wrapper a.docs
+	{
+		padding-left: 2% !important;	
+	}
+	
+	#offers a
+	{
+		height: 77px;
+	}
+}

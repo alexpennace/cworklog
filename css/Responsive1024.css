@@ -1,0 +1,59 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media screen and (max-width: 1024px)
+{
+	#header
+	{
+		width: 95% !important;
+	}
+	
+	#left
+	{
+		width: 48% !important;
+		margin-left: 2%;
+	}
+	
+	#right
+	{
+		width: 45%;
+	}
+	
+	#right img
+	{
+		width: 100%;
+		margin-top: 3.6em;
+	}
+	
+	.steps ul
+	{
+		width: auto !important;
+		font-size: 0.8em;
+		margin: 0 auto;
+	}
+	
+	#offer-right
+	{
+		right: 20px !important;
+	}
+	
+	#footer
+	{
+		height: auto !important;
+	}
+	
+	#features h1
+	{
+		margin: 0 0 0 3% !important;
+	}
+	
+	#features ul li.third, #features ul li.second
+	{
+		margin: 0 0 0 2em !important;
+	}
+	
+	#features ul.bottom
+	{
+		padding: 0 0 0 17em !important;
+	}
+}

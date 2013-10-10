@@ -1,0 +1,100 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media screen and (max-width: 480px)
+{
+	ul.nav li a
+	{
+		color: #2F343A !important;
+	}
+	
+	ul.nav li a.login
+	{
+		color: #FCCF38 !important;
+	}
+	
+	ul.nav
+	{
+		top: 6.5em !important;
+		left: 2% !important;
+	}
+	
+	#middle-wrapper h1
+	{
+		margin: 0 !important;
+		padding: 0 !important;
+		margin-left: 1% !important;
+		width: 45% !important;
+	}
+	
+	p
+	{
+		width: 46% !important;
+		font-size: 120% !important;
+		clear: left;
+	}
+	
+	#header-wrapper
+	{
+		z-index: 100;
+	}
+	
+	span.register
+	{
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+	
+	#middle-wrapper h1
+	{
+		padding-top: 2em !important;
+	}
+	
+	.steps
+	{
+		margin-left: 5% !important;
+	}
+	
+	#left a img
+	{
+		margin-left: 9% !important;
+	}
+	
+	#lower-wrapper h1
+	{
+		width: 46% !important;
+	}
+	
+	#offers h1
+	{
+		width: 100% !important;
+	}
+	
+	#offer-left, #offer-center, #offer-right
+	{
+		position: static !important;
+		float: left;
+		clear: left;
+		margin-left: 13%;
+		margin-top: 1%;
+	}
+	
+	#offer-left ul, #offer-right ul, #offer-center ul
+	{
+		display: none;
+	}
+	
+	#footer p
+	{
+		float: left;
+		clear: left;
+		width: 45% !important;
+	}
+	
+	#lower-wrapper
+	{
+		height: 722px !important;
+	}
+	
+}

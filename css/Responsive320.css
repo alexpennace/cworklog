@@ -1,0 +1,121 @@
+@charset "utf-8";
+/* CSS Document */
+
+@media screen and (max-width: 320px)
+{
+	#features h1
+	{
+		clear: left;
+	}
+	ul.nav li a
+	{
+		color: #2F343A !important;
+	}
+	
+	ul.nav li a.login
+	{
+		color: #FCCF38 !important;
+	}
+	
+	#middle-wrapper h1
+	{
+		width: 29% !important;
+	}
+	
+	.steps
+	{
+		clear: left;
+		margin-left: -3% !important;
+		font-size: 75% !important;
+	}
+	
+	ul.nav
+	{
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+	ul.nav li
+	{
+		padding: 0  0.4em 0 !important;
+		margin-top: 1em !important;
+	}
+	
+	span.register
+	{
+		display: none;
+	}
+	
+	p
+	{
+		width: 30% !important;
+	}
+	
+	#left a img
+	{
+		width: 41%;
+		margin-left: 0 !important;
+	}
+	#features h1
+	{
+		font-size: 185% !important;
+	}
+	
+	#features ul li.third, #features ul li.first, #features ul li.second
+	{
+		width: 31% !important;
+		font-size: 90% !important;
+	}
+	
+	#features ul li.third
+	{
+		height: 1.5em !important;
+	}
+	
+	#features ul.bottom
+	{
+		padding: 0 !important;
+		width: 25% !important;
+		font-size: 107% !important;
+	}
+	
+	#features ul
+	{
+		margin-left: 3%;
+	}
+	
+	#features ul
+	{
+		padding: 0 !important;
+		width: 80% !important;
+	}
+	#lower-wrapper h1
+	{
+		width: 31% !important;
+		font-size: 170%;
+	}
+	
+	#offers h1
+	{
+		width: 100% !important;
+	}
+	
+	p
+	{
+		width: 30% !important;
+	}
+	
+	#offer-left, #offer-center, #offer-right
+	{
+		margin-left: 2%;
+	}
+	
+	#footer p
+	{
+		width: 31% !important;
+	}
+	
+	#lower-wrapper
+	{
+		height: 580px !important;
+	}
+}
