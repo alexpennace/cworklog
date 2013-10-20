@@ -11,4 +11,5 @@
       define('CFG_USE_PHP_MAIL', false);
       define('CFG_EMAIL_FROM_HEADER', 'From: Contractor\'s Work Log <noreply@cworklog.com>');
       define('CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION', true);
-?>
+      
+      define('CFG_STRIPE_APIKEY', "<PUT-YOUR-APIKEY-HERE>");
