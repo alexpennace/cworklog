@@ -112,7 +112,9 @@ Look at the main screen showing all your work logs
 </div>
 
 <div class="Col2">
-
+<?php include_once(dirname(__FILE__).'/extras/donate_thermom.php'); ?>
+<br>
+<br>
 <form id="LoginForm" action="index.php" method="POST">
 <?PHP
   if (isset($_GET['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_GET['goto'])?>"/><?PHP }
