@@ -29,7 +29,7 @@
    }
    else if (isset($_POST['work_log_id']) && isset($_POST['file'])){
       $wl = new work_log($_POST['work_log_id']);
-	  $wl->addFile($_POST['file'], $_POST['change_type'], $_POST['feature'], $_POST['notes']);
+	   $wl->addFile($_POST['file'], $_POST['change_type'], $_POST['feature'], $_POST['notes']);
    }
    
    if (isset($_REQUEST['ajaxedit'])){
@@ -523,6 +523,7 @@ $(document).bind('keydown', function(e) {
   $(document).ready(function() {
         $("#dlgAddNote").dialog({ autoOpen: false, width: 240, height: 190 });
 		  $("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
+		  $("#dlgAddTime").dialog({ autoOpen: false, width: 240, height: 130 });
          
                  function clearSelection() {
                       if(document.selection && document.selection.empty) {
@@ -1033,6 +1034,15 @@ $(function(){
 </form>
 </div>
 
+<div id="dlgAddTime" title="Add Time" style="display: none;">
+<form name="frmAddTime" method="POST" action="time_log_show.php" id="frmAddTime" onsubmit="this.action = 'time_log_show.php?wid='+this.wid.value;">
+<input type="hidden" name="wid" value="" />
+<input type="hidden" name="add_entry" value="1" />
+<input name="to_parse_time" value="15 min" />
+<input type="submit" value="Add Time" />
+</form>
+</div>
+
 <style>
 table.tblFileMods{
   border: 0px;
@@ -1235,6 +1245,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
                    '<li><a target="_blank" href="invoice.php?wid='+id+'&format=pdf"><span class="ui-icon ui-icon-document"></span>Create PDF Invoice</a></li>' + 
            (inprogress ? '<li><a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><span class="ui-icon ui-icon-refresh"></span>Show Timer in Progress</a></li>' : '') + 
            (!locked && !inprogress ? '<li><a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><span class="ui-icon ui-icon-clock"></span>Start Timer</a></li>' : '') +
+           (!locked && !inprogress ? '<li><a href="time_log.php?wid='+ id +'" onclick="document.frmAddTime.wid.value = '+id+'; $(\'#dlgAddTime\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-clock"></span>Quick-add time</a></li>' : '') +
            ' <li><a target="_blank" href="time_log_show.php?wid='+id+'"><span class="ui-icon ui-icon-calculator"></span>'+(!locked ? 'Edit/':'')+'View Time Log</a></li>' + 
            (!locked ? ' <li><a href="#" onclick="document.frmAddNote.work_log_id.value = '+id+'; $(\'#dlgAddNote\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-comment"></span>Add Note</a></li>' : '') + 
            (!locked ? ' <li><a href="#" onclick="document.frmAddFile.work_log_id.value = '+id+'; $(\'#dlgAddFile\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-suitcase"></span>Add File/DB Change</a></li>' : '') + 
@@ -1260,9 +1271,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 elLiner.innerHTML += !locked && !inprogress ? ' <a href="time_log.php?wid='+ oRecord.getData('id') +'" onclick="poptimer(\'time_log.php?wid='+ oRecord.getData('id') +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>' : '';
                 elLiner.innerHTML += '<a target="_blank" href="time_log_show.php?wid='+oRecord.getData('id')+'"><img border=0 title="View'+(!locked ? '/Edit':'')+' Time Log" src="images/timelog.png" style="width: 16px; height: 16px"></a>';
                 elLiner.innerHTML += !locked ? ' <a href="#" onclick="document.frmAddFile.work_log_id.value = '+oRecord.getData('id')+'; $(\'#dlgAddFile\').dialog(\'open\'); return false;"><img title="Add File/DB Modification" src="images/add_file.png" border=0 style="width:16px"></a>' : '';
-				elLiner.innerHTML += !locked ? ' <a href="#" onclick="document.frmAddNote.work_log_id.value = '+oRecord.getData('id')+'; $(\'#dlgAddNote\').dialog(\'open\'); return false;"><img title="Add Note" src="images/note_add.png" border=0 /></a>' : '';
+				    elLiner.innerHTML += !locked ? ' <a href="#" onclick="document.frmAddNote.work_log_id.value = '+oRecord.getData('id')+'; $(\'#dlgAddNote\').dialog(\'open\'); return false;"><img title="Add Note" src="images/note_add.png" border=0 /></a>' : '';
                 
-				elLiner.innerHTML += ' <a href="work_log.php?wid='+oRecord.getData('id')+'"><img src="images/view_details.gif" title="View Work Details" border=0 /></a>';
+				    elLiner.innerHTML += ' <a href="work_log.php?wid='+oRecord.getData('id')+'"><img src="images/view_details.gif" title="View Work Details" border=0 /></a>';
                 if (!locked){
                    elLiner.innerHTML += ' <a title="Permanently delete this work log" href="delete.php?wid='+oRecord.getData('id')+'"><img src="images/delete.png" style="width: 16px" border=0></a>';
                 }

@@ -2,6 +2,7 @@
    require_once(dirname(__FILE__).'/lib/db.inc.php');
    require_once(dirname(__FILE__).'/lib/Members.class.php');
    require_once(dirname(__FILE__).'/lib/Site.class.php');
+   require_once(dirname(__FILE__).'/lib/work_log.class.php');
    Members::SessionForceLogin();
    
 
@@ -84,8 +85,6 @@
       die('Work log id needed');
    }
    
-   
-   require_once('lib/work_log.class.php');
    try
    {
     $work_log = new work_log($wid);
@@ -99,10 +98,21 @@
    if ($_SERVER['REQUEST_METHOD'] == 'POST'){
      if (!empty($_POST['add_entry'])){
         if (!$wl_row['locked']){    
+           $starttime = 'NOW()';
+           $stoptime = 'NOW()';
+           $hms = '00:00:00';
+           if (isset($_POST['to_parse_time'])){
+              list($hours, $minutes, $total_min) = work_log::ParseTimeToHrMin($_POST['to_parse_time']);
+              if ($hours !== false){
+                 $hms = work_log::sec2hms($total_min*60);
+                 $starttime .= 'D - (DATE(NOW()) '.$hms.')';
+              }
+           }
+           
            $prep = $DBH->prepare('INSERT INTO time_log (id, work_log_id, start_time, stop_time) 
-                                                   VALUES (NULL, :wid, NOW(), NOW());');
-           if ($prep->execute(array(':wid'=>$wl_row['id']))){
-             $success = 'Time log entry added for 00:00:00 hours, please double click to edit';
+                                                   VALUES (NULL, :wid, :starttime, :stoptime);');
+           if ($prep->execute(array(':starttime'=>$starttime,':stoptime'=>$stoptime,':wid'=>$wl_row['id']))){
+             $success = 'Time log entry added for '.$hms.' hours, please double click to edit';
            }else{
              $error = 'Error adding time log entry';
            }

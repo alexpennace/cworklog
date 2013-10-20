@@ -20,6 +20,27 @@ class work_log
       return $hms;
   }
   
+  public static function ParseTimeToHrMin($str){
+        preg_match_all('/(((?<hours>\d\d?)\s*(hr?|:))\s*)?((?<min>\d\d?)\s*(m?i?n?(utes?)?))?/im', $str, $result, PREG_SET_ORDER);
+        $hours = 0;
+        $minutes = 0;
+        $total_minutes = 0;
+        if (count($result) == 0){
+           return array(false, false, false);
+        }
+        
+        for ($matchi = 0; $matchi < count($result); $matchi++) {
+            if (!empty($result[$matchi]['hours'])){
+                $hours += $result[$matchi]['hours'];
+            } 
+            if (!empty($result[$matchi]['min'])){
+                $minutes += $result[$matchi]['min'];
+            }
+        }
+        $total_minutes = ($hours*60) + $minutes;
+        return array($hours, $minutes, $total_minutes);
+  }
+  
   public static function HtmlFormAddWorkLog($specific_company_id){
     ?>
 	<script type="text/javascript">
