@@ -1,4 +1,7 @@
 <?PHP
+/**
+ * Copyright (C) 2012-2013 Jim A Kinsman
+ */
 require_once(dirname(__FILE__).'/lib/Members.class.php');
 require_once(dirname(__FILE__).'/lib/misc.inc.php');
 require_once(dirname(__FILE__).'/lib/Site.class.php');
@@ -193,7 +196,9 @@ if (isset($_POST)){
 ?>
 <script>
     $(function() {
-        $( "#accordion" ).accordion({ active: 0, collapsible: true });
+        var $acc = $( "#accordion" );
+        $acc.accordion({ active: 0, collapsible: true, height: '100px' });
+        $('.ui-accordion-content').css('height', '');
     });
 </script>
 
@@ -487,7 +492,8 @@ if (isset($_POST)){
        ?><option value="<?=$tz?>"><?=$tz?></option><?PHP
      }
     ?>
-    </select>
+    </select> &nbsp;
+    <br>
     <input type="submit" value="Change Timezone"/>
     </form>
   </div>
