@@ -101,20 +101,23 @@
            $starttime = 'NOW()';
            $stoptime = 'NOW()';
            $hms = '00:00:00';
+           $total_min = 0;
            if (isset($_POST['to_parse_time'])){
               list($hours, $minutes, $total_min) = work_log::ParseTimeToHrMin($_POST['to_parse_time']);
-              if ($hours !== false){
+              if ($total_min !== false){
                  $hms = work_log::sec2hms($total_min*60);
-                 $starttime .= 'D - (DATE(NOW()) '.$hms.')';
+                 //TODO: make this work
+                 $starttime .= ' - INTERVAL '.((int)$total_min).' MINUTE ';
+                 echo $starttime;
               }
            }
-           
-           $prep = $DBH->prepare('INSERT INTO time_log (id, work_log_id, start_time, stop_time) 
-                                                   VALUES (NULL, :wid, :starttime, :stoptime);');
-           if ($prep->execute(array(':starttime'=>$starttime,':stoptime'=>$stoptime,':wid'=>$wl_row['id']))){
-             $success = 'Time log entry added for '.$hms.' hours, please double click to edit';
+           $sql = "INSERT INTO time_log (id, work_log_id, start_time, stop_time) 
+                                                   VALUES (NULL, :wid, $starttime, $stoptime);";
+           $prep = $DBH->prepare($sql);
+           if ($prep->execute(array(':wid'=>$wl_row['id']))){
+             $success = 'Time log entry added for '.$total_min.' minutes, please double click to edit';
            }else{
-             $error = 'Error adding time log entry';
+             $error = 'Error adding time log entry: '.$sql;
            }
         }else{
            $error = 'Work log is locked, cannot add time log entry';
