@@ -1240,12 +1240,13 @@ YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.Basic = function() {
        var gen_jquery_uimenu = function(id, locked, inprogress){
         return '<ul class="actionmenu"><li class="main"><a href="#" onclick="return false;">&nbsp;</a><ul>' + 
+            (!locked && !inprogress ? '<li><a href="time_log.php?wid='+ id +'" onclick="document.frmAddTime.wid.value = '+id+'; $(\'#dlgAddTime\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-clock"></span>Quick-add time</a></li>' : '') +
             (locked ? '<li><a href="#" onclick="glbAjaxUpdateWorkLog('+id+',\'locked\',0, 1); return false;"><span class="ui-icon ui-icon-unlocked"></span>Unlock</a></li>' : 
                    '<li><a href="#" onclick="glbAjaxUpdateWorkLog('+id+',\'locked\',1, 0); return false;"><span class="ui-icon ui-icon-locked"></span>Lock</a></li>') + 
                    '<li><a target="_blank" href="invoice.php?wid='+id+'&format=pdf"><span class="ui-icon ui-icon-document"></span>Create PDF Invoice</a></li>' + 
            (inprogress ? '<li><a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><span class="ui-icon ui-icon-refresh"></span>Show Timer in Progress</a></li>' : '') + 
            (!locked && !inprogress ? '<li><a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><span class="ui-icon ui-icon-clock"></span>Start Timer</a></li>' : '') +
-           (!locked && !inprogress ? '<li><a href="time_log.php?wid='+ id +'" onclick="document.frmAddTime.wid.value = '+id+'; $(\'#dlgAddTime\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-clock"></span>Quick-add time</a></li>' : '') +
+           
            ' <li><a target="_blank" href="time_log_show.php?wid='+id+'"><span class="ui-icon ui-icon-calculator"></span>'+(!locked ? 'Edit/':'')+'View Time Log</a></li>' + 
            (!locked ? ' <li><a href="#" onclick="document.frmAddNote.work_log_id.value = '+id+'; $(\'#dlgAddNote\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-comment"></span>Add Note</a></li>' : '') + 
            (!locked ? ' <li><a href="#" onclick="document.frmAddFile.work_log_id.value = '+id+'; $(\'#dlgAddFile\').dialog(\'open\'); return false;"><span class="ui-icon ui-icon-suitcase"></span>Add File/DB Change</a></li>' : '') + 
