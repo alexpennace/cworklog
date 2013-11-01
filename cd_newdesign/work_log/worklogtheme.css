@@ -1,0 +1,36 @@
+body{
+   background-color: #252a2d;
+   color: #70859c;
+}
+
+.filterbox {
+   border-color: #70859c;
+   background-color: #556678;
+   color: #70859c;
+}
+
+
+.container {
+   width: 1000px;
+   left: auto;
+   right: auto;
+}
+
+.container .rightmain {
+   width: 829px; 
+}
+
+.container .leftnav{
+   width: 171px;
+}
+
+.container .leftnav .loggedinbox {
+   height: 122px;
+   border-color: #70859c;
+   border-left: 1px solid;
+   border-top: 1px solid;
+}
+
+.container .bigbuttonnav{
+    height: 57px;
+}
