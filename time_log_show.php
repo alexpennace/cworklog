@@ -108,7 +108,6 @@
                  $hms = work_log::sec2hms($total_min*60);
                  //TODO: make this work
                  $starttime .= ' - INTERVAL '.((int)$total_min).' MINUTE ';
-                 echo $starttime;
               }
            }
            $sql = "INSERT INTO time_log (id, work_log_id, start_time, stop_time) 
