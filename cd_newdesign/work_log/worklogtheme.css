@@ -1,6 +1,7 @@
-body{
+body {
    background-color: #252a2d;
    color: #70859c;
+   font-family: Arial;
 }
 
 .filterbox {
@@ -9,20 +10,38 @@ body{
    color: #70859c;
 }
 
-
 .container {
    width: 1000px;
    left: auto;
    right: auto;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+.container .header {
+   width: 1000px;
+   height: 126px;
 }
 
 .container .rightmain {
    width: 829px; 
 }
 
-.container .leftnav{
+.container .leftnav {
    width: 171px;
+   float: left;
 }
+
+.container .leftnav .box {
+   background-color: #556678;
+   color: white;
+}
+
+.box a{
+   color: #FEC835;
+}
+
+
 
 .container .leftnav .loggedinbox {
    height: 122px;
@@ -31,6 +50,21 @@ body{
    border-top: 1px solid;
 }
 
-.container .bigbuttonnav{
+.container .rightnav .contentbox {
+   background-color: white;
+}
+
+.container .bigbuttonnav {
+    border-top: 1px solid #8E959B;
     height: 57px;
+    background-color: #3B4751; /*gradient to #2A3239*/
+}
+
+.bigbuttonnav ul {
+   list-style-type: none;
+}
+
+.bigbuttonnav li {
+    border-right: 1px solid #4D5A67;
+    border-left: 1px solid #38424B;
 }
