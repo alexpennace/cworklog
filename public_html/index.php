@@ -108,7 +108,13 @@ Look at the main screen showing all your work logs
 <br>
 </p>
 <div class="Col2">
+<<<<<<< HEAD
 
+=======
+<?php include_once(dirname(__FILE__).'/extras/donate_thermom.php'); ?>
+<br>
+<br>
+>>>>>>> parent of f9eed80... NODONATETHERM
 <form id="LoginForm" action="index.php" method="POST">
 <?PHP
   if (isset($_GET['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_GET['goto'])?>"/><?PHP }
