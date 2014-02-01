@@ -76,7 +76,6 @@ document.frmLogin.submit();
 <?PHP }else{ ?>
 <div id="Wrapper">
 <div class="logost"><img src="images/logo.jpg" width="412" height="136" /></div>
-<div class="Row">
 <div class="Col1">
 <h2>Welcome  to <span class="OrangeColor">Contractor's</span> <span class="GreenColor">Work Log</span></h2>
 <p>
@@ -108,6 +107,7 @@ Look at the main screen showing all your work logs
     </ul>
 <br>
 </p>
+<div class="Col2">
 
 <form id="LoginForm" action="index.php" method="POST">
 <?PHP
