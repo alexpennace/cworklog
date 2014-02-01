@@ -109,9 +109,6 @@ Look at the main screen showing all your work logs
 <br>
 </p>
 
-</div>
-
-<div class="Col2">
 <form id="LoginForm" action="index.php" method="POST">
 <?PHP
   if (isset($_GET['goto'])){ ?><input type="hidden" name="goto" value="<?=htmlentities($_GET['goto'])?>"/><?PHP }
