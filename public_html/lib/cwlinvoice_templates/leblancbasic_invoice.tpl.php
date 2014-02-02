@@ -47,13 +47,6 @@
 	   <table border=0 style="width: 100%" cellpadding="0" cellspacing="0" width="100%">
 	   <tr><td align="left" width="50%">
     <?PHP } ?>
-    <?PHP
-       //The information is now gathered from the user table which represents the bill-to information
-       $result = mysql_query("SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id']);
-	   if ($result){
-          $from_user_row = mysql_fetch_assoc($result);
-	   }
-    ?>
 		<div id="from_business" style="position: absolute; left: 0px; top: 125px;">
 			<div>
 				<?PHP if (!empty($from_user_row['name'])){ ?><?=$from_user_row['name']?><br /><?PHP } ?>

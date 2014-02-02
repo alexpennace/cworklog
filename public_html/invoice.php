@@ -2,6 +2,7 @@
 require_once('lib/db.inc.php');
 require_once('lib/Members.class.php');
 Members::SessionForceLogin();
+
 if (!empty($_REQUEST['invoice_wid'])){
    $wid = $_REQUEST['invoice_wid'];
 }else{
@@ -9,7 +10,7 @@ if (!empty($_REQUEST['invoice_wid'])){
 }
 
 if (!empty($_REQUEST['invoice_template'])){
-   $template = $_REQUEST['invoice_template'];
+    $template = $_REQUEST['invoice_template'];
 }else{
 	$template = null;
 }

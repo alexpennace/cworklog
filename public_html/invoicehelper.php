@@ -35,7 +35,6 @@ iframe {
 }
 
 .invoice {
-		border-top: 1px dotted black;
 		height: 800px;
 }
 

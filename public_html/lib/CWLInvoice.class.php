@@ -66,9 +66,18 @@ class CWLInvoice{
 	public function generate($wid_or_widlist, $template = null) {
 		    $this->final_html = false;
 		    $wl_ids = self::parse_wids($wid_or_widlist);
-
+		    //echo json_encode($wl_ids);
 			if (count($wl_ids) === 0){
 				throw new Exception('Invalid $wid_or_widlist type, must be integer or array');
+		    }
+
+			if (is_null($template)){
+				$template = $this->opts['template'];
+			}
+
+		    $template_file = $this->getTemplateFile($template);
+		    if (empty($template_file)){
+		    	throw new Exception('Template file not found from "'.$template.'"');
 		    }
 
 		    self::validate_wids($wl_ids);
@@ -140,11 +149,14 @@ class CWLInvoice{
 
 			$fullcompany_address = self::genhtml_adddress($company_row);
 
-			if (is_null($template)){
-				$template = $this->opts['template'];
-			}
 
-			$template_file = $this->getTemplateFile($template);
+	       //The information is now gathered from the user table which represents the bill-to information
+	       $result = mysql_query("SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id']);
+		   if ($result){
+	          $from_user_row = mysql_fetch_assoc($result);
+		   }
+			
+
 			if ($template_file !== false){
 				ob_start();
 				include($template_file);
@@ -193,10 +205,17 @@ class CWLInvoice{
     	$base = basename($template_file);
     	$dir = $this->opts['templates_dir'];
 
-    	if (!file_exists("$dir/$base.php")){
-    		$base .= '.php';
-    	}
-    	if (!file_exists("$dir/$base")){
+    	$file = "$dir/$base";
+
+    	if (!file_exists($file)){
+    		$file = "$dir/$base.tpl.php";
+    	}    
+    	
+    	if (!file_exists($file)){
+    		$file = "$dir/$base.php";
+    	}   
+
+    	if (!file_exists($file)){
     		return false;
     	}
         return "$dir/$base";
