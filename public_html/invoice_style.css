@@ -12,6 +12,7 @@ Permissions beyond the scope of this license may be available at http://www.desi
 
 body {
 	font-family: Helvetica, Arial, sans-serif;
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 }
 
 #header {
@@ -20,6 +21,7 @@ body {
 #invoice {
 	font-size: 6em;
 	font-family: Garamond, "Times New Roman", serif;
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 	color: #777;
 	float: left;
 	display: block;
