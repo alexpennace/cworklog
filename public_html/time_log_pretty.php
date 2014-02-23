@@ -96,7 +96,7 @@ $result2 = $prep->execute();
         if (!$result_ins){
            die('Could not create new time log database');
         }else{
-           $time_log_id = mysql_insert_id();
+           $time_log_id = $DBH->lastInsertId();
            $prep = $DBH->prepare("SELECT * FROM time_log WHERE id = $time_log_id");
 $result2 = $prep->execute();
            $time_log_row = $prep->fetch();

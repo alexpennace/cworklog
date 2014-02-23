@@ -124,7 +124,7 @@ $result = $prep->execute();
          $prep = $DBH->prepare($sql);
 $result = $prep->execute();
          if ($result){
-            $ary['company_id'] = mysql_insert_id();
+            $ary['company_id'] = $DBH->lastInsertId();
 			return $ary['company_id'];
          }else{
             self::$last_error = 'Error adding company'.mysql_error(); 

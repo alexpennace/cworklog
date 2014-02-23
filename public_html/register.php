@@ -112,7 +112,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
         //now a new feature is to insert a mock-up 
         if (Site::$insert_mock_company_upon_registration){
             $ins_work_log = work_log::Add(array('title'=>'My First Work Log','description'=>'Learning the ins and outs of '.Site::$title,
-                'user_id'=> mysql_insert_id(),
+                'user_id'=> $DBH->lastInsertId(),
                 'company_id'=>'new',
                 'name'=>'My First Company',
                 'default_hourly_rate'=>21.5,
