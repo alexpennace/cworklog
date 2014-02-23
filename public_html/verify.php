@@ -10,7 +10,7 @@
         if (isset($_GET['email'])){
             $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(email) = LOWER('%s')";
             $result = mysql_query(sprintf($sql, $_GET['code'], $_GET['email']));
-            if ($result && $row = mysql_fetch_assoc($result)){
+            if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
                 $sql2 = "UPDATE user SET status = 1, verify_code = '', verify_param = '' WHERE id = %d";
                 $result2 = mysql_query(sprintf($sql2, $verify_user['id']));
@@ -25,7 +25,7 @@
        }else if (isset($_GET['new_email'])){
             $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(verify_param) = LOWER('%s')";
             $result = mysql_query(sprintf($sql, mysql_real_escape_string($_GET['code']), mysql_real_escape_string($_GET['new_email'])));         
-            if ($result && $row = mysql_fetch_assoc($result)){
+            if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
                 $sql2 = "UPDATE user SET status = 1, email = '%s', verify_code = '', verify_param = '' WHERE id = %d";
                 $result2 = mysql_query(sprintf($sql2, mysql_real_escape_string($_GET['new_email']), $verify_user['id']));
@@ -41,7 +41,7 @@
    }else if (isset($_GET['resetpwcode'])){
             $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(email) = LOWER('%s')";
             $result = mysql_query(sprintf($sql, $_GET['resetpwcode'], $_GET['email']));
-            if ($result && $row = mysql_fetch_assoc($result)){
+            if ($result && $row = $prep->fetch()){
                 $resetpw_user = $row;
                 if (!empty($_POST)){
                    if (!empty($_POST['password']) && !empty($_POST['password_confirm'])){

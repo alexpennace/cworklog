@@ -58,7 +58,7 @@ class work_log
 	<select name="company_id" onchange="if (this.value == 'new'){ $('#new_company').toggle(true); $('#dlgAddWorkLog').dialog('option', 'height', 400); }else{ $('#new_company').toggle(false); $('#dlgAddWorkLog').dialog('option', 'height', 'auto'); }">
 	<?PHP
 	  $result = mysql_query("SELECT id, name, default_hourly_rate FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY id ASC");
-	  while ($row = mysql_fetch_assoc($result)) {
+	  while ($row = $prep->fetch()) {
 		  ?><option value="<?=$row['id']?>"<?PHP if ($specific_company_id == $row['id']){ echo ' selected '; }?>><?=htmlentities($row['name'].($row['default_hourly_rate'] > 0 ? ' ($'.$row['default_hourly_rate'].'/hr)':''))?></option><?PHP
 	  }
 	?>
@@ -150,7 +150,7 @@ class work_log
       }
       
       $result = mysql_query("SELECT name, default_hourly_rate FROM company WHERE id = ".(int)$ary['company_id']." AND user_id = ".(int)$user_id);
-      if ($result && $row = mysql_fetch_assoc($result)){
+      if ($result && $row = $prep->fetch()){
          //company exists!!!
       }else{
          self::$last_error = 'Company with id '.$ary['company_id'].' does not exist.';
@@ -193,7 +193,7 @@ class work_log
      }
 	 $result = mysql_query($sql);
 	 $files = array();
-	 while ($row = mysql_fetch_assoc($result)){
+	 while ($row = $prep->fetch()){
 		$files[] = $row;
 	 }
 	 return $files;
@@ -205,7 +205,7 @@ class work_log
                               FROM work_log JOIN company ON company_id = company.id
                               WHERE work_log.user_id = ".$_SESSION['user_id']." AND work_log.id = ".(int)$wid);
        if ($result) {
-       	$this->row = mysql_fetch_assoc($result);
+       	$this->row = $prep->fetch();
        	if (!$this->row){
        	  throw new Exception('Work log wid '.$wid.' does not exist');
        	}
@@ -227,7 +227,7 @@ class work_log
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
       if ($result2){
-         while($time_log_row = mysql_fetch_assoc($result2)){
+         while($time_log_row = $prep->fetch()){
             $total_seconds += strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
          }
       }
@@ -238,7 +238,7 @@ class work_log
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
       if ($result3){
-         if ($uf_time_log_row = mysql_fetch_assoc($result3)){
+         if ($uf_time_log_row = $prep->fetch()){
             $row['_in_progress_'] = true;
          }else{
             $row['_in_progress_'] = false;
@@ -259,7 +259,7 @@ class work_log
                                 AND start_time IS NOT NULL");
       if ($result2){
          $rows = array();
-         while($time_log_row = mysql_fetch_assoc($result2)){
+         while($time_log_row = $prep->fetch()){
             $rows[] = $time_log_row;
          }
          return $rows;
@@ -288,7 +288,7 @@ class work_log
      $notes = array();
      $sql = "SELECT id, text, date_added FROM note_log WHERE work_log_id = ".$this->wid." ORDER BY date_added DESC";
      $result = mysql_query($sql);
-     while($row = mysql_fetch_assoc($result)){
+     while($row = $prep->fetch()){
 	   if (isset($opts['asciionly'])){
 	      $row['text'] = preg_replace('/[^\x00-\x7F]+/', '', $row['text']);
 	   }

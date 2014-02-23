@@ -99,7 +99,7 @@ if (isset($_POST)){
           $sql = "SELECT * FROM user WHERE id = %d AND MD5('%s') = password";
           $sql = sprintf($sql, $_SESSION['user_id'], $_POST['pw_current']);
           $result = mysql_query($sql);
-          if ($row = mysql_fetch_assoc($result)){
+          if ($row = $prep->fetch()){
              //current password matches
              $sql = "UPDATE user SET password = MD5('%s') WHERE id = %d";
              $sql = sprintf($sql, $_POST['pw_new'], $_SESSION['user_id']);
@@ -118,7 +118,7 @@ if (isset($_POST)){
           $sql = "SELECT * FROM user WHERE id = %d AND MD5('%s') = password";
           $sql = sprintf($sql, $_SESSION['user_id'], $_POST['pw_current']);
           $result = mysql_query($sql);
-          if ($row = mysql_fetch_assoc($result)){
+          if ($row = $prep->fetch()){
              if (!filter_var($_POST['email_new'], FILTER_VALIDATE_EMAIL)){
                   $error = 'Email is not valid';
                   $error_field = 'email';
@@ -191,7 +191,7 @@ if (isset($_POST)){
    //grab latest user row from database
    $sql = "SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id'];
    $result = mysql_query($sql);
-   $user_row = mysql_fetch_assoc($result);
+   $user_row = $prep->fetch();
    //update the session variables
    $_SESSION['user_row'] = $user_row;
 ?>

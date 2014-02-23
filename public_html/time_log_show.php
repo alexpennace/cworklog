@@ -23,7 +23,7 @@
 				   " AND time_log.id = ".(int)$_REQUEST['timelog_id'];
 			$res = mysql_query($sql);
 			if ($res){
-               $tl_row = mysql_fetch_assoc($res);
+               $tl_row = $prep->fetch();
                if ($tl_row['locked']){
                  //cannot edit a locked work log
                  $result['error'] = 'This work log is currently locked. Cannot update.';
@@ -60,7 +60,7 @@
 			   if ($res){
 			      $sql = "SELECT * FROM time_log WHERE id = ".(int)$_REQUEST['timelog_id'];
 				  $res = mysql_query($sql);
-				  $result['time_log'] = mysql_fetch_assoc($res);
+				  $result['time_log'] = $prep->fetch();
                   $result['time_log']['__calc_seconds__'] = strtotime($result['time_log']['stop_time']) - strtotime($result['time_log']['start_time']);
 			      $result['time_log']['__calc_minutes__'] = number_format($result['time_log']['__calc_seconds__'] / 60, 3); 
                   $result['success'] = true;
@@ -523,7 +523,7 @@ $(function(){
 <td class="editable" rowid="<?=$row['id']?>" cellid="timelog[start_time][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>');"><span id="spn_start_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', strtotime($row['start_time']))?></span></td>
 <?PHP
       $now_res = mysql_query("SELECT NOW()");
-	  $now_row = mysql_fetch_assoc($now_res); 
+	  $now_row = $prep->fetch(); 
 ?>
 <td class="editable" rowid="<?=$row['id']?>" cellid="timelog[stop_time][<?=$row['id']?>]" title="Double-Click to edit stop time" id="stop_time_<?=$i?>" <?=is_null($row['stop_time'])?'style="color: orange;"':''?> ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['stop_time']))?>');"><span style="display: none;"><input type="text" name="time[stop_time][<?=$row['id']?>]" value="<?=date('M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?>"/><br><a href="#save" onclick="alert('saved'); return false;">Save</a> <a href="#cancel" onclick="this.parentNode.style.display = 'none'; this.parentNode.parentNode.getElementsByTagName('SPAN')[1].style.display = 'inline'; return false;">Cancel</a>  </span><span id="spn_stop_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?></span></td>
 <td align=right <?=is_null($row['stop_time'])?'style="color: orange;"':''?>><?PHP

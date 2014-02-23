@@ -66,7 +66,7 @@
                         if ($result){
                          
                            echo '<div id="unfinished" style="float:left"> &nbsp; ';
-                           while($row = mysql_fetch_assoc($result)){
+                           while($row = $prep->fetch()){
                               $time_logs_unfinished[] = $row;
                               
                            }
@@ -117,7 +117,7 @@
                         if ($result){
                          
                            echo '<div id="unfinished" style="float:left"> &nbsp; ';
-                           while($row = mysql_fetch_assoc($result)){
+                           while($row = $prep->fetch()){
                               $time_logs_unfinished[] = $row;
                               
                            }
@@ -222,7 +222,7 @@
                         if ($result){
                          
                            echo '<div style="display: inline; float: left;"> &nbsp; ';
-                           while($row = mysql_fetch_assoc($result)){
+                           while($row = $prep->fetch()){
                               $time_logs_unfinished[] = $row;
                               
                            }
@@ -278,7 +278,7 @@
 		{
 		   $sql = "SELECT * FROM user WHERE LOWER(username) = LOWER('%s')";
 		   $result = mysql_query(sprintf($sql, $username));
-		   if ($result && $row = mysql_fetch_assoc($result)){
+		   if ($result && $row = $prep->fetch()){
 		      return $row;
 		   }else{
 		      return false;
@@ -289,7 +289,7 @@
 		{
 		   $sql = "SELECT * FROM user WHERE LOWER(email) = LOWER('%s')";
 		   $result = mysql_query(sprintf($sql, $email));
-		   if ($result && $row = mysql_fetch_assoc($result)){
+		   if ($result && $row = $prep->fetch()){
 		      return $row;
 		   }else{
 		      return false;
@@ -308,7 +308,7 @@
 			}
 			$sql .= " LIMIT 1";
 			$result = mysql_query(sprintf($sql, strtolower($username_or_email_or_id)));
-			if ($result && $row = mysql_fetch_assoc($result)){
+			if ($result && $row = $prep->fetch()){
 				$_SESSION['user_row'] = $row;
 				$_SESSION['user_id'] = $row['id'];
 			}else{
@@ -327,7 +327,7 @@
 			}
 			$sql .= " LIMIT 1";
 			$result = mysql_query(sprintf($sql, $password, strtolower($username_or_email)));
-			if ($result && $row = mysql_fetch_assoc($result)){
+			if ($result && $row = $prep->fetch()){
             return $row;
          }else{
             return false;

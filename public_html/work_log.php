@@ -51,7 +51,7 @@
                               FROM work_log JOIN company ON company_id = company.id
                               WHERE work_log.id = $wid");
        if ($result) {
-       	$original_row = mysql_fetch_assoc($result);
+       	$original_row = $prep->fetch();
        }else{
           //die(json_encode(array('error'=>mysql_error())));
        }
@@ -71,7 +71,7 @@
                                       AND start_time IS NOT NULL 
                                       AND stop_time IS NULL");
             if ($result3){
-               if ($uf_time_log_row = mysql_fetch_assoc($result3)){
+               if ($uf_time_log_row = $prep->fetch()){
                   //$row['_in_progress_'] = true;
                   die(json_encode(array('error'=>'This entry has a time log in progress and cannot be locked.')));
                }else{
@@ -221,7 +221,7 @@
       echo $sql.mysql_error();
    }
    $cal_events = array();
-   while ($row = mysql_fetch_assoc($result)){
+   while ($row = $prep->fetch()){
       
       $work_log = new work_log($row['id']);
       $row['note_log'] = json_encode($work_log->getNotes());
@@ -235,7 +235,7 @@
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
       if ($result2){
-         while($time_log_row = mysql_fetch_assoc($result2)){
+         while($time_log_row = $prep->fetch()){
 		    $seconds = strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
             $total_seconds += $seconds;
 			$hours = $seconds / 60 / 60;
@@ -256,7 +256,7 @@
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
       if ($result3){
-         if ($uf_time_log_row = mysql_fetch_assoc($result3)){
+         if ($uf_time_log_row = $prep->fetch()){
             $row['_in_progress_'] = true;
          }else{
             $row['_in_progress_'] = false;
@@ -355,7 +355,7 @@
       $result = mysql_query("SELECT company.*, work_log.* 
                              FROM company JOIN work_log on company.id = company_id 
                              WHERE work_log.id = ".$specific_work_log_id);
-      if ($result && $row = mysql_fetch_assoc($result)) {
+      if ($result && $row = $prep->fetch()) {
       	$specific_company_id = $row['company_id'];
       }
    }
@@ -809,7 +809,7 @@ $(document).bind('keydown', function(e) {
             <?PHP
                  $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY name ASC";
                  $result = mysql_query($sql);
-                 while ($row = mysql_fetch_assoc($result)){
+                 while ($row = $prep->fetch()){
                    ?><option <?=$specific_company_id == $row['company_id'] ? 'selected ' : ''?> value="<?=$row['company_id']?>"><?=htmlentities($row['company_name'])?></option><?PHP
                  }
             ?>
@@ -824,7 +824,7 @@ $(document).bind('keydown', function(e) {
                 <?PHP
                      $sql = "SELECT id, title FROM work_log WHERE company_id = ".$specific_company_id." ORDER BY id DESC";
                      $result = mysql_query($sql);
-                     while ($row = mysql_fetch_assoc($result)){
+                     while ($row = $prep->fetch()){
                        ?><option <?=$specific_work_log_id == $row['id'] ? 'selected ' : ''?> value="<?=$row['id']?>"><?=htmlentities($row['title'])?></option><?PHP
                      }
                 ?>
@@ -989,7 +989,7 @@ $(function(){
 <?PHP
    if (isset($_GET['company'])){
       $result = mysql_query("SELECT name,phone FROM company WHERE id = ".(int)$_GET['company']);
-      if ($result && $row = mysql_fetch_assoc($result)){
+      if ($result && $row = $prep->fetch()){
          echo '<h2>'.$row['name'].' - '.$row['phone'].'</h2>';
       }else{
          echo '<h2 style="color: red">Invalid Company ID</h2>';
@@ -1000,7 +1000,7 @@ $(function(){
       $result = mysql_query("SELECT company.*, work_log.* 
                              FROM company JOIN work_log on company.id = company_id 
                              WHERE work_log.id = ".(int)$_GET['wid']);
-      if ($result && $row = mysql_fetch_assoc($result)) {
+      if ($result && $row = $prep->fetch()) {
         $company_wl_row = $row;
 		echo '<h2><a href="?company='.$row['company_id'].'">'.$row['name'].'</a> - '.$row['phone'].'</h2>';
       	echo '<h2>'.$row['title'].'</h2>';
@@ -1076,7 +1076,7 @@ table.tblFileMods td{ padding:2px; }
   $files_assoc = array();
   $files = array();
   if ($result){
-	 while($row = mysql_fetch_assoc($result)){
+	 while($row = $prep->fetch()){
 	    if (!isset($features_assoc[$row['feature']])){
 		  $features_assoc[$row['feature']] = 1;
 		  $features[] = $row['feature'];

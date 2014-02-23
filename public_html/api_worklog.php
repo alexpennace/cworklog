@@ -30,15 +30,14 @@
    $prep = $DBH->prepare($sql);
    $prep->execute();
    if (!$result){
-      die(json_encode(array('error'=> true, 'response'=>array('code'=>2,'message'=>'Server error, try again later')))); //mysql_error());
+      die(json_encode(array('error'=> true, 'response'=>array('code'=>2,'message'=>'Server error, try again later')))); 
    }
    $work_log_rows = array();
-   while($row = mysql_fetch_assoc($result)){ 
+   while($row = $prep->fetch($result)){ 
       $wl = new work_log($row['id']);
       $work_log_rows[] = $wl->getRow();
    }
 
-   
  die(json_encode(array('error'=>false, 'response'=> array(
      'user'=>array('api_key'=>$_SESSION['user_row']['api_key'],'id'=>$_SESSION['user_id']), 
      'work_logs'=>$work_log_rows)))

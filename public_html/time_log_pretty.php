@@ -17,7 +17,7 @@
       die(mysql_error());
    }
    $work_log_rows = array();
-   while($row = mysql_fetch_assoc($result)){ 
+   while($row = $prep->fetch()){ 
       if ($work_log_id == false){ $work_log_id = $row['id']; }
       $work_log_rows[] = $row;
    }
@@ -31,7 +31,7 @@
   if (!$result){
     die(mysql_error());
   }
-  $work_log_row = mysql_fetch_assoc($result);
+  $work_log_row = $prep->fetch();
   if (!$work_log_row){
     die('You must have a valid work_log_id (wid)');
   }else if ($work_log_row['locked']){
@@ -46,7 +46,7 @@
      $resume_time_log = true;
      $time_log_id = false;
 	 $result = mysql_query("SELECT * FROM time_log WHERE work_log_id = $work_log_id AND stop_time IS NULL ORDER BY start_time DESC LIMIT 1");
-	 if ($result && $time_log_row = mysql_fetch_assoc($result)){
+	 if ($result && $time_log_row = $prep->fetch()){
 		   $time_log_id = $time_log_row['id'];
 	 }
 	 else{
@@ -68,7 +68,7 @@
   if (!$result){
      die('Company '.$company.' does not exist.'.mysql_error());
   }
-  $company_row = mysql_fetch_assoc($result);
+  $company_row = $prep->fetch();
   
   if (!$company_row){
     die('Company '.$company.' does not exist.');
@@ -81,7 +81,7 @@
      if (!$result2) {
      	  die(mysql_error());
      }
-     $time_log_row = mysql_fetch_assoc($result2);
+     $time_log_row = $prep->fetch();
      if (!$time_log_row){
         //die('Invalid time_log_row');
         
@@ -92,7 +92,7 @@
         }else{
            $time_log_id = mysql_insert_id();
            $result2 = mysql_query("SELECT * FROM time_log WHERE id = $time_log_id");
-           $time_log_row = mysql_fetch_assoc($result2);
+           $time_log_row = $prep->fetch();
            $start_time = $time_log_row['start_time'];
         }
         

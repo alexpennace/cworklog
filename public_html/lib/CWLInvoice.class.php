@@ -115,9 +115,11 @@ class CWLInvoice{
 			   }
 
 			   //name	street	street2	city	state	zip	country	phone	email	notes
-			   $result = mysql_query("SELECT id, name, street, street2, city, state, zip, country, phone, email FROM company WHERE id = ".(int)$wl_row['company_id']);
+			   $prep = $DBH->prepare("SELECT id, name, street, street2, city, state, zip, country, phone, email FROM company WHERE id = ".(int)$wl_row['company_id']);
+			   $result = $prep->execute();
+
 			   if ($result){
-			     $company_row = mysql_fetch_assoc($result);
+			     $company_row = $prep->fetch($result);
 			     $companies[$wl_row['company_id']] = $company_row;
 			   }
 
@@ -153,7 +155,7 @@ class CWLInvoice{
 	       //The information is now gathered from the user table which represents the bill-to information
 	       $result = mysql_query("SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id']);
 		   if ($result){
-	          $from_user_row = mysql_fetch_assoc($result);
+	          $from_user_row = $prep->fetch();
 		   }
 			
 
