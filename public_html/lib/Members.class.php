@@ -1,8 +1,37 @@
 <?PHP
-    require_once('lib/db.inc.php');
-    require_once('lib/work_log.class.php');
+/**
+ *  This file helps manage Membership and logins
+ * 
+ *  Coders/Contractors Work Log - A time tracking/invoicing app 
+ *  Copyright (C) 2014 Jim A Kinsman (cworklog.com) relipse@gmail.com github.com/relipse 
+ *
+ *  LICENSES - GPL 3. (If you need a different commercial license please contact Jim 
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License.
+ * 
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *  
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
+ */
+  require_once(dirname(__FILE__).'/db.inc.php');
+  require_once(dirname(__FILE__).'/work_log.class.php');
 	class Members
 	{
+        public static function LoggedInShortName(){
+           if (!self::IsLoggedIn()){ return false; }
+           $name = $_SESSION['user_row']['name'];
+           if (empty($name)){
+             $name = $_SESSION['user_row']['username'];
+           }
+           return $name;
+        }
+
         public static function MenuBarCompact(){
           $name = $_SESSION['user_row']['name'];
           if (empty($name)){
@@ -25,7 +54,7 @@
              <div style="float:left; line-height:37px; vertical-align:top;color:#fff" ><a href="index.php" title="Work Logs"><img border=0 src="images/Inr_hdr_logo.jpg" width="122" height="37" /></a>
 
  				<?PHP if (self::IsLoggedIn()){
-                  require_once('lib/Site.class.php');
+                  require_once(dirname(__FILE__).'/Site.class.php');
                   ?><?PHP
                   Site::ImgLinks();
                   
@@ -78,7 +107,7 @@
              <div id="topnavigation">
               <div class="lefttopbar">
 				<?PHP if (self::IsLoggedIn()){
-                  require_once('lib/Site.class.php');
+                  require_once(dirname(__FILE__).'/Site.class.php');
                   Site::ImgLinkTableSmall();
                   
                         $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 
@@ -183,7 +212,7 @@
 			<div class="topbar">
                 <div class="lefttopbar">
 				<?PHP if (self::IsLoggedIn()){
-                  require_once('lib/Site.class.php');
+                  require_once(dirname(__FILE__).'/Site.class.php');
                   Site::ImgLinkTableSmall();
                   
                         $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 

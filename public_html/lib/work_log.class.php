@@ -302,5 +302,3 @@ class work_log
   }
 
 }
-
-?>
