@@ -1,0 +1,183 @@
+ @charset "utf-8";
+ @import "../css/fontface.css";
+
+body{
+    font-family: Helvetica, Arial, sans-serif;
+    background-image: url(../betarelease_images/green_bg.png);
+    margin: 0;
+	padding: 0;
+	width: 100% !important;
+	overflow-x: hidden;
+	font-size: 20px;
+}
+
+input[type=text] {
+    width: 350pt;
+    font-family: 'Courier New';
+}
+
+input#CFG_DB_USER {
+	width: 15em;
+}
+
+input#CFG_DB {
+	width: 15em;
+}
+
+textarea#config_inc_file_gen {
+	width: 95%;
+	height: 300px;
+
+}
+
+div.config_file_box .header{
+
+}
+
+div.round_box {
+	border: 1px solid #7EB243;
+	width: 600px;
+	margin: 15px;
+    box-shadow: 2px 2px 2px 2px #000;
+
+	  -webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+}
+
+div.round_box {
+	float: left;
+}
+
+button {
+	background-color: #EDBC13;
+	border-radius: 15px;
+	box-shadow: 2px 2px 2px 2px #000;
+	padding: 3px;
+	font-weight: bold;
+	font-size: larger;
+}
+
+button.create_config_file {
+   font-weight: bold;
+   font-size: 1.3em;
+}
+
+
+.round_box .header {
+   box-shadow: none;
+   border-bottom: 1px solid #000;
+   background-color: #7EB243;
+   padding: 3px;
+   border-radius: none;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.round_box .body {
+	box-shadow: none;
+   background-image: none;
+   background-color: #7EB243;
+   padding: 3px;
+   border-radius: none;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+#header-wrapper {
+	display: block !important;
+	width: 100% !important;
+	height: 105px;
+	background: url(../betarelease_images/header_bg.jpg) repeat-x;
+	overflow: visible;
+	position: relative;
+}
+
+#header {
+	width: 960px;
+	display: block;
+	position: relative;
+}
+#header img.logo {
+	float: left;
+}
+
+#header img.beta {
+	float: left;
+}
+
+#header .cotitle {
+	float: left;
+	left: 10px;
+	font-size: 45px;
+	font-family: 'sansfatregular',Arial;
+	color: #588E12;
+	padding: 5px;
+	margin: 15px;
+}
+
+#content {
+	padding: 15px;
+}
+
+.cwl_logo {
+   background-image: url(../betarelease_images/logo.png);
+   background-repeat:no-repeat;
+   background-position:0px 3px
+   min-width: 284px;
+   min-height: 123px;
+   background-color: #2F343A;
+}
+
+h1 {
+	font-size: 25px;
+}
+
+h1, h2, h3 {
+	font-family: 'sansfatregular',Arial;
+	margin-bottom: -5px;
+}
+
+
+
+ div.success {
+    background-color: #D2FFD2;
+  }
+ div.success {
+    border: 1px solid green;
+ } 
+
+ div.error {
+   background-color: #FF6F6F;
+ }
+ div.error {
+   border: 1px solid red;
+ }
+
+ ul.checklist{
+ 	list-style-type:none;
+	padding:0px;
+	margin:0px;
+ }
+
+ ul.checklist li {
+    padding-left: 20px;
+ }
+
+ ul.checklist li.success {
+		background-image:url(images/check.png);
+		background-repeat:no-repeat;
+		background-position:0px 3px; 
+ }
+
+  ul.checklist li.error {
+		background-image:url(images/x.png);
+		background-repeat:no-repeat;
+		background-position:0px 3px; 
+ }
+
+ ul.checklist li.warning {
+		background-image:url(images/warning.png);
+		background-repeat:no-repeat;
+		background-position:0px 3px; 
+ }
