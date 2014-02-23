@@ -1,8 +1,8 @@
 <?PHP
-   require_once('lib/db.inc.php');
-   require_once('lib/Members.class.php');
+   require_once(dirname(__FILE__).'/lib/db.inc.php');
+   require_once(dirname(__FILE__).'/lib/Members.class.php');
    Members::SessionForceLogin();
-   require_once('lib/work_log.class.php');
+   require_once(dirname(__FILE__).'/lib/work_log.class.php');
 
 	 if (isset($_REQUEST['ajaxedit'])){
        if (empty($_REQUEST['cid']) || !is_numeric($_REQUEST['cid'])){
@@ -19,9 +19,10 @@
        //now do checks on the specific fields
        
        
-       $result = mysql_query("SELECT * FROM company WHERE id = $cid AND user_id = ".(int)$_SESSION['user_id']);
+       $prep = $DBH->prepare("SELECT * FROM company WHERE id = $cid AND user_id = ".(int)$_SESSION['user_id']);
+       $result = $prep->execute();
        if ($result) {
-       	$original_row = mysql_fetch_assoc($result);
+       	$original_row = $prep->fetch(PDO::FETCH_ASSOC);
        }
        if (empty($original_row)){
           die(json_encode(array('error'=>'Company not found.')));
@@ -38,18 +39,23 @@
        }
        
        //if we made it down here, then everything is ok
-       $result_upd = mysql_query("UPDATE company SET ".mysql_real_escape_string($field)." = '".mysql_real_escape_string($value)."' ".
+       $prep = $DBH->prepare("UPDATE company SET ".$DBH->quote($field)." = '".$DBH->quote($value)."' ".
                    "WHERE id = $cid ");
+
+       $result_upd = $prep->execute();
+
        if ($result_upd){
           
-          $result_after_upd = mysql_query("SELECT * FROM company WHERE id = $cid AND user_id = ".(int)$_SESSION['user_id']);
-          if ($result_after_upd && $row = mysql_fetch_assoc($result_after_upd)){
+          $prep2 = $DBH->prepare("SELECT * FROM company WHERE id = $cid AND user_id = ".(int)$_SESSION['user_id']);
+          $result_after_upd = $prep2->execute();
+
+          if ($result_after_upd && $row = $prep2->fetch()){
 				die(json_encode(array('success'=>'Updated.', 'row'=>$row)));
 		  }else{
-		        die(json_encode(array('error'=>mysql_error())));
+		        die(json_encode(array('error'=> $DBH->errorInfo())));
 		  }
        }else{
-          die(json_encode(array('error'=>mysql_error())));
+          die(json_encode(array('error'=>$DBH->errorInfo())));
        }
    }   
    
@@ -67,17 +73,18 @@
    }       
    
    $sql .= $sql_where." ORDER BY name ASC";
-
-   $result = mysql_query($sql);
+   $prep = $DBH->prepare($sql);
+   
+   $result = $prep->execute();
    $rows = array();
 
    if (!$result){
-      echo $sql.mysql_error();
+      echo $sql.$DBH->errorInfo();
    }
-   while ($row = mysql_fetch_assoc($result)){
+   while ($row = $prep->fetch()){
       $rows[] = $row;   
    }
-   include_once('lib/Site.class.php');
+   include_once(dirname(__FILE__).'/lib/Site.class.php');
    
    $specific_company_id = isset($_GET['company']) ? (int)$_GET['company'] : false;
 ?>

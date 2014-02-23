@@ -1,11 +1,11 @@
 <?PHP
    header('Content-type: application/json');
-   require_once('lib/db.inc.php');
-   require_once('lib/Members.class.php');
+   require_once(dirname(__FILE__).'/lib/db.inc.php');
+   require_once(dirname(__FILE__).'/lib/Members.class.php');
    if (!Members::Login($_REQUEST['u'], $_REQUEST['p'])){
       die(json_encode(array('error'=> true, 'response'=>array('code'=>1, 'message'=>'Error logging in'))));
    }
-   require_once('lib/work_log.class.php');
+   require_once(dirname(__FILE__).'/lib/work_log.class.php');
    //allow the user to get a specific work log from his organization
    if (isset($_REQUEST['wid'])){
       $wl = new work_log($_REQUEST['wid']);
@@ -27,7 +27,8 @@
              AND (work_log.date_paid IS NULL OR work_log.date_paid = '0000-00-00') 
              AND work_log.company_id = company.id AND work_log.user_id = ".(int)$_SESSION['user_id'].
 	  " ORDER BY name ASC";
-   $result = mysql_query($sql);
+   $prep = $DBH->prepare($sql);
+   $prep->execute();
    if (!$result){
       die(json_encode(array('error'=> true, 'response'=>array('code'=>2,'message'=>'Server error, try again later')))); //mysql_error());
    }
@@ -36,7 +37,9 @@
       $wl = new work_log($row['id']);
       $work_log_rows[] = $wl->getRow();
    }
-   die(json_encode(array('error'=>false, 'response'=> array(
-       'user'=>array('api_key'=>$_SESSION['user_row']['api_key'],'id'=>$_SESSION['user_id']), 
-       'work_logs'=>$work_log_rows)))
-      );
+
+   
+ die(json_encode(array('error'=>false, 'response'=> array(
+     'user'=>array('api_key'=>$_SESSION['user_row']['api_key'],'id'=>$_SESSION['user_id']), 
+     'work_logs'=>$work_log_rows)))
+    );
