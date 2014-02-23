@@ -110,16 +110,16 @@ $result = $prep->execute();
          
          $sql = "INSERT INTO company (id, user_id, name, street, street2, city, state, zip, country, phone, email, notes, default_hourly_rate) ".
                 "VALUES(NULL, ".$user_id.", '".
-                mysql_real_escape_string($ary['name'])."', '".
-				mysql_real_escape_string($ary['street'])."', '".
-                mysql_real_escape_string($ary['street2'])."', '".
-                mysql_real_escape_string($ary['city'])."', '".
-                mysql_real_escape_string($ary['state'])."', '".
-                mysql_real_escape_string($ary['zip'])."', '".
-                mysql_real_escape_string($ary['country'])."', '".
-                mysql_real_escape_string($ary['phone'])."', '".
-                mysql_real_escape_string($ary['email'])."', '".
-                mysql_real_escape_string($ary['notes'])."', ".
+                $DBH->quote($ary['name'])."', '".
+				$DBH->quote($ary['street'])."', '".
+                $DBH->quote($ary['street2'])."', '".
+                $DBH->quote($ary['city'])."', '".
+                $DBH->quote($ary['state'])."', '".
+                $DBH->quote($ary['zip'])."', '".
+                $DBH->quote($ary['country'])."', '".
+                $DBH->quote($ary['phone'])."', '".
+                $DBH->quote($ary['email'])."', '".
+                $DBH->quote($ary['notes'])."', ".
                 (float)$ary['default_hourly_rate']." );";
          $prep = $DBH->prepare($sql);
 $result = $prep->execute();
@@ -161,8 +161,8 @@ $result = $prep->execute();
       }
       
       $sql = "INSERT INTO work_log (id, user_id, company_id, title, description, rate) ".
-             "VALUES ( NULL , ".(int)$user_id.", ".(int)$ary['company_id'].", '".mysql_real_escape_string($ary['title'])."', '".
-             mysql_real_escape_string($ary['description'])."', ".$row['default_hourly_rate']." );";
+             "VALUES ( NULL , ".(int)$user_id.", ".(int)$ary['company_id'].", '".$DBH->quote($ary['title'])."', '".
+             $DBH->quote($ary['description'])."', ".$row['default_hourly_rate']." );";
       $prep = $DBH->prepare($sql);
 $result = $prep->execute();
       return $result;
@@ -277,7 +277,7 @@ $result = $prep->execute();
   public function addNotes($text)
   {
      $sql = "INSERT INTO note_log (id, work_log_id, text, date_added) VALUES ".
-            "( NULL, ".$this->wid.", '".mysql_real_escape_string($text)."', NOW() );";
+            "( NULL, ".$this->wid.", '".$DBH->quote($text)."', NOW() );";
      $prep = $DBH->prepare($sql);
 $result = $prep->execute();
      return $result;

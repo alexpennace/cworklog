@@ -91,7 +91,7 @@
        }
        
        //if we made it down here, then everything is ok
-       $result_upd = mysql_query("UPDATE work_log SET ".mysql_real_escape_string($field)." = '".mysql_real_escape_string($value)."' ".
+       $result_upd = mysql_query("UPDATE work_log SET ".$DBH->quote($field)." = '".$DBH->quote($value)."' ".
                    "WHERE id = $wid ");
        if ($result_upd){
           
@@ -117,7 +117,7 @@
       
       if (empty($sql_where)){ $sql_where = ' WHERE '; }
       else { $sql_where .= ' AND '; }
-      $like_search = "'%".mysql_real_escape_string($_GET['search'])."%'";
+      $like_search = "'%".$DBH->quote($_GET['search'])."%'";
       $sql_where .= " ( title LIKE $like_search OR description LIKE $like_search OR company.name LIKE $like_search ";
 
       if (is_numeric($s)){

@@ -26,12 +26,12 @@ $result2 = $prep->execute();
             }
        }else if (isset($_GET['new_email'])){
             $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(verify_param) = LOWER('%s')";
-            $prep = $DBH->prepare(sprintf($sql, mysql_real_escape_string($_GET['code']), mysql_real_escape_string($_GET['new_email'])));
+            $prep = $DBH->prepare(sprintf($sql, $DBH->quote($_GET['code']), $DBH->quote($_GET['new_email'])));
 $result = $prep->execute();         
             if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
                 $sql2 = "UPDATE user SET status = 1, email = '%s', verify_code = '', verify_param = '' WHERE id = %d";
-                $prep = $DBH->prepare(sprintf($sql2, mysql_real_escape_string($_GET['new_email']), $verify_user['id']));
+                $prep = $DBH->prepare(sprintf($sql2, $DBH->quote($_GET['new_email']), $verify_user['id']));
 $result2 = $prep->execute();
                 if ($result2){
                    $success = 'Thank you for verifying your new email address, your account has been updated';
@@ -69,7 +69,7 @@ $result = $prep->execute();
                        }else{
                           
                             $sql2 = "UPDATE user SET status = 1, password = MD5('%s'), verify_code = '', verify_param = '' WHERE id = %d";
-                            $prep = $DBH->prepare(sprintf($sql2, mysql_real_escape_string($_POST['password']), $resetpw_user['id']));
+                            $prep = $DBH->prepare(sprintf($sql2, $DBH->quote($_POST['password']), $resetpw_user['id']));
 $result2 = $prep->execute();
                             if ($result2){
                                $success = 'Thank you for verifying your new email address, your account has been updated';
