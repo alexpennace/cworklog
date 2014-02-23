@@ -182,7 +182,8 @@ $result = $prep->execute();
   public function deleteFile($filename, $feature_name){
     $sql = "DELETE FROM files_log WHERE work_log_id = ".(int)$this->wid." AND file = '%s' AND feature = '%s'";
 	$sqls = sprintf($sql, $filename, $feature_name);
-	return mysql_query($sqls);
+	$prep = $DBH->prepare($sqls);
+                return $prep->execute();
   }
   
   public function getFiles($optional_feature_name = null){
