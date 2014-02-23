@@ -21,7 +21,7 @@ if (!empty($_POST)){
       $prep = $DBH->prepare(sprintf($sql, $code, $user_by_username['id']));
 $result = $prep->execute();
       if ($result){
-           if (mysql_affected_rows() == 1){
+           if ($prep->rowCount() == 1){
               if (Site::$use_php_mail){
                  $mailed = mail($_POST['email'], 'Contractor\'s Work Log Reset Password', 
                     "Please reset your password by going to the link below:\r\n".
