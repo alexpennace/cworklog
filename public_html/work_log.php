@@ -47,9 +47,10 @@
        //now do checks on the specific fields
        
        
-       $result = mysql_query("SELECT work_log.*, company.name AS company_name 
+       $prep = $DBH->prepare("SELECT work_log.*, company.name AS company_name 
                               FROM work_log JOIN company ON company_id = company.id
                               WHERE work_log.id = $wid");
+                $result =  $prep->execute();
        if ($result) {
        	$original_row = $prep->fetch();
        }else{
@@ -65,11 +66,12 @@
        
        //everything else seemed to pass, now check if user is trying to lock a row in-progress
        if ($field == 'locked' && $value != 0 && $original_row['locked'] == false){
-            $result3 = mysql_query("SELECT start_time, stop_time 
+            $prep = $DBH->prepare("SELECT start_time, stop_time 
                                     FROM time_log 
                                     WHERE work_log_id = $wid 
                                       AND start_time IS NOT NULL 
                                       AND stop_time IS NULL");
+                $result3 =  $prep->execute();
             if ($result3){
                if ($uf_time_log_row = $prep->fetch()){
                   //$row['_in_progress_'] = true;
@@ -91,8 +93,9 @@
        }
        
        //if we made it down here, then everything is ok
-       $result_upd = mysql_query("UPDATE work_log SET ".$DBH->quote($field)." = '".$DBH->quote($value)."' ".
+       $prep = $DBH->prepare("UPDATE work_log SET ".$DBH->quote($field)." = '".$DBH->quote($value)."' ".
                    "WHERE id = $wid ");
+                $result_upd =  $prep->execute();
        if ($result_upd){
           
           try{ $worklog = new work_log($wid);}
@@ -230,11 +233,12 @@ $result = $prep->execute();
       
       $total_seconds = 0;
 	 
-      $result2 = mysql_query("SELECT start_time, stop_time 
+      $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$row['id']." 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
+                $result2 =  $prep->execute();
       if ($result2){
          while($time_log_row = $prep->fetch()){
 		    $seconds = strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
@@ -251,11 +255,12 @@ $result = $prep->execute();
          }
       }
       
-      $result3 = mysql_query("SELECT start_time, stop_time 
+      $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$row['id']." 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
+                $result3 =  $prep->execute();
       if ($result3){
          if ($uf_time_log_row = $prep->fetch()){
             $row['_in_progress_'] = true;
@@ -353,9 +358,10 @@ $result = $prep->execute();
    $specific_work_log_id = isset($_GET['wid']) ? (int)$_GET['wid'] : false;
    if (!empty($specific_work_log_id)){
 
-      $result = mysql_query("SELECT company.*, work_log.* 
+      $prep = $DBH->prepare("SELECT company.*, work_log.* 
                              FROM company JOIN work_log on company.id = company_id 
                              WHERE work_log.id = ".$specific_work_log_id);
+                $result =  $prep->execute();
       if ($result && $row = $prep->fetch()) {
       	$specific_company_id = $row['company_id'];
       }
@@ -1001,9 +1007,10 @@ $result = $prep->execute();
    }
    
    if (isset($_GET['wid'])) {
-      $result = mysql_query("SELECT company.*, work_log.* 
+      $prep = $DBH->prepare("SELECT company.*, work_log.* 
                              FROM company JOIN work_log on company.id = company_id 
                              WHERE work_log.id = ".(int)$_GET['wid']);
+                $result =  $prep->execute();
       if ($result && $row = $prep->fetch()) {
         $company_wl_row = $row;
 		echo '<h2><a href="?company='.$row['company_id'].'">'.$row['name'].'</a> - '.$row['phone'].'</h2>';

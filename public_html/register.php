@@ -101,10 +101,11 @@ if (isset($_POST['username']) && isset($_POST['email']))
            //whatever
         }
           
-		$result = mysql_query(sprintf($sql, $_POST['username'], $_POST['password'], 
+		$prep = $DBH->prepare(sprintf($sql, $_POST['username'], $_POST['password'], 
 		                    $_POST['email'], $_POST['phone'], 
 							$_POST['fullname'], $_POST['street1'], $_POST['street2'], $_POST['city'], $_POST['state'], $_POST['zip'], $_POST['country'],
 							0, $verify_code));
+                $result =  $prep->execute();
 		if (!$result){
 		   $error = 'There was a server error, please try again later';
 		}

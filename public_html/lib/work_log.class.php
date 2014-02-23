@@ -208,9 +208,10 @@ $result = $prep->execute();
   
   public function getRow(){ return $this->row; }
   public function __construct($wid){
-      $result = mysql_query("SELECT work_log.*, company.name AS company_name 
+      $prep = $DBH->prepare("SELECT work_log.*, company.name AS company_name 
                               FROM work_log JOIN company ON company_id = company.id
                               WHERE work_log.user_id = ".$_SESSION['user_id']." AND work_log.id = ".(int)$wid);
+                $result =  $prep->execute();
        if ($result) {
        	$this->row = $prep->fetch();
        	if (!$this->row){
@@ -228,22 +229,24 @@ $result = $prep->execute();
   public function appendMoreDetailsToRow(&$row)
   {
       $total_seconds = 0;
-      $result2 = mysql_query("SELECT start_time, stop_time 
+      $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$row['id']." 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
+                $result2 =  $prep->execute();
       if ($result2){
          while($time_log_row = $prep->fetch()){
             $total_seconds += strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
          }
       }
       
-      $result3 = mysql_query("SELECT start_time, stop_time 
+      $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$row['id']." 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
+                $result3 =  $prep->execute();
       if ($result3){
          if ($uf_time_log_row = $prep->fetch()){
             $row['_in_progress_'] = true;
@@ -260,10 +263,11 @@ $result = $prep->execute();
   }
   
   public function fetchTimeLog(){
-      $result2 = mysql_query("SELECT id, start_time, stop_time, notes 
+      $prep = $DBH->prepare("SELECT id, start_time, stop_time, notes 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$this->row['id']." 
                                 AND start_time IS NOT NULL");
+                $result2 =  $prep->execute();
       if ($result2){
          $rows = array();
          while($time_log_row = $prep->fetch()){

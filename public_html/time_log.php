@@ -95,8 +95,9 @@ $result2 = $prep->execute();
      if (!$time_log_row){
         //die('Invalid time_log_row');
         
-        $result_ins = mysql_query("INSERT INTO time_log (id, work_log_id, start_time, stop_time) VALUES
-                     (NULL, $work_log_id, NOW(), NULL);");
+        $prep = $DBH->prepare("INSERT INTO time_log (id, work_log_id, start_time, stop_time) VALUES
+                     (NULL, $work_log_id, NOW(), NULL);
+                $result_ins =  $prep->execute();");
         if (!$result_ins){
            die('Could not create new time log database');
         }else{
