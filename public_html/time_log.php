@@ -16,7 +16,7 @@
    $prep = $DBH->prepare($sql);
 $result = $prep->execute();
    if (!$result){
-      die(mysql_error());
+      die($DBH->errorInfo());
    }
    $work_log_rows = array();
    while($row = $prep->fetch()){ 
@@ -32,7 +32,7 @@ $result = $prep->execute();
   $prep = $DBH->prepare("SELECT * FROM work_log WHERE id = $work_log_id AND user_id = ".(int)$_SESSION['user_id']);
 $result = $prep->execute();
   if (!$result){
-    die(mysql_error());
+    die($DBH->errorInfo());
   }
   $work_log_row = $prep->fetch();
   if (!$work_log_row){
@@ -75,7 +75,7 @@ $result = $prep->execute();
   $prep = $DBH->prepare("SELECT name FROM company WHERE id = $company");
 $result = $prep->execute();
   if (!$result){
-     die('Company '.$company.' does not exist.'.mysql_error());
+     die('Company '.$company.' does not exist.'.$DBH->errorInfo());
   }
   $company_row = $prep->fetch();
   
@@ -89,7 +89,7 @@ $result = $prep->execute();
      $prep = $DBH->prepare("SELECT * FROM time_log WHERE id = $time_log_id");
 $result2 = $prep->execute();
      if (!$result2) {
-     	  die(mysql_error());
+     	  die($DBH->errorInfo());
      }
      $time_log_row = $prep->fetch();
      if (!$time_log_row){

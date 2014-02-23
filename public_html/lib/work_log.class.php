@@ -127,7 +127,7 @@ $result = $prep->execute();
             $ary['company_id'] = $DBH->lastInsertId();
 			return $ary['company_id'];
          }else{
-            self::$last_error = 'Error adding company'.mysql_error(); 
+            self::$last_error = 'Error adding company'.$DBH->errorInfo(); 
             return false;
          }  
   }
@@ -220,7 +220,7 @@ $result = $prep->execute();
        	$this->appendMoreDetailsToRow($this->row);
        	
        }else{
-         throw new Exception('Error fetching work_log: '.mysql_error());
+         throw new Exception('Error fetching work_log: '.$DBH->errorInfo());
        }
   }
   

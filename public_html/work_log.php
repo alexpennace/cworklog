@@ -53,7 +53,7 @@
        if ($result) {
        	$original_row = $prep->fetch();
        }else{
-          //die(json_encode(array('error'=>mysql_error())));
+          //die(json_encode(array('error'=>$DBH->errorInfo())));
        }
        if (empty($original_row)){
           die(json_encode(array('error'=>'No work log found.')));
@@ -102,7 +102,7 @@
           
           die(json_encode(array('success'=>'Updated.', 'row'=>$worklog->getRow())));
        }else{
-          die(json_encode(array('error'=>mysql_error())));
+          die(json_encode(array('error'=>$DBH->errorInfo())));
        }
    }
 
@@ -219,7 +219,7 @@ $result = $prep->execute();
    $super_total_seconds = 0;
    $super_total_amount = 0.0;
    if (!$result){
-      echo $sql.mysql_error();
+      echo $sql.$DBH->errorInfo();
    }
    $cal_events = array();
    while ($row = $prep->fetch()){
