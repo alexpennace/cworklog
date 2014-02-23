@@ -61,7 +61,8 @@
                   
                         $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 
                                 WHERE stop_time IS NULL AND work_log.user_id = ".(int)$_SESSION['user_id'];
-                        $result = mysql_query($sql);
+                        $prep = $DBH->prepare($sql);
+$result = $prep->execute();
                        $time_logs_unfinished = array();
                         if ($result){
                          
@@ -112,7 +113,8 @@
                   
                         $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 
                                 WHERE stop_time IS NULL AND work_log.user_id = ".(int)$_SESSION['user_id'];
-                        $result = mysql_query($sql);
+                        $prep = $DBH->prepare($sql);
+$result = $prep->execute();
                        $time_logs_unfinished = array();
                         if ($result){
                          
@@ -217,7 +219,8 @@
                   
                         $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 
                                 WHERE stop_time IS NULL AND work_log.user_id = ".(int)$_SESSION['user_id'];
-                        $result = mysql_query($sql);
+                        $prep = $DBH->prepare($sql);
+$result = $prep->execute();
                        $time_logs_unfinished = array();
                         if ($result){
                          
@@ -277,7 +280,8 @@
 		public static function GetUserByUsername($username)
 		{
 		   $sql = "SELECT * FROM user WHERE LOWER(username) = LOWER('%s')";
-		   $result = mysql_query(sprintf($sql, $username));
+		   $prep = $DBH->prepare(sprintf($sql, $username));
+$result = $prep->execute();
 		   if ($result && $row = $prep->fetch()){
 		      return $row;
 		   }else{
@@ -288,7 +292,8 @@
 		public static function GetUserByEmail($email)
 		{
 		   $sql = "SELECT * FROM user WHERE LOWER(email) = LOWER('%s')";
-		   $result = mysql_query(sprintf($sql, $email));
+		   $prep = $DBH->prepare(sprintf($sql, $email));
+$result = $prep->execute();
 		   if ($result && $row = $prep->fetch()){
 		      return $row;
 		   }else{
@@ -307,7 +312,8 @@
 				  $sql .= "LOWER(username) = '%s'";
 			}
 			$sql .= " LIMIT 1";
-			$result = mysql_query(sprintf($sql, strtolower($username_or_email_or_id)));
+			$prep = $DBH->prepare(sprintf($sql, strtolower($username_or_email_or_id)));
+$result = $prep->execute();
 			if ($result && $row = $prep->fetch()){
 				$_SESSION['user_row'] = $row;
 				$_SESSION['user_id'] = $row['id'];
@@ -326,7 +332,8 @@
 				  $sql .= "LOWER(username) = '%s'";
 			}
 			$sql .= " LIMIT 1";
-			$result = mysql_query(sprintf($sql, $password, strtolower($username_or_email)));
+			$prep = $DBH->prepare(sprintf($sql, $password, strtolower($username_or_email)));
+$result = $prep->execute();
 			if ($result && $row = $prep->fetch()){
             return $row;
          }else{

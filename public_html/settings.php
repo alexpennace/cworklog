@@ -98,12 +98,14 @@ if (isset($_POST)){
 
           $sql = "SELECT * FROM user WHERE id = %d AND MD5('%s') = password";
           $sql = sprintf($sql, $_SESSION['user_id'], $_POST['pw_current']);
-          $result = mysql_query($sql);
+          $prep = $DBH->prepare($sql);
+$result = $prep->execute();
           if ($row = $prep->fetch()){
              //current password matches
              $sql = "UPDATE user SET password = MD5('%s') WHERE id = %d";
              $sql = sprintf($sql, $_POST['pw_new'], $_SESSION['user_id']);
-             $result = mysql_query($sql);
+             $prep = $DBH->prepare($sql);
+$result = $prep->execute();
              if (!$result){
                 $error = 'Your password could not be changed';
              }else{
@@ -117,7 +119,8 @@ if (isset($_POST)){
    }else if (isset($_POST['email_new'])){ 
           $sql = "SELECT * FROM user WHERE id = %d AND MD5('%s') = password";
           $sql = sprintf($sql, $_SESSION['user_id'], $_POST['pw_current']);
-          $result = mysql_query($sql);
+          $prep = $DBH->prepare($sql);
+$result = $prep->execute();
           if ($row = $prep->fetch()){
              if (!filter_var($_POST['email_new'], FILTER_VALIDATE_EMAIL)){
                   $error = 'Email is not valid';
@@ -128,7 +131,8 @@ if (isset($_POST)){
                                          verify_code = '".$verify_code."', 
                                          verify_param = '".$_POST['email_new']."' 
                          WHERE id = ".(int)$_SESSION['user_id'];
-                 $result = mysql_query($sql);
+                 $prep = $DBH->prepare($sql);
+$result = $prep->execute();
                  if (!$result){
                     $error = 'Error performing email address change, try again later.';
                  }else{ //everything so far so good
@@ -190,7 +194,8 @@ if (isset($_POST)){
 <?PHP
    //grab latest user row from database
    $sql = "SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id'];
-   $result = mysql_query($sql);
+   $prep = $DBH->prepare($sql);
+$result = $prep->execute();
    $user_row = $prep->fetch();
    //update the session variables
    $_SESSION['user_row'] = $user_row;

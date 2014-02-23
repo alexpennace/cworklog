@@ -13,7 +13,8 @@
   $sql = "SELECT work_log.id, work_log.rate, work_log.title, work_log.description, company.name AS company_name FROM work_log JOIN company WHERE work_log.locked = 0 AND 
       (work_log.date_billed IS NULL OR work_log.date_billed = '0000-00-00') AND (work_log.date_paid IS NULL OR work_log.date_paid = '0000-00-00') AND work_log.company_id = company.id AND work_log.user_id = ".(int)$_SESSION['user_id'].
 	  " ORDER BY name ASC";
-   $result = mysql_query($sql);
+   $prep = $DBH->prepare($sql);
+$result = $prep->execute();
    if (!$result){
       die(mysql_error());
    }
@@ -28,7 +29,8 @@
   }
     
    
-  $result = mysql_query("SELECT * FROM work_log WHERE id = $work_log_id AND user_id = ".(int)$_SESSION['user_id']);
+  $prep = $DBH->prepare("SELECT * FROM work_log WHERE id = $work_log_id AND user_id = ".(int)$_SESSION['user_id']);
+$result = $prep->execute();
   if (!$result){
     die(mysql_error());
   }
@@ -46,7 +48,8 @@
   if (isset($_GET['tid']) && $_GET['tid'] == 'latest'){
      $resume_time_log = true;
      $time_log_id = false;
-	 $result = mysql_query("SELECT * FROM time_log WHERE work_log_id = $work_log_id AND stop_time IS NULL ORDER BY start_time DESC LIMIT 1");
+	 $prep = $DBH->prepare("SELECT * FROM time_log WHERE work_log_id = $work_log_id AND stop_time IS NULL ORDER BY start_time DESC LIMIT 1");
+$result = $prep->execute();
 	 if ($result && $time_log_row = $prep->fetch()){
 		   $time_log_id = $time_log_row['id'];
          //redirect to latest time log
@@ -62,13 +65,15 @@
  
   if ($time_log_id > 0 && $work_log_id > 0 && isset($_REQUEST['notes'])){
      $sql = "UPDATE time_log SET notes = '".$_REQUEST['notes']."' WHERE work_log_id = ".$work_log_id." AND id = ".$time_log_id." LIMIT 1";
-     $result = mysql_query($sql);
+     $prep = $DBH->prepare($sql);
+$result = $prep->execute();
   }
  
   $company = $work_log_row['company_id'];
   
   //grab company info (make sure it is valid)
-  $result = mysql_query("SELECT name FROM company WHERE id = $company");
+  $prep = $DBH->prepare("SELECT name FROM company WHERE id = $company");
+$result = $prep->execute();
   if (!$result){
      die('Company '.$company.' does not exist.'.mysql_error());
   }
@@ -81,7 +86,8 @@
     
   if ($time_log_id !== false && !$resume_time_log)
   {
-     $result2 = mysql_query("SELECT * FROM time_log WHERE id = $time_log_id");
+     $prep = $DBH->prepare("SELECT * FROM time_log WHERE id = $time_log_id");
+$result2 = $prep->execute();
      if (!$result2) {
      	  die(mysql_error());
      }
@@ -95,7 +101,8 @@
            die('Could not create new time log database');
         }else{
            $time_log_id = mysql_insert_id();
-           $result2 = mysql_query("SELECT * FROM time_log WHERE id = $time_log_id");
+           $prep = $DBH->prepare("SELECT * FROM time_log WHERE id = $time_log_id");
+$result2 = $prep->execute();
            $time_log_row = $prep->fetch();
            $start_time = $time_log_row['start_time'];
         }
@@ -105,7 +112,8 @@
         $stop_time = $time_log_row['stop_time'];
         
         if (is_null($stop_time)){
-           $result_upd = mysql_query("UPDATE time_log SET stop_time = NOW() WHERE id = $time_log_id");
+           $prep = $DBH->prepare("UPDATE time_log SET stop_time = NOW() WHERE id = $time_log_id");
+$result_upd = $prep->execute();
            if ($result_upd){
               $done_logging_time = true;
               //refetch work log so we get an accurate account of time

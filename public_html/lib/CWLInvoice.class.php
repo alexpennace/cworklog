@@ -153,7 +153,8 @@ class CWLInvoice{
 
 
 	       //The information is now gathered from the user table which represents the bill-to information
-	       $result = mysql_query("SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id']);
+	       $prep = $DBH->prepare("SELECT * FROM user WHERE id = ".(int)$_SESSION['user_id']);
+$result = $prep->execute();
 		   if ($result){
 	          $from_user_row = $prep->fetch();
 		   }

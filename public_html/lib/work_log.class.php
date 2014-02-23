@@ -57,7 +57,8 @@ class work_log
 	<label>Client
 	<select name="company_id" onchange="if (this.value == 'new'){ $('#new_company').toggle(true); $('#dlgAddWorkLog').dialog('option', 'height', 400); }else{ $('#new_company').toggle(false); $('#dlgAddWorkLog').dialog('option', 'height', 'auto'); }">
 	<?PHP
-	  $result = mysql_query("SELECT id, name, default_hourly_rate FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY id ASC");
+	  $prep = $DBH->prepare("SELECT id, name, default_hourly_rate FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY id ASC");
+$result = $prep->execute();
 	  while ($row = $prep->fetch()) {
 		  ?><option value="<?=$row['id']?>"<?PHP if ($specific_company_id == $row['id']){ echo ' selected '; }?>><?=htmlentities($row['name'].($row['default_hourly_rate'] > 0 ? ' ($'.$row['default_hourly_rate'].'/hr)':''))?></option><?PHP
 	  }
@@ -120,7 +121,8 @@ class work_log
                 mysql_real_escape_string($ary['email'])."', '".
                 mysql_real_escape_string($ary['notes'])."', ".
                 (float)$ary['default_hourly_rate']." );";
-         $result = mysql_query($sql);
+         $prep = $DBH->prepare($sql);
+$result = $prep->execute();
          if ($result){
             $ary['company_id'] = mysql_insert_id();
 			return $ary['company_id'];
@@ -149,7 +151,8 @@ class work_log
           return false;
       }
       
-      $result = mysql_query("SELECT name, default_hourly_rate FROM company WHERE id = ".(int)$ary['company_id']." AND user_id = ".(int)$user_id);
+      $prep = $DBH->prepare("SELECT name, default_hourly_rate FROM company WHERE id = ".(int)$ary['company_id']." AND user_id = ".(int)$user_id);
+$result = $prep->execute();
       if ($result && $row = $prep->fetch()){
          //company exists!!!
       }else{
@@ -160,7 +163,8 @@ class work_log
       $sql = "INSERT INTO work_log (id, user_id, company_id, title, description, rate) ".
              "VALUES ( NULL , ".(int)$user_id.", ".(int)$ary['company_id'].", '".mysql_real_escape_string($ary['title'])."', '".
              mysql_real_escape_string($ary['description'])."', ".$row['default_hourly_rate']." );";
-      $result = mysql_query($sql);
+      $prep = $DBH->prepare($sql);
+$result = $prep->execute();
       return $result;
   }
   
@@ -170,7 +174,8 @@ class work_log
     $sql = "INSERT INTO files_log (work_log_id, feature, file, change_type, notes, date_modified) 
 	                      VALUES (".(int)$this->wid.", '%s', '%s','%s', '%s', NOW())";
 	$sqls = sprintf($sql, $feature_name, $filename, $changetype, $notes);
-	$result = mysql_query($sqls);
+	$prep = $DBH->prepare($sqls);
+$result = $prep->execute();
 	return $result;
   }
   
@@ -191,7 +196,8 @@ class work_log
 	 }else{
 	    $sql .= ' ORDER BY date_modified DESC';
      }
-	 $result = mysql_query($sql);
+	 $prep = $DBH->prepare($sql);
+$result = $prep->execute();
 	 $files = array();
 	 while ($row = $prep->fetch()){
 		$files[] = $row;
@@ -272,13 +278,15 @@ class work_log
   {
      $sql = "INSERT INTO note_log (id, work_log_id, text, date_added) VALUES ".
             "( NULL, ".$this->wid.", '".mysql_real_escape_string($text)."', NOW() );";
-     $result = mysql_query($sql);
+     $prep = $DBH->prepare($sql);
+$result = $prep->execute();
      return $result;
   }
   
   public function deleteNote($note_id){
      $sql = "DELETE FROM note_log WHERE id = ".(int)$note_id." AND work_log_id = ".(int)$this->wid;
-     $result = mysql_query($sql);
+     $prep = $DBH->prepare($sql);
+$result = $prep->execute();
 	 return $result;
   }
   
@@ -287,7 +295,8 @@ class work_log
   {
      $notes = array();
      $sql = "SELECT id, text, date_added FROM note_log WHERE work_log_id = ".$this->wid." ORDER BY date_added DESC";
-     $result = mysql_query($sql);
+     $prep = $DBH->prepare($sql);
+$result = $prep->execute();
      while($row = $prep->fetch()){
 	   if (isset($opts['asciionly'])){
 	      $row['text'] = preg_replace('/[^\x00-\x7F]+/', '', $row['text']);

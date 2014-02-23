@@ -212,7 +212,8 @@
 
    //echo $sql;
    
-   $result = mysql_query($sql);
+   $prep = $DBH->prepare($sql);
+$result = $prep->execute();
    $rows = array();
    $columns = array();
    $super_total_seconds = 0;
@@ -808,7 +809,8 @@ $(document).bind('keydown', function(e) {
             <option value="">[All Clients]</option>
             <?PHP
                  $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY name ASC";
-                 $result = mysql_query($sql);
+                 $prep = $DBH->prepare($sql);
+$result = $prep->execute();
                  while ($row = $prep->fetch()){
                    ?><option <?=$specific_company_id == $row['company_id'] ? 'selected ' : ''?> value="<?=$row['company_id']?>"><?=htmlentities($row['company_name'])?></option><?PHP
                  }
@@ -823,7 +825,8 @@ $(document).bind('keydown', function(e) {
                 <option value="unpaid" <?=$unpaid ? 'selected' : ''?>>[Unpaid Work Logs]</option>
                 <?PHP
                      $sql = "SELECT id, title FROM work_log WHERE company_id = ".$specific_company_id." ORDER BY id DESC";
-                     $result = mysql_query($sql);
+                     $prep = $DBH->prepare($sql);
+$result = $prep->execute();
                      while ($row = $prep->fetch()){
                        ?><option <?=$specific_work_log_id == $row['id'] ? 'selected ' : ''?> value="<?=$row['id']?>"><?=htmlentities($row['title'])?></option><?PHP
                      }
@@ -988,7 +991,8 @@ $(function(){
 </script>
 <?PHP
    if (isset($_GET['company'])){
-      $result = mysql_query("SELECT name,phone FROM company WHERE id = ".(int)$_GET['company']);
+      $prep = $DBH->prepare("SELECT name,phone FROM company WHERE id = ".(int)$_GET['company']);
+$result = $prep->execute();
       if ($result && $row = $prep->fetch()){
          echo '<h2>'.$row['name'].' - '.$row['phone'].'</h2>';
       }else{
@@ -1070,7 +1074,8 @@ table.tblFileMods td{ padding:2px; }
 	 //$sql .= " WHERE work_log_id = ".(int)$_GET['wid'];
   }
   $sql .= " ORDER BY feature, file ASC";
-  $result = mysql_query($sql);
+  $prep = $DBH->prepare($sql);
+$result = $prep->execute();
   $features_assoc = array();
   $features = array();
   $files_assoc = array();

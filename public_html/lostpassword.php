@@ -18,7 +18,8 @@ if (!empty($_POST)){
       $code = random_string(25);
       $sql = "UPDATE user SET verify_command = 'reset_password', verify_code = '%s', verify_param = '' 
               WHERE id = %d LIMIT 1";
-      $result = mysql_query(sprintf($sql, $code, $user_by_username['id']));
+      $prep = $DBH->prepare(sprintf($sql, $code, $user_by_username['id']));
+$result = $prep->execute();
       if ($result){
            if (mysql_affected_rows() == 1){
               if (Site::$use_php_mail){
