@@ -42,6 +42,7 @@ class work_log
   }
   
   public static function HtmlFormAddWorkLog($specific_company_id){
+    global $DBH;
     ?>
 	<script type="text/javascript">
 	  $(function() {
@@ -187,6 +188,8 @@ $result = $prep->execute();
   }
   
   public function getFiles($optional_feature_name = null){
+    global $DBH;
+
      $sql = "SELECT * FROM files_log WHERE work_log_id = ".(int)$this->wid;
 	 if (!is_null($optional_feature_name)){
 		$sql .= " AND feature = '%s'";
@@ -197,8 +200,9 @@ $result = $prep->execute();
 	 }else{
 	    $sql .= ' ORDER BY date_modified DESC';
      }
-	 $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+	 
+   $prep = $DBH->prepare($sql);
+   $result = $prep->execute();
 	 $files = array();
 	 while ($row = $prep->fetch()){
 		$files[] = $row;
@@ -208,6 +212,7 @@ $result = $prep->execute();
   
   public function getRow(){ return $this->row; }
   public function __construct($wid){
+      global $DBH;
       $prep = $DBH->prepare("SELECT work_log.*, company.name AS company_name 
                               FROM work_log JOIN company ON company_id = company.id
                               WHERE work_log.user_id = ".$_SESSION['user_id']." AND work_log.id = ".(int)$wid);
@@ -228,6 +233,7 @@ $result = $prep->execute();
   
   public function appendMoreDetailsToRow(&$row)
   {
+      global $DBH;
       $total_seconds = 0;
       $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
@@ -298,6 +304,8 @@ $result = $prep->execute();
   
   public function getNotes($opts=array('asciionly'=>true))
   {
+    global $DBH;
+
      $notes = array();
      $sql = "SELECT id, text, date_added FROM note_log WHERE work_log_id = ".$this->wid." ORDER BY date_added DESC";
      $prep = $DBH->prepare($sql);
