@@ -91,7 +91,7 @@ $result = $prep->execute();
         }
         
         public static function MenuBarOpenBottomLeftOpen(){
-        
+          global $DBH;
           $name = isset($_SESSION['user_row']['name']) ? $_SESSION['user_row']['name'] : '';
           if (empty($name)){
              $name = isset($_SESSION['user_row']['username']) ? $_SESSION['user_row']['username'] : '';
@@ -325,6 +325,7 @@ $result = $prep->execute();
       
       public static function CheckUsernamePassword($username_or_email, $password)
       {
+        global $DBH;
 		    $sql = "SELECT * FROM user WHERE password = MD5('%s') AND ";
 		    if (strpos($username_or_email, '@') !== false){
 			      $sql .= "LOWER(email) = '%s'";
