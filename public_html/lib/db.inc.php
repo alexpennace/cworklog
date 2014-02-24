@@ -21,7 +21,7 @@
  */
   require_once(dirname(__FILE__).'/config.inc.php');
 
-  if (!defined(CFG_DB_DSN)){
+  if (!defined('CFG_DB_DSN')){
   	   if (!defined('CFG_DB_DRIVER')){
   	   	  define('CFG_DB_DRIVER', 'mysql');
   	   }
