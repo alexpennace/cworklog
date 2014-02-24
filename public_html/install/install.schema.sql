@@ -1,23 +1,32 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.0-rc1
+-- version 4.0.4.1
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Feb 21, 2014 at 09:35 PM
--- Server version: 5.1.72-2
--- PHP Version: 5.3.3-7+squeeze17
+-- Host: 127.0.0.1
+-- Generation Time: Feb 23, 2014 at 06:44 AM
+-- Server version: 5.6.11
+-- PHP Version: 5.5.3
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
 --
--- Database: `db_cworklog`
+-- Database: `work_log_db`
 --
+CREATE DATABASE IF NOT EXISTS `work_log_db` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE work_log_db;
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `company`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
 --
 
 CREATE TABLE IF NOT EXISTS `company` (
@@ -35,12 +44,14 @@ CREATE TABLE IF NOT EXISTS `company` (
   `notes` text,
   `default_hourly_rate` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `files_log`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
 --
 
 CREATE TABLE IF NOT EXISTS `files_log` (
@@ -49,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `files_log` (
   `file` varchar(255) NOT NULL,
   `change_type` enum('file','db') NOT NULL DEFAULT 'file',
   `notes` text,
+  `in_production` tinyint(1) NOT NULL DEFAULT '0',
   `date_modified` datetime NOT NULL,
   PRIMARY KEY (`work_log_id`,`feature`,`file`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -56,25 +68,24 @@ CREATE TABLE IF NOT EXISTS `files_log` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `issues`
+-- Table structure for table `install`
+--
+-- Creation: Feb 22, 2014 at 04:48 AM
 --
 
-CREATE TABLE IF NOT EXISTS `issues` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` enum('bug','feature') NOT NULL,
-  `date_created` datetime NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `priority` enum('low','normal','high') NOT NULL,
-  `status` enum('open','closed','analyzed','in-progress') NOT NULL,
-  `memo` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `install` (
+  `version` varchar(25) NOT NULL,
+  `version_date` date NOT NULL,
+  `version_int` int(11) NOT NULL,
+  `date_installed` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `note_log`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
 --
 
 CREATE TABLE IF NOT EXISTS `note_log` (
@@ -83,17 +94,23 @@ CREATE TABLE IF NOT EXISTS `note_log` (
   `text` text NOT NULL,
   `date_added` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=207 ;
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `plan`
 --
+-- Creation: Oct 08, 2013 at 06:32 AM
+-- Last update: Oct 08, 2013 at 05:32 AM
+--
 
 CREATE TABLE IF NOT EXISTS `plan` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `shortname` varchar(25) NOT NULL,
+  `name` varchar(35) NOT NULL,
+  `descrip_html` varchar(255) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `max_clients` int(11) NOT NULL,
   `max_active_worklogs` int(11) NOT NULL,
   `allow_api_key` tinyint(1) NOT NULL DEFAULT '0',
@@ -101,12 +118,32 @@ CREATE TABLE IF NOT EXISTS `plan` (
   `expires` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `shortname` (`shortname`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `public_links`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
+--
+
+CREATE TABLE IF NOT EXISTS `public_links` (
+  `code` varchar(255) NOT NULL,
+  `date_expires` datetime DEFAULT NULL,
+  `permission` enum('view_time_log') NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `company_id` int(11) DEFAULT NULL,
+  `work_log_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `time_log`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
 --
 
 CREATE TABLE IF NOT EXISTS `time_log` (
@@ -118,12 +155,14 @@ CREATE TABLE IF NOT EXISTS `time_log` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `work_log_id` (`work_log_id`,`start_time`),
   KEY `time_log_FKIndex1` (`work_log_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4157 ;
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `user`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
@@ -143,34 +182,24 @@ CREATE TABLE IF NOT EXISTS `user` (
   `verify_command` enum('initial_email_check','change_email','reset_password') NOT NULL,
   `verify_code` varchar(50) DEFAULT NULL,
   `verify_param` varchar(255) NOT NULL,
+  `date_created` datetime NOT NULL,
   `plan_id` int(11) NOT NULL DEFAULT '0',
-  `trial_expired` tinyint(1) NOT NULL,
+  `trial_expired` tinyint(1) NOT NULL DEFAULT '0',
   `date_plan_expires` date DEFAULT NULL,
   `referred_by_id` int(11) DEFAULT NULL,
   `api_key` varchar(255) DEFAULT NULL,
-  `date_created` datetime NOT NULL,
+  `stripe_id` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`),
-  UNIQUE KEY `api_key` (`api_key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `view_time_usage`
---
-CREATE TABLE IF NOT EXISTS `view_time_usage` (
-`username` varchar(30)
-,`title` varchar(100)
-,`start_time` datetime
-,`stop_time` datetime
-,`diff` double(27,10)
-);
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `work_log`
+--
+-- Creation: Oct 08, 2013 at 05:32 AM
 --
 
 CREATE TABLE IF NOT EXISTS `work_log` (
@@ -188,13 +217,8 @@ CREATE TABLE IF NOT EXISTS `work_log` (
   `locked` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `work_log_FKIndex1` (`company_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=141 ;
 
--- --------------------------------------------------------
-
---
--- Structure for view `view_time_usage`
---
-DROP TABLE IF EXISTS `view_time_usage`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`cworklog_php`@`%` SQL SECURITY DEFINER VIEW `view_time_usage` AS select `user`.`username` AS `username`,`work_log`.`title` AS `title`,`time_log`.`start_time` AS `start_time`,`time_log`.`stop_time` AS `stop_time`,((`time_log`.`stop_time` - `time_log`.`start_time`) / 60) AS `diff` from ((`user` left join `work_log` on((`work_log`.`user_id` = `user`.`id`))) left join `time_log` on((`time_log`.`work_log_id` = `work_log`.`id`))) order by `time_log`.`start_time` desc;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
