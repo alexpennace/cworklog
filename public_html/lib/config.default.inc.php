@@ -14,3 +14,9 @@
       define('CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION', true);
       
       define('CFG_STRIPE_APIKEY', "<PUT-YOUR-APIKEY-HERE>");
+
+
+      define('CWL_ENVIRONMENT', 'development'); ///or production 
+
+      define('CWL_VERBOSE_DEBUGGING', false);   //verbose debugging will show SQL statements, etc
+      
