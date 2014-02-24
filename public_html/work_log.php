@@ -213,16 +213,20 @@
    
    $sql .= $sql_where." ORDER BY work_log.id DESC";
 
-   //echo $sql;
-   
+   if (CWL_VERBOSE_DEBUGGING){
+   		echo $sql;
+   }
+
    $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+   $result = $prep->execute();
+
+
    $rows = array();
    $columns = array();
    $super_total_seconds = 0;
    $super_total_amount = 0.0;
    if (!$result){
-      echo $sql.$DBH->errorInfo();
+      if (CWL_VERBOSE_DEBUGGING){ echo $sql.$DBH->errorInfo(); }
    }
    $cal_events = array();
    while ($row = $prep->fetch()){
@@ -233,14 +237,14 @@ $result = $prep->execute();
       
       $total_seconds = 0;
 	 
-      $prep = $DBH->prepare("SELECT start_time, stop_time 
+      $prep2 = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$row['id']." 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
-                $result2 =  $prep->execute();
+                $result2 =  $prep2->execute();
       if ($result2){
-         while($time_log_row = $prep->fetch()){
+         while($time_log_row = $prep2->fetch()){
 		    $seconds = strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
             $total_seconds += $seconds;
 			$hours = $seconds / 60 / 60;
@@ -255,14 +259,14 @@ $result = $prep->execute();
          }
       }
       
-      $prep = $DBH->prepare("SELECT start_time, stop_time 
+      $prep3 = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
                               WHERE work_log_id = ".(int)$row['id']." 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
-                $result3 =  $prep->execute();
+                $result3 =  $prep3->execute();
       if ($result3){
-         if ($uf_time_log_row = $prep->fetch()){
+         if ($uf_time_log_row = $prep3->fetch()){
             $row['_in_progress_'] = true;
          }else{
             $row['_in_progress_'] = false;
@@ -278,7 +282,9 @@ $result = $prep->execute();
          $columns = array_keys($row);
       }
       $rows[] = $row;   
-   }
+   }//end while fetching all rows
+
+
    $super_total_hours = $super_total_seconds / 60 / 60;   
    if (isset($_GET['output'])){
        if ($_GET['output'] == 'json'){

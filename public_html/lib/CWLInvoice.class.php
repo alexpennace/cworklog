@@ -64,6 +64,8 @@ class CWLInvoice{
      * based on the given work log id or work log id list
      */
 	public function generate($wid_or_widlist, $template = null) {
+			global $DBH;
+
 		    $this->final_html = false;
 		    $wl_ids = self::parse_wids($wid_or_widlist);
 		    //echo json_encode($wl_ids);
@@ -221,7 +223,7 @@ $result = $prep->execute();
     	if (!file_exists($file)){
     		return false;
     	}
-        return "$dir/$base";
+        return $file;
     }
 
 	public function output($format = null){
