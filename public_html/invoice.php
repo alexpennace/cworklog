@@ -42,7 +42,7 @@ if (!empty($_REQUEST['invoice_template'])){
 }
 
 require_once(dirname(__FILE__).'/lib/CWLInvoice.class.php');
-
-$inv = new CWLInvoice($_GET);
+$ARY = array_merge($_GET, $_POST);
+$inv = new CWLInvoice($ARY);
 $inv->generate($wid, $template);
 $inv->output();

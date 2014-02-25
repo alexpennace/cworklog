@@ -22,6 +22,10 @@ class CWLInvoice{
 		   'templates_dir'=>false,
 		   'format'=>'html',
 		   'currency_symbol'=>'$',
+		   'thankyou_message'=>'THANK YOU FOR YOUR BUSINESS!',
+		   'final_descrip_override'=>false,
+		   'invoice_number'=>false, //just dont put one if we dont need it
+		   'extra_css'=>false,
     );
     //populated in generate() method
 	private $final_html = '';
@@ -91,6 +95,9 @@ class CWLInvoice{
 			$num = 0;
 			$wl_final['amount_billed'] = 0;
 			$wl_final['description'] = count($wl_ids) > 0 ? count($wl_ids).' work logs<br>' : '';
+			if (!empty($this->opts['final_descrip_override'])){
+				$wl_final['description'] = $this->opts['final_descrip_override'];
+			}
 			$wl_final['hours'] = 0;
 			$wl_final['rate'] = 0;
 			$wl_final['sum_rates'] = 0;
@@ -161,7 +168,10 @@ $result = $prep->execute();
 	          $from_user_row = $prep->fetch();
 		   }
 			
-
+			$THANKSMSG = $this->opts['thankyou_message']; 
+			$invoice_number = $this->opts['invoice_number'];
+			$extra_css = $this->opts['extra_css'];
+			
 			if ($template_file !== false){
 				ob_start();
 				include($template_file);

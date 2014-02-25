@@ -16,36 +16,26 @@ $OPTS = $_GET;
 
 forcecheck('wid');
 $OPTS['format'] = forcecheck('format', 'pdf');
+
+
+   include_once(dirname(__FILE__).'/lib/Site.class.php');
+
 ?>
 <!doctype html>
 <html>
 <head>
 <title>CWorkLog Invoice</title>
-<style>
-iframe {
-	width: 100%;
-	height: 100%;
-}
-
-.invoice_helper {
-	width: 100%;
-	height: 60px;
-	border: 1px solid silver;
-	text-align: center;
-}
-
-.invoice {
-		height: 800px;
-}
-
-</style>
+<?php
+Site::CssJsJqueryIncludes();
+?>
+<link href="css/invoicehelper.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 
 <div class="container">
-
 	<div class="invoice_helper">
 	<form target="invoice" action="invoice.php" method="GET">
+
 	<input type="hidden" name="invoice_wid" value="<?=$OPTS['wid']?>">
 	<label>Format
 		<select name="format">
@@ -74,17 +64,52 @@ iframe {
 	})(); 
    </script>
 
+	<button type="submit">Update Invoice</button>
 
-	<button type="submit">Go</button>
+	<div id="moreinvoiceoptions">
+	<div class="head">
+	More Invoice Options
+	</div>
+	<div class="body flexcroll">
+		<label>Custom Invoice Number: <input type="text" name="invoice_number" value=""></label>
+		<label>Description Override<br>
+		<textarea name="final_descrip_override"></textarea>
+		</label>
+
+		<label>Thank you message at the bottom: <br>
+		<textarea name="thankyou_message">THANK YOU FOR YOUR BUSINESS!</textarea>
+		</label>
+
+		<label>Extra CSS for the invoice<br>
+		<textarea name="extra_css"></textarea>
+		</label>
+	</div>
+	</div>
 	</form>
 	</div>
-
 	<div class="invoice">
 	<iframe name="invoice" src="invoice.php?invoice_wid=<?=$OPTS['wid']?>&format=<?=$OPTS['format']?>">
 	</iframe>
 	</div>
 
 	</div>
+<script>
+$(function(){
+		$('#moreinvoiceoptions .head').click(function(){
+				var $body = $(this).parent().find('.body');
+				$body.toggle();
+				var invoice_top_helper_height;
+				
+				if ($body.is(":visible")){
+						invoice_top_helper_height = '140px';
+				}else{
+						invoice_top_helper_height = '70px';
+				}
 
+				$('.invoice_helper').css('height', invoice_top_helper_height);
+				$('.invoice').css('padding-top', invoice_top_helper_height);
+		}).click();
+});
+</script>
 </body>
 </html>

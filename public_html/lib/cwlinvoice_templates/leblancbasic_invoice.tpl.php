@@ -14,28 +14,42 @@
 <head>
 	<title>Invoice</title>
 	<link rel="stylesheet" href="invoice_style.css" type="text/css">
-<style>
+	<style>
+	   div.footer {
+	      position: fixed;
+	      overflow: hidden;
+	      width: 100%;
+	      padding: 0.1cm;
+	   }
+	 div.footer {
+	     bottom: 0cm;
+		  left: 0cm;
+	     border-top-width: 1px;
+	     height: 2cm;
+	     text-align: center;
+	   }
 
-               div.footer {
-                  position: fixed;
-                  overflow: hidden;
-                  width: 100%;
-                  padding: 0.1cm;
-               }
-             div.footer {
-                 bottom: 0cm;
-            	  left: 0cm;
-                 border-top-width: 1px;
-                 height: 2cm;
-                 text-align: center;
-               }
-</style>
+	   <?php
+	   		if (!empty($extra_css)){
+	   			?>
+	   			<?=$extra_css?>
+	   			<?php
+	   	    }
+	   ?>
+	</style>
 </head>
 <body>
 	<div id="header">
 		<div id="invoice">
 			INVOICE
 		</div>
+		<?php if (!empty($invoice_number)){ ?>
+			<div id="invoice_number" class="invoice_number" 
+			      style="position: absolute; top: 10px; left: 180px;">
+			Inv. Number: <?=$invoice_number?>
+			</span><?php 
+		 } ?>
+
 		<div id="date" style="position: absolute; top: 70px; right: 0px;">
 			<?PHP $date = !empty($wl_final['date_billed']) && strtotime($wl_final['date_billed']) !== false ? $wl_final['date_billed'] : 'now'; ?>
          Date: <?=date('M j, Y', strtotime($date))?>
@@ -151,7 +165,7 @@
 			
 		</div>
 		<div id="thanks">
-			THANK YOU FOR YOUR BUSINESS!
+			<?=$THANKSMSG?>
 		</div>
 	</div>
 	

@@ -40,6 +40,7 @@
        }
        if (isset($_REQUEST['f']) && isset($_REQUEST['v'])){
           $field = $_REQUEST['f'];
+          $field = preg_replace('/[^\w]/', '', $field);
           $value = $_REQUEST['v'];
        }else{
           die(json_encode(array('error'=>'No [f]ield or [v]alue provided.')));
@@ -49,8 +50,8 @@
        
        $prep = $DBH->prepare("SELECT work_log.*, company.name AS company_name 
                               FROM work_log JOIN company ON company_id = company.id
-                              WHERE work_log.id = $wid");
-                $result =  $prep->execute();
+                              WHERE work_log.id = :work_log_id");
+                $result =  $prep->execute(array(':work_log_id'=>(int)$wid));
        if ($result) {
        	$original_row = $prep->fetch();
        }else{
@@ -93,9 +94,11 @@
        }
        
        //if we made it down here, then everything is ok
-       $prep = $DBH->prepare("UPDATE work_log SET ".$DBH->quote($field)." = '".$DBH->quote($value)."' ".
-                   "WHERE id = $wid ");
-                $result_upd =  $prep->execute();
+       $sql = "UPDATE work_log SET $field = :value WHERE id = :work_log_id LIMIT 1";
+       $prep = $DBH->prepare($sql);
+       if (CWL_VERBOSE_DEBUGGING) { echo $sql; }
+
+       $result_upd =  $prep->execute(array('work_log_id'=>$wid, 'value'=>$value));
        if ($result_upd){
           
           try{ $worklog = new work_log($wid);}
@@ -113,7 +116,7 @@
    $sql = "SELECT work_log.*,company.name AS company_name 
                           FROM work_log JOIN company ON company_id = company.id ";
    //only allow logged in user to see this work log
-   $sql_where = " WHERE work_log.user_id = ".(int)$_SESSION['user_id'];
+   $sql_where = " WHERE work_log.user_id = :user_id ";
    
    if (isset($_GET['search'])){ 
       $s = $_GET['search'];
@@ -218,8 +221,7 @@
    }
 
    $prep = $DBH->prepare($sql);
-   $result = $prep->execute();
-
+   $result = $prep->execute(array(':user_id'=>(int)$_SESSION['user_id']));
 
    $rows = array();
    $columns = array();
@@ -239,10 +241,10 @@
 	 
       $prep2 = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
-                              WHERE work_log_id = ".(int)$row['id']." 
+                              WHERE work_log_id = :work_log_id 
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
-                $result2 =  $prep2->execute();
+                $result2 =  $prep2->execute(array('work_log_id'=>(int)$row['id']));
       if ($result2){
          while($time_log_row = $prep2->fetch()){
 		    $seconds = strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
@@ -261,10 +263,10 @@
       
       $prep3 = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
-                              WHERE work_log_id = ".(int)$row['id']." 
+                              WHERE work_log_id = :work_log_id
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
-                $result3 =  $prep3->execute();
+      $result3 =  $prep3->execute(array('work_log_id'=>(int)$row['id']));
       if ($result3){
          if ($uf_time_log_row = $prep3->fetch()){
             $row['_in_progress_'] = true;
@@ -294,7 +296,7 @@
        //spreadsheet output
        else if ($_GET['output'] == 'csv' || $_GET['output'] == 'xls'|| $_GET['output'] == 'xlsx'){
             /** Include PHPExcel */
-            require_once('lib/PHPExcel.php');
+            require_once(dirname(__FILE__).'/lib/PHPExcel.php');
             
             // Create new PHPExcel object
             $objPHPExcel = new PHPExcel();
@@ -359,6 +361,7 @@
    }
    
    include_once(dirname(__FILE__).'/lib/Site.class.php');
+   require_once(dirname(__FILE__).'/lib/work_log.inc.php');
    
    $specific_company_id = isset($_GET['company']) ? (int)$_GET['company'] : false;
    $specific_work_log_id = isset($_GET['wid']) ? (int)$_GET['wid'] : false;
@@ -366,14 +369,14 @@
 
       $prep = $DBH->prepare("SELECT company.*, work_log.* 
                              FROM company JOIN work_log on company.id = company_id 
-                             WHERE work_log.id = ".$specific_work_log_id);
-                $result =  $prep->execute();
+                             WHERE work_log.id = :work_log_id);");
+                $result =  $prep->execute(array('work_log_id'=>$specific_work_log_id));
       if ($result && $row = $prep->fetch()) {
       	$specific_company_id = $row['company_id'];
       }
    }
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!doctype html>
 <html>
 <head>
 <title>Work Log</title>
@@ -382,422 +385,24 @@
   Site::CssJsJqueryIncludes();
   Site::Css();
 ?>
-<style>
-.ui-menu { width: 150px; font-size: .7em; }
-.actionmenu{ 
-  margin-left: 7px;
-  width: 22px;
-  float: right; 
-}
-.ui-menu a:hover{ color: white; }
-
-.ui-state-default, .ui-widget-content .ui-state-focus{
-    border: 1px solid #f09424;
-    background: orange;
-    font-weight: normal/*{fwDefault}*/;
-    color: white;
-    outline: none;
-}
-</style>
+<link href="css/work_log.css" media="screen" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="js/work_log_shared.js"></script>
-<script type="text/javascript">
-var FALSE_FUNCTION = new Function( "return false" );
-
-/**
- * Called to disable F1, F3, and F5.
- */
-function disableShortcuts() {
-  // Disable online help (the F1 key).
-  //
-  document.onhelp = FALSE_FUNCTION;
-  window.onhelp = FALSE_FUNCTION;
-
-  // Disable the F1, F3 and F5 keys. Without this, browsers that have these
-  // function keys assigned to a specific behaviour (i.e., opening a search
-  // tab, or refreshing the page) will continue to execute that behaviour.
-  //
-  document.onkeydown = function disableKeys() {
-    // Disable F1, F3 and F5 (112, 114 and 116, respectively).
-    //
-    if( typeof event != 'undefined' ) {
-      if( (event.keyCode == 112) ||
-          (event.keyCode == 114) ||
-          (event.keyCode == 116) ) {
-        event.keyCode = 0;
-        return false;
-      }
-    }
-  };
-
-  // For good measure, assign F1, F3, and F5 to functions that do nothing.
-  //
-  shortcut.add( "f1", FALSE_FUNCTION );
-  shortcut.add( "f3", FALSE_FUNCTION );
-  shortcut.add( "f5", function(){ window.location.href = window.location.href; } );
-}
-
-$(document).bind('keydown', function(e) {
-    if(e.which === 116) {
-       console.log('super javascript refresh!');
-       window.location.href = window.location.href;
-       return false;
-    }
-    if(e.which === 82 && e.ctrlKey) {
-       console.log('blocked');
-       return false;
-    }
-});
-
-</script>
-<script>
-  function sumCheckedAmounts(){
-     if (typeof(glbDataTable) != 'undefined'){
-        //find record
-        var recordSet = glbDataTable.getRecordSet();
-        var records = recordSet.getRecords();
-        var record = false;
-        var total_calc_hours = 0;
-        var total_calc_amount = 0;
-        
-        var array_details = [];
-        
-        for (var i = 0; i < records.length; ++i){
-            if ($('input[name=cbx_wl_' + records[i].getData('id') + ']').prop('checked')){
-                   if (records[i].getData('_calc_hours_')){
-                       total_calc_hours += records[i].getData('_calc_hours_');
-                   }                
-                   if (records[i].getData('_calc_amount_')){
-                       total_calc_amount += records[i].getData('_calc_amount_');
-                   }
-                   
-                   array_details.push(records[i].getData());
-             }
-        }   
-        return { total_calc_hours: total_calc_hours, total_calc_amount: total_calc_amount, details: array_details };
-     }  
-  }
-  
-  function updateWLChecked(cbx, id){
-     if (typeof(cbx) != 'undefined' && typeof(id) != 'undefined'){
-        //update the checked data value so we don't lose the checkbox
-        var record = glbFindRecordById(id);
-        if (record){
-               record.setData('__checked__', $(cbx).prop('checked') );
-               glbDataTable.getRecordSet(record).updateRecordValue ( record , '__checked__' , $(cbx).prop('checked') ); 
-               //glbDataTable.render();  
-        }                      
-     }
-     var checkedCount = $('.wlcbxes:checked').length;
-     var tot_calc_hours;
-     var tot_calc_amount;
-     var details = [];
-        
-     if (checkedCount == 0){
-        $('#selbox_with_wlchecked').hide();
-        $('#selbox_with_wlchecked option[value=""]').text('With checked: ');
-        tot_calc_hours = 0;
-        tot_calc_amount = 0;
-     }else{
-        $('#selbox_with_wlchecked').show();
-        var res = sumCheckedAmounts();
-        $('#selbox_with_wlchecked option[value=""]').text('With ('+checkedCount+') checked: ' );
-        tot_calc_hours = res.total_calc_hours;
-        tot_calc_amount = res.total_calc_amount;
-        details = res.details;
-        //$('#selbox_with_wlchecked option[value=""]').text('With ('+checkedCount+') checked (' + res.total_calc_hours.toFixed(2) + 'hr => $' + res.total_calc_amount.toFixed(2) + '): ' );
-     }
-     
-     if (checkedCount == 0 || (tot_calc_hours == 0 && tot_calc_amount == 0)){
-         $('#divCheckedSummary').hide();
-         
-     }else{
-        //$('#spnCheckedNum').text(checkedCount);
-        //$('#spnCheckedTotalCalcHours').text(tot_calc_hours.toFixed(2)+' hr');
-        //$('#spnCheckedTotalCalcAmount').text(tot_calc_amount.toFixed(2));
-        $('#divCheckedSummary').show();
-        
-        var s = '';
-        var sum_rate = 0;
-        if (details.length > 0){
-           s = '<table border=0 cellspacing=3 cellpadding=3>';
-           //s += '<tr><td>Work Log</td><td>Calc Hours</td><td>Rate</td><td>Calc Amount</td><td>&nbsp;</td></tr>';
-           s += '<tr><td colspan=5><b>' + checkedCount +'</b> Work Logs Selected</td></tr>';
-           for(var i = 0; i < details.length; ++i){
-              sum_rate += details[i]['rate'];
-              s += '<tr><td align=left>'+details[i]['title']+'</td><td align=right>'+details[i]['_calc_hours_'].toFixed(3) + ' hr' + '</td><td align=right>@ $' + (details[i]['rate'] ? parseFloat(details[i]['rate']).toFixed(2) : '0.00') + '/hr</td><td align=right> $' + details[i]['_calc_amount_'].toFixed(2) + '</td><td>&nbsp;</td></tr>';
-           }
-           s += '<tr class="totals"><td align=right><b>Total: </b></td><td align=right><b>' + tot_calc_hours.toFixed(3)+' hr</b></td><td align=center> =&gt; </td><td align=right><b>$'+ tot_calc_amount.toFixed(2) +'</b></td><td align=right style="border-top: none;"><button onclick="glbDoWithChecked(\'generate-invoice\');">PDF Invoice</button></tr>';
-           s += '</table>';
-        }
-        $('#divCheckedDetailed').html(s);
-     }
-  }
-  
-  $(document).ready(function() {
-        $("#dlgAddNote").dialog({ autoOpen: false, width: 240, height: 190 });
-		  $("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
-		  $("#dlgAddTime").dialog({ autoOpen: false, width: 240, height: 130 });
-         
-                 function clearSelection() {
-                      if(document.selection && document.selection.empty) {
-                          document.selection.empty();
-                      } else if(window.getSelection) {
-                          var sel = window.getSelection();
-                          sel.removeAllRanges();
-                      }
-                  }
-        //can't make draggable because then you can't select text
-        var flip = false;
-        $( "#divCheckedSummary" ).dblclick(function(){ 
-                 if (flip){ 
-                    $(this).draggable('destroy').css('cursor', 'pointer'); 
-                 } else{ 
-                    $(this).draggable().css('cursor', 'move');
-                    
-                 }
-                 flip = !flip;
-                 clearSelection();
-
-              } );
- 
-        updateWLChecked();
-  });
-</script>
-	<style>
-	.ui-combobox {
-		position: relative;
-		display: inline-block;
-	}
-	.ui-combobox-toggle {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		margin-left: -1px;
-		padding: 0;
-		/* adjust styles for IE 6/7 */
-		*height: 1.7em;
-		*top: 0.1em;
-	}
-	.ui-combobox-input {
-		margin: 0;
-		padding: 0.3em;
-	}
-	</style>
-	<script>
-	(function( $ ) {
-		$.widget( "ui.combobox", {
-			_create: function() {
-				var input,
-					self = this,
-					select = this.element.hide(),
-					selected = select.children( ":selected" ),
-					value = selected.val() ? selected.text() : "",
-					wrapper = this.wrapper = $( "<span>" )
-						.addClass( "ui-combobox" )
-						.insertAfter( select );
-
-				input = $( "<input>" )
-					.appendTo( wrapper )
-					.val( value )
-					.addClass( "ui-state-default ui-combobox-input" )
-					.autocomplete({
-						delay: 0,
-						minLength: 0,
-						source: function( request, response ) {
-							var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
-							response( select.children( "option" ).map(function() {
-								var text = $( this ).text();
-								if ( this.value && ( !request.term || matcher.test(text) ) )
-									return {
-										label: text.replace(
-											new RegExp(
-												"(?![^&;]+;)(?!<[^<>]*)(" +
-												$.ui.autocomplete.escapeRegex(request.term) +
-												")(?![^<>]*>)(?![^&;]+;)", "gi"
-											), "<strong>$1</strong>" ),
-										value: text,
-										option: this
-									};
-							}) );
-						},
-						select: function( event, ui ) {
-							ui.item.option.selected = true;
-							self._trigger( "selected", event, {
-								item: ui.item.option
-							});
-						},
-						change: function( event, ui ) {
-							if ( !ui.item ) {
-								var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( $(this).val() ) + "$", "i" ),
-									valid = false;
-								select.children( "option" ).each(function() {
-									if ( $( this ).text().match( matcher ) ) {
-										this.selected = valid = true;
-										return false;
-									}
-								});
-								if ( !valid ) {
-									// remove invalid value, as it didn't match anything
-									$( this ).val( "" );
-									select.val( "" );
-									input.data( "autocomplete" ).term = "";
-									return false;
-								}
-							}
-						}
-					})
-					.addClass( "ui-widget ui-widget-content ui-corner-left" );
-
-				input.data( "autocomplete" )._renderItem = function( ul, item ) {
-					return $( "<li></li>" )
-						.data( "item.autocomplete", item )
-						.append( "<a>" + item.label + "</a>" )
-						.appendTo( ul );
-				};
-
-				$( "<a>" )
-					.attr( "tabIndex", -1 )
-					.attr( "title", "Show All Items" )
-					.appendTo( wrapper )
-					.button({
-						icons: {
-							primary: "ui-icon-triangle-1-s"
-						},
-						text: false
-					})
-					.removeClass( "ui-corner-all" )
-					.addClass( "ui-corner-right ui-combobox-toggle" )
-					.click(function() {
-						// close if already visible
-						if ( input.autocomplete( "widget" ).is( ":visible" ) ) {
-							input.autocomplete( "close" );
-							return;
-						}
-
-						// work around a bug (likely same cause as #5265)
-						$( this ).blur();
-
-						// pass empty string as value to search for, displaying all results
-						input.autocomplete( "search", "" );
-						input.focus();
-					});
-			},
-
-			destroy: function() {
-				this.wrapper.remove();
-				this.element.show();
-				$.Widget.prototype.destroy.call( this );
-			}
-		});
-	})( jQuery );
-
-	$(function() {
-		//$( "#add_file_featurecombo" ).combobox();
-	});
-</script>
+<script type="text/javascript" src="js/work_log.js"></script>
 </head>
-<style>
-.unfilter{
-  color: #00b000;
-}
-#selbox_with_wlchecked{
-  font-size: 11px;
-  margin-right: 5px;
-}
-</style>
 <body class="yui-skin-sam">
-<?PHP           
-          function makeFilterLink($text, $key, $value)
-          {
-            ?><a <?PHP if (isset($_GET[$key]) && $_GET[$key] == $value){ 
-                ?>href="<?=modQS('',array($key))?>" class="unfilter" title="Unfilter <?=htmlentities($text)?>"<?PHP 
-            }else{
-                ?>href="<?=modQS(array($key=>$value))?>"<?PHP 
-            }?>><?=$text?></a><?PHP
-          }
-          
+<?PHP 
           Members::MenuBarOpenBottomLeftOpen();
           ?>
-          <select id="selbox_with_wlchecked">
-            <option value="">With checked:</option>
-            <option value="generate-invoice"> &nbsp; &nbsp; Generate PDF Invoice</option>
-            <option value="lock-worklogs"> &nbsp; &nbsp; Lock</option>
-            <option value="unlock-worklogs"> &nbsp; &nbsp; Unlock</option>
-            <option value="invoice-date-today"> &nbsp; &nbsp; Mark Billed Today</option>
-            <option value="mark-paid-today"> &nbsp; &nbsp; Mark Paid Today</option>
-            </select>
-            
-            
-            <form action method="GET" style="display: inline" onsubmit="var uri; if ($(this.search_method).val() == 'within'){ uri = window.location.href; uri = updateQueryStringParameter(uri,'search', $(this.search).val()); }else{ uri = '?search=' + encodeURIComponent($(this.search).val()); }window.location.href = uri; return false;">
-               <input type="text" name="search" value="<?=!empty($_GET['search']) ? htmlentities($_GET['search']) : ''?>" title="Search Work Logs" placeholder="Search..." size=10 />
-               <input type="submit" title="Search all worklogs " ="all" value=" All "/>
-               <input type="submit" title="Search within filter" name="within" value=" Within " onclick="this.form.search_method.value = 'within';"/>
-               <input type="hidden" name="search_method" value="all">
-            </form>
-
             <strong class="OrangeColor">Filter:</strong> 
             <?PHP makeFilterLink('Paid', 'paid', '1'); ?>,<?PHP makeFilterLink('Unpaid', 'paid', '0'); ?> | 
             <?PHP makeFilterLink('Billed', 'billed', '1'); ?>,<?PHP makeFilterLink('Not Billed', 'billed', '0'); ?> | 
             <?PHP makeFilterLink('Locked', 'locked', '1'); ?>,<?PHP makeFilterLink('Unlocked', 'locked', '0'); ?>
             &nbsp; 
-            <span id="seldate_short">
-            <select>
-               <option value="">--- Date Billed ---</option>
-               <option value="show-all" data-after-date-billed="" data-before-date-billed="">Show All</option>
-               <option value="30-days-ago" data-after-date-billed="30 days ago" data-before-date-billed="">30 days ago</option>
-               <option value="60-days-ago" data-after-date-billed="60 days ago" data-before-date-billed="">60 days ago</option>
-               <option value="90-days-ago" data-after-date-billed="90 days ago" data-before-date-billed="">90 days ago</option>
-               <option value="between">Between Dates</option>
-               <option value="2012" data-after-date-billed="1/1/2012" data-before-date-billed="12/31/2012">2012 Report</option>
-            </select>
-            </span>
-            <span id="datebill_between" style="display: none">
-            <span id="datebill_label" title="Filter dates billed between these dates"><strong>Date Billed:</strong></span>
-            <input type="text" size=8 id="after_date_billed" value="<?=$stt_aft_date_billed !== false ? date('Y-m-d', $stt_aft_date_billed) : ''?>" onkeydown="if (event.which == 13){ $('#btn_date_billed').click(); }"/>
-            -
-            <input type="text" size=8 id="before_date_billed" value="<?=$stt_bef_date_billed !== false ? date('Y-m-d', $stt_bef_date_billed) : ''?>" onkeydown="if (event.which == 13){ $('#btn_date_billed').click(); }"/>
-            <button id="btn_date_billed" onclick="var uri = window.location.href; uri = updateQueryStringParameter(uri,'before_date_billed', $('#before_date_billed').val()); uri = updateQueryStringParameter(uri,'after_date_billed', $('#after_date_billed').val()); window.location.href = uri;">Go</button>
-            </span>
-            <script>
-            $(function(){
-               $('#datebill_label').click(function(){
-                  $('#seldate_short').show();
-                  $('#datebill_between').hide();                 
-               });
-               
-               $('#seldate_short select').change(function(){
-                  if ($(this).val() == ''){ return; }
-                  
-                  if ($(this).val() == 'between'){
-                      $(this).parent().hide();
-                      $('#datebill_between').show();
-                  }else{
-                     var after = $(this.options[this.selectedIndex]).data('after-date-billed');
-                     var before = $(this.options[this.selectedIndex]).data('before-date-billed');
-                     $('#after_date_billed').val(after);
-                     $('#before_date_billed').val(before);
-                     $('#btn_date_billed').click();
-                  }
-                  $(this).val('');
-               });
-               
-               if ($('#after_date_billed').val() != '' || $('#before_date_billed').val() != ''){
-                  $('#seldate_short').hide();
-                  $('#datebill_between').show();
-               }else{
-                  $('#seldate_short').show();
-                  $('#datebill_between').hide();
-               }
-            });
-            
-            </script>
-            
-            &nbsp;
-            <a href="<?=modQS(array('output'=>'csv'))?>" title="Export entries below to csv format"><img src="images/excel_csv.png"></a>
-            <a href="<?=modQS(array('output'=>'xlsx'))?>" title="Export entries below to Excel 2007 xlsx format"><img src="images/excel_xlsx.png"></a>
+            <strong class="OrangeColor">Export:</strong>
+            <a href="<?=modQS(array('output'=>'csv'))?>" title="Export entries below to csv format"><img src="images/excel_csv.png"> csv</a>
             <?PHP /*** DOESN'T WORK CORRECTLY <a href="<?=modQS(array('output'=>'xls'))?>" title="Export entries below to Excel xls format"><img src="images/excel_xls.png"> xls</a> **/ ?>
-            
-            <?PHP /** <a target="_blank" href="<?=modQS(array('output'=>'json'))?>" title="Export entries below to json format"><img src="images/json.png"> json</a> **/ ?>
+            <a href="<?=modQS(array('output'=>'xlsx'))?>" title="Export entries below to Excel 2007 xlsx format"><img src="images/excel_xlsx.png"> xlsx</a>
+            <a target="_blank" href="<?=modQS(array('output'=>'json'))?>" title="Export entries below to json format"><img src="images/json.png"> json</a>
             <?PHP /** Not sure anyone even uses the notes feature right now
             <a href="<?=modQS(array('notes'=>'off'))?>">Notes Off</a> | 
             <a href="<?=modQS(array('notes'=>'cut'))?>">Notes Trimmed</a> | 
@@ -817,13 +422,13 @@ $(document).bind('keydown', function(e) {
           Members::MenuBarBottomLeftCloseRightOpen();
           ?>
           <select style="margin-top: 10px" onChange="if (this.value != ''){ window.location.href = 'work_log.php?company=' + this.value + '<?=modQS('',array('company','company_id','wid'))?>'.replace('?','&'); } else { window.location.href = 'work_log.php<?=modQS('',array('company','company_id'))?>'; }">
-            <option value="">-- Client --</option>
-            <option value="">[All Clients]</option>
+            <option value="">-- Company --</option>
+            <option value="">[All Companies]</option>
             <?PHP
-                 $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = ".(int)$_SESSION['user_id']." ORDER BY name ASC";
+                 $sql = "SELECT company.name AS company_name, company.id as company_id FROM company WHERE user_id = :user_id ORDER BY name ASC";
                  $prep = $DBH->prepare($sql);
-$result = $prep->execute();
-                 while ($row = $prep->fetch()){
+                 $result = $prep->execute(array('user_id'=> (int)$_SESSION['user_id']));
+                 while ($row = $prep->fetch()) {
                    ?><option <?=$specific_company_id == $row['company_id'] ? 'selected ' : ''?> value="<?=$row['company_id']?>"><?=htmlentities($row['company_name'])?></option><?PHP
                  }
             ?>
@@ -831,15 +436,15 @@ $result = $prep->execute();
             <?PHP
               if (!empty($specific_company_id)){
             ?>
-                <select onChange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&paid=0';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
+                <select onChange="if (this.value == 'unpaid'){ window.location.href = 'work_log.php?company=<?=$specific_company_id?>&filter[]=unpaid';}else if (this.value != ''){ window.location.href = 'work_log.php?wid=' + this.value; }else{ window.location.href = 'work_log.php?company=<?=$specific_company_id?>'; }">
                 <option value="" selected>-- Work Log --</option>
                 <option value="" <?=!$unpaid && !$paid? 'selected' : ''?>>[All Work Logs]</option>
                 <option value="unpaid" <?=$unpaid ? 'selected' : ''?>>[Unpaid Work Logs]</option>
                 <?PHP
                      $sql = "SELECT id, title FROM work_log WHERE company_id = ".$specific_company_id." ORDER BY id DESC";
-                     $prep = $DBH->prepare($sql);
-$result = $prep->execute();
-                     while ($row = $prep->fetch()){
+                     $prep2 = $DBH->prepare($sql);
+                     $result = $prep2->execute();
+                     while ($row = $prep2->fetch()){
                        ?><option <?=$specific_work_log_id == $row['id'] ? 'selected ' : ''?> value="<?=$row['id']?>"><?=htmlentities($row['title'])?></option><?PHP
                      }
                 ?>
@@ -851,156 +456,11 @@ $result = $prep->execute();
           Members::MenuBarBottomRightClose();
           Members::MenuBarClose(); 
 ?>
-<?PHP
-   function modQS($ary_or_qs, $ary_unset = array()){
-     if (is_string($ary_or_qs)){
-       $ary_or_qs = parse_str($ary_or_qs);
-     }
-     if (!is_array($ary_or_qs)) {
-     	  $ary_or_qs = array();
-     }
-     
-     if (!is_array($ary_unset)){
-        $ary_unset = array($ary_unset);
-     }
-     
-    
-     $CURQS = array_merge($_GET, $ary_or_qs);
-     
-     //actually generate the query string
-     $qs = '';
-     foreach($CURQS as $key => $val){
-     
-         if (in_array($key, $ary_unset)){
-            continue; //ignore this key
-         }
-
-         if (isset($ary_or_qs[$key])) {
-            $CURQS[$key] = $ary_or_qs[$key];
-         }
-         
-         if (is_string($key) && is_string($CURQS[$key])){
-            if ($qs == ''){ $qs = '?'; }
-            else { $qs .= '&'; }
-            $qs .= urlencode($key).'='.urlencode($CURQS[$key]);
-         }
-     }
-     //if the query string is empty, we need to specify the page
-     if (empty($qs)){
-         return $_SERVER['PHP_SELF'];
-     }else{
-        return $qs;
-     }
-   }
-?>
-<style>
-#divCheckedSummary{
-   /*position: fixed;*/
-   background-color: #ffe6cc;
-   border: 1px solid silver;
-   margin-left: 1em;
-   width: 40em;
-   padding_top: 2px;
-   
-   
-   display: block;
-   position: absolute;
-   left: 345px;
-   top: 39px;
-   filter: alpha(opacity=90);
-   opacity: 0.9;
-}
-
-/*draw pretty line to separate totals*/
-#divCheckedDetailed table tr.totals td{
-  border-top: 1px solid black;
-}
-
-#divCheckedDetailed button{ padding: 4px; }
-#divCheckedDetailed table td{
-   padding-left: 3px;
-   padding-right: 3px;
-}
-
-
-</style>
 <div id="divCheckedSummary">
 <div id="divCheckedDetailed">
 </div>
 </div>
 <div class="dataBlk">
-<script>
-function glbGetCheckedCSVids(){
-     var s = '';
-     $('.wlcbxes:checked').each(function(){
-        if (s != ''){ s += ','; }
-        s += $(this).val();
-     });
-     return s;
-}
-
-function glbPostAction(action, csv_worklog_ids, callback){
-        $.post('ajax_service.php', {'action': action, 'csv_worklog_ids':csv_worklog_ids}, 
-        function (data){
-          if (typeof(callback) == 'function'){ callback(data); }
-        }, 'json');
-}
-
-function glbDoWithChecked(action){
-   var s = glbGetCheckedCSVids();
-   var ids = s.split(',');
-   if (action == 'generate-invoice'){
-        window.location.href = 'invoice.php?wid='+s+'&format=pdf';
-        return;
-   }else if (action == 'lock-worklogs'){
-       glbPostAction(action, s, function(data){
-          if (!data.error){
-             for (var i = 0; i < data.work_logs.length; ++i){
-                glbUpdateWorkLogJS(data.work_logs[i]);
-             }
-          }
-       });
-   }else if (action == 'unlock-worklogs'){
-       glbPostAction(action, s, function(data){
-          if (!data.error){
-             for (var i = 0; i < data.work_logs.length; ++i){
-                glbUpdateWorkLogJS(data.work_logs[i]);
-             }
-          }
-       });
-   }else if (action == 'invoice-date-today'){
-       glbPostAction(action, s, function(data){
-          if (!data.error){
-             for (var i = 0; i < data.work_logs.length; ++i){
-                glbUpdateWorkLogJS(data.work_logs[i]);
-             }
-          }
-       });
-   }else if (action == 'mark-paid-today'){
-       glbPostAction(action, s, function(data){
-          if (!data.error){
-             for (var i = 0; i < data.work_logs.length; ++i){
-                glbUpdateWorkLogJS(data.work_logs[i]);
-             }
-          }
-       });
-   }
-}
-
-$(function(){
-    $('#selbox_with_wlchecked').change(function(){
-       var action = $(this).val();
-       $(this).val('');
-       if (action != ''){
-           if ($('.wlcbxes:checked').length == 0){
-              alert('Please check a worklog before trying to perform an action');
-              return;
-           }
-           glbDoWithChecked(action);
-       }
-    });
-});
-</script>
 <?PHP
    if (isset($_GET['company'])){
       $prep = $DBH->prepare("SELECT name,phone FROM company WHERE id = ".(int)$_GET['company']);
@@ -1073,7 +533,7 @@ table.tblFileMods td{ padding:2px; }
 <label>Feature 
 <input type="text" name="feature" value="" style="width: 90%">
 <?PHP
-  $sql = "SELECT feature, file, change_type, notes FROM files_log JOIN work_log ON work_log.id = work_log_id WHERE user_id = ".(int)$_SESSION['user_id'];
+  $sql = "SELECT feature, file, change_type, notes FROM files_log JOIN work_log ON work_log.id = work_log_id WHERE user_id = :user_id ";
   if (isset($_GET['company_id'])){
      $sql .= " AND company_id = ".(int)$_GET['company_id'];
   }
@@ -1088,7 +548,7 @@ table.tblFileMods td{ padding:2px; }
   }
   $sql .= " ORDER BY feature, file ASC";
   $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+  $result = $prep->execute(array(':user_id'=>(int)$_SESSION['user_id']));
   $features_assoc = array();
   $features = array();
   $files_assoc = array();
@@ -1187,71 +647,6 @@ Notes<br>
 <input type="hidden" name="feature" value=""/>
 </form>
 <script type="text/javascript">
-generator = null;
-var debug = [];
-
-glbDeleteFileChange = function(wid, file, feature){
-   if (!confirm('Are you sure you want to delete this file or db change modification?')){ return false; }
-   var f = document.frmDeleteFileModification;
-   f.work_log_id.value = wid;
-   f.file.value = file;
-   f.feature.value = feature;
-   f.submit();
-}
-
-glbDeleteNote = function(wid, note_id){
-  var f = document.frmDeleteNote;
-  f.work_log_id.value = wid;
-  f.note_id.value = note_id;
-  f.submit();
-}
-
-
-glbFindRecordById = function(id){
-   //find record by oData.id
-   var recordSet = glbDataTable.getRecordSet();
-   var records = recordSet.getRecords();
-   var record = false;
-
-   for (var i = 0; i < records.length; ++i){
-      if (records[i].getData('id') == id){
-         record = records[i];
-         break;
-      }
-   }
-   return record;
-}
-
-/**
- * Update the datatable row with data by a given record 
- *(it will attempt to find the record if oRecord is undefined)
- */
-glbUpdateWorkLogJS = function(oData, oRecord){
-            //find record by oData.id
-            var recordSet = glbDataTable.getRecordSet();
-            var records = recordSet.getRecords();
-            var record = false;
-			
-			if (typeof(oRecord) == 'undefined'){
-				for (var i = 0; i < records.length; ++i){
-					if (records[i].getData('id') == oData['id']){
-					   record = records[i];
-					   break;
-					}
-				}
-			}else{
-			   record = oRecord;
-			}
-			
-			if (record){
-                    //set all the values stored in oData (which should be an object with key-value pairs)
-					for (var col in oData){
-                       record.setData(col, oData[col]);
-                       recordSet.updateRecordValue ( record , col , oData[col] );   
-                    }                   
-                    glbDataTable.render();			
-			}
-}
 
 YAHOO.util.Event.addListener(window, "load", function() {
 

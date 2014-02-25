@@ -100,6 +100,7 @@ $result = $prep->execute();
   }
   
   public static function AddCompany($ary){
+       global $DBH;
        $user_id = (int)(isset($ary['user_id']) ? $ary['user_id'] : $_SESSION['user_id']);
        
        $cwluser = new CWLUser($user_id);
@@ -107,33 +108,25 @@ $result = $prep->execute();
           self::$last_error = 'Your plan can not have any more clients. Please upgrade or contact support';
           return false;
        }
-  
+       $params = $ary;
+       $params['user_id'] = $user_id;
+       $params['default_hourly_rate'] = (float)$ary['default_hourly_rate'];
          
-         $sql = "INSERT INTO company (id, user_id, name, street, street2, city, state, zip, country, phone, email, notes, default_hourly_rate) ".
-                "VALUES(NULL, ".$user_id.", '".
-                $DBH->quote($ary['name'])."', '".
-				$DBH->quote($ary['street'])."', '".
-                $DBH->quote($ary['street2'])."', '".
-                $DBH->quote($ary['city'])."', '".
-                $DBH->quote($ary['state'])."', '".
-                $DBH->quote($ary['zip'])."', '".
-                $DBH->quote($ary['country'])."', '".
-                $DBH->quote($ary['phone'])."', '".
-                $DBH->quote($ary['email'])."', '".
-                $DBH->quote($ary['notes'])."', ".
-                (float)$ary['default_hourly_rate']." );";
-         $prep = $DBH->prepare($sql);
-$result = $prep->execute();
-         if ($result){
+       $sql = "INSERT INTO company (id, user_id, name, street, street2, city, state, zip, country, phone, email, notes, default_hourly_rate) ".
+                "VALUES(NULL, :user_id, :name, :street, :street2, :city, :state, :zip, :country, :phone, :email, :notes, :default_hourly_rate);";
+       $prep = $DBH->prepare($sql);
+       $result = $prep->execute($params);
+       if ($result){
             $ary['company_id'] = $DBH->lastInsertId();
-			return $ary['company_id'];
-         }else{
+			      return $ary['company_id'];
+       }else{
             self::$last_error = 'Error adding company'.$DBH->errorInfo(); 
             return false;
-         }  
+       }  
   }
   
   public static function Add($ary){
+      global $DBH;
       if ($ary['company_id'] == 'new'){
          $ary['company_id'] = self::AddCompany($ary);
          if ($ary['company_id'] === false){
@@ -152,8 +145,8 @@ $result = $prep->execute();
           return false;
       }
       
-      $prep = $DBH->prepare("SELECT name, default_hourly_rate FROM company WHERE id = ".(int)$ary['company_id']." AND user_id = ".(int)$user_id);
-$result = $prep->execute();
+      $prep = $DBH->prepare("SELECT name, default_hourly_rate FROM company WHERE id = :company_id AND user_id = :user_id");
+      $result = $prep->execute(array(':company_id'=>$ary['company_id'], ':user_id'=>(int)$user_id));
       if ($result && $row = $prep->fetch()){
          //company exists!!!
       }else{
@@ -162,29 +155,34 @@ $result = $prep->execute();
       }
       
       $sql = "INSERT INTO work_log (id, user_id, company_id, title, description, rate) ".
-             "VALUES ( NULL , ".(int)$user_id.", ".(int)$ary['company_id'].", '".$DBH->quote($ary['title'])."', '".
-             $DBH->quote($ary['description'])."', ".$row['default_hourly_rate']." );";
+             "VALUES ( NULL , :user_id, :company_id, :title, :description, :default_hourly_rate );";
       $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+        $result = $prep->execute(array('user_id'=>(int)$user_id, 'company_id'=>(int)$ary['company_id'],
+          'title'=>$ary['title'], 'default_hourly_rate'=>$row['default_hourly_rate'], 'description'=>$ary['description']));
       return $result;
   }
   
   private $wid = null;
   private $row = null;
   public function addFile($filename, $changetype, $feature_name, $notes){
+    global $DBH;
     $sql = "INSERT INTO files_log (work_log_id, feature, file, change_type, notes, date_modified) 
-	                      VALUES (".(int)$this->wid.", '%s', '%s','%s', '%s', NOW())";
-	$sqls = sprintf($sql, $feature_name, $filename, $changetype, $notes);
-	$prep = $DBH->prepare($sqls);
-$result = $prep->execute();
-	return $result;
+	                      VALUES (:work_log_id, :feature, :file, :change_type, :notes, NOW())";
+
+  	$prep = $DBH->prepare($sql);
+    $result = $prep->execute(array('work_log_id'=>$this->wid, 
+                            'feature'=>$feature_name, 
+                            'file'=>$filename,
+                            'change_type'=>$changetype, 
+                            'notes'=>$notes));
+  	return $result;
   }
   
   public function deleteFile($filename, $feature_name){
-    $sql = "DELETE FROM files_log WHERE work_log_id = ".(int)$this->wid." AND file = '%s' AND feature = '%s'";
-	$sqls = sprintf($sql, $filename, $feature_name);
-	$prep = $DBH->prepare($sqls);
-                return $prep->execute();
+     global $DBH;
+     $sql = "DELETE FROM files_log WHERE work_log_id = :work_log_id AND file = :file AND feature = :feature";
+	   $prep = $DBH->prepare($sql);
+     return $prep->execute(array('work_log_id'=> (int)$this->wid, 'file'=>$filename, 'feature'=>$feature_name));
   }
   
   public function getFiles($optional_feature_name = null){
@@ -215,8 +213,8 @@ $result = $prep->execute();
       global $DBH;
       $prep = $DBH->prepare("SELECT work_log.*, company.name AS company_name 
                               FROM work_log JOIN company ON company_id = company.id
-                              WHERE work_log.user_id = ".$_SESSION['user_id']." AND work_log.id = ".(int)$wid);
-                $result =  $prep->execute();
+                              WHERE work_log.user_id = :user_id AND work_log.id = :work_log_id");
+        $result =  $prep->execute(array('user_id'=>$_SESSION['user_id'], 'work_log_id'=>$wid));
        if ($result) {
        	$this->row = $prep->fetch();
        	if (!$this->row){
@@ -237,10 +235,10 @@ $result = $prep->execute();
       $total_seconds = 0;
       $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
-                              WHERE work_log_id = ".(int)$row['id']." 
+                              WHERE work_log_id = :work_log_id
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NOT NULL");
-                $result2 =  $prep->execute();
+      $result2 =  $prep->execute(array('work_log_id'=>$row['id']));
       if ($result2){
          while($time_log_row = $prep->fetch()){
             $total_seconds += strtotime($time_log_row['stop_time']) - strtotime($time_log_row['start_time']);
@@ -249,10 +247,10 @@ $result = $prep->execute();
       
       $prep = $DBH->prepare("SELECT start_time, stop_time 
                               FROM time_log 
-                              WHERE work_log_id = ".(int)$row['id']." 
+                              WHERE work_log_id = :work_log_id
                                 AND start_time IS NOT NULL 
                                 AND stop_time IS NULL");
-                $result3 =  $prep->execute();
+                $result3 =  $prep->execute(array('work_log_id'=>$row['id']));
       if ($result3){
          if ($uf_time_log_row = $prep->fetch()){
             $row['_in_progress_'] = true;
@@ -269,11 +267,12 @@ $result = $prep->execute();
   }
   
   public function fetchTimeLog(){
+      global $DBH;
       $prep = $DBH->prepare("SELECT id, start_time, stop_time, notes 
                               FROM time_log 
-                              WHERE work_log_id = ".(int)$this->row['id']." 
+                              WHERE work_log_id = :work_log_id 
                                 AND start_time IS NOT NULL");
-                $result2 =  $prep->execute();
+        $result2 =  $prep->execute(array('work_log_id'=>(int)$this->row['id']));
       if ($result2){
          $rows = array();
          while($time_log_row = $prep->fetch()){
@@ -287,36 +286,38 @@ $result = $prep->execute();
   
   public function addNotes($text)
   {
+     global $DBH;
      $sql = "INSERT INTO note_log (id, work_log_id, text, date_added) VALUES ".
-            "( NULL, ".$this->wid.", '".$DBH->quote($text)."', NOW() );";
+            "( NULL, :work_log_id, :text, NOW() );";
      $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+     $result = $prep->execute(array('work_log_id'=>$this->wid, 'text'=>$text));
      return $result;
   }
   
   public function deleteNote($note_id){
-     $sql = "DELETE FROM note_log WHERE id = ".(int)$note_id." AND work_log_id = ".(int)$this->wid;
+     global $DBH;
+     $sql = "DELETE FROM note_log WHERE id = :note_id AND work_log_id = :work_log_id";
      $prep = $DBH->prepare($sql);
-$result = $prep->execute();
-	 return $result;
+     $result = $prep->execute(array('note_id'=>$note_id, ':work_log_id'=>$work_log_id));
+	   return $result;
   }
   
   
   public function getNotes($opts=array('asciionly'=>true))
   {
-    global $DBH;
+     global $DBH;
 
      $notes = array();
-     $sql = "SELECT id, text, date_added FROM note_log WHERE work_log_id = ".$this->wid." ORDER BY date_added DESC";
+     $sql = "SELECT id, text, date_added FROM note_log WHERE work_log_id = :work_log_id ORDER BY date_added DESC";
      $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+     $result = $prep->execute(array('work_log_id'=>$this->wid));
      while($row = $prep->fetch()){
-	   if (isset($opts['asciionly'])){
-	      $row['text'] = preg_replace('/[^\x00-\x7F]+/', '', $row['text']);
-	   }
-	   if (isset($opts['htmlentities'])){
-	      $row['text'] = htmlentities($row['text']);
-	   }
+  	   if (isset($opts['asciionly'])){
+  	      $row['text'] = preg_replace('/[^\x00-\x7F]+/', '', $row['text']);
+  	   }
+  	   if (isset($opts['htmlentities'])){
+  	      $row['text'] = htmlentities($row['text']);
+  	   }
 	   
        $notes[] = $row;
      }

@@ -33,6 +33,7 @@
         }
 
         public static function MenuBarCompact(){
+          global $DBH;
           $name = $_SESSION['user_row']['name'];
           if (empty($name)){
              $name = $_SESSION['user_row']['username'];
