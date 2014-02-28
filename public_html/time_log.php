@@ -96,14 +96,14 @@ $result2 = $prep->execute();
         //die('Invalid time_log_row');
         
         $prep = $DBH->prepare("INSERT INTO time_log (id, work_log_id, start_time, stop_time) VALUES
-                     (NULL, $work_log_id, NOW(), NULL);
-                $result_ins =  $prep->execute();");
+                     (NULL, $work_log_id, NOW(), NULL);");
+        $result_ins =  $prep->execute();
         if (!$result_ins){
            die('Could not create new time log database');
         }else{
            $time_log_id = $DBH->lastInsertId();
            $prep = $DBH->prepare("SELECT * FROM time_log WHERE id = $time_log_id");
-$result2 = $prep->execute();
+           $result2 = $prep->execute();
            $time_log_row = $prep->fetch();
            $start_time = $time_log_row['start_time'];
         }

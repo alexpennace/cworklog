@@ -108,7 +108,7 @@ $result = $prep->execute();
             <div id="Header">
              <div id="topnavigation">
               <div class="lefttopbar">
-				<?PHP if (self::IsLoggedIn()){
+				        <?PHP if (self::IsLoggedIn()){
                   require_once(dirname(__FILE__).'/Site.class.php');
                   Site::ImgLinkTableSmall();
                   

@@ -181,3 +181,8 @@ h1, h2, h3 {
 		background-repeat:no-repeat;
 		background-position:0px 3px; 
  }
+
+pre {
+   font-size: 8px;
+   font-family: 'Courier New';
+}

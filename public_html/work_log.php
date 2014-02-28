@@ -369,7 +369,7 @@
 
       $prep = $DBH->prepare("SELECT company.*, work_log.* 
                              FROM company JOIN work_log on company.id = company_id 
-                             WHERE work_log.id = :work_log_id);");
+                             WHERE work_log.id = :work_log_id");
                 $result =  $prep->execute(array('work_log_id'=>$specific_work_log_id));
       if ($result && $row = $prep->fetch()) {
       	$specific_company_id = $row['company_id'];

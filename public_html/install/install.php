@@ -6,13 +6,26 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+include_once(dirname(__FILE__).'/installhelper.class.php');
+
+
+//a variety of flags get set depending on the installation
   $flags = array(
        'NO_CONFIG_FILE_FOUND'=>null,
+       'INVALID_CONFIG_FILE'=>null,
        'NO_MOCK_CONFIG_FILE_FOUND'=>null,
        'MOCK_COPY_FAIL'=>null,
        'DB_ERROR_NOCONNECT'=>null,
        'DB_NO_INSTALL_SCHEMA'=>null,
        'DB_ERROR_NOTFOUND_TABLES'=>null,
+       'LOGGED_IN_NAME'=>null,   //if someone is logged in with the browser it will show up here
+       'FAULTY_INSTALL'=>null,
+       'INSTALL_COUNT'=>0,
+       'INSTALL_MULTIPLE'=>false,
+       'ALREADY_INSTALLED_INFO'=>false,
+       'IS_UPGRADE_OR_REPAIR'=>null,
+       'EXTRA_ERROR_MSG'=>'',
+       'ALLOW_REPLACE_CONFIG_FILE'=>null, 
   );
 
   define("CWL_CONFIG_FILE", dirname(__FILE__).'/../lib/config.inc.php');
@@ -59,6 +72,18 @@ ini_set('display_errors', 1);
 
        $prep->execute(array('DB'=>val('CFG_DB')));
        $tables = $prep->fetchAll(PDO::FETCH_ASSOC);
+
+       //at this point, we have successfully connected to the database in the given config file
+       //lets check if the user clicked the big yellow "Install Database" button
+       if (!empty($_POST['install_db'])){
+            list($statements, $errors) = 
+                  installhelper::import(dirname(__FILE__).'/install.schema.sql', $DBH);
+            if (!empty($errors)){
+                $flags['INSTALL_DB_IMPORT_ERRORS'] = $errors;
+            }else{
+                $flags['INSTALL_DB_COMMIT'] = 'DISABLE_BECAUSE_OF_DEBUG_MODE';
+            }
+       }
 
        $tables_not_found = array();
        foreach($tables_check_base as $table){
@@ -153,10 +178,22 @@ ini_set('display_errors', 1);
         </div>
 </div>
 <div id="content">
-<form method="POST" action="install2.php">
+<form method="POST" action="install.php">
 <h3>Install/Upgrade/Repair Checklist</h3>
 <ul id="install_checklist" class="checklist">
 <?php
+if (!empty($_POST['install_db'])){
+
+   if (empty($flags['INSTALL_DB_IMPORT_ERRORS']) ){
+        ?><li class="success">
+             You have successfully ran the database install (install.schema.sql) which should undergo repairs and installs.
+        </li><?php  
+   }else{
+      ?><li class="error">Some errors occurred with the install.schema.sql, you may want to try and import this manually using mysqldump or phpmyadmin or something. Details: <pre><?=print_r($flags['INSTALL_DB_IMPORT_ERRORS'])?></pre></li>
+      <?php 
+   }
+}
+
 if ( !empty($flags['EXTRA_ERROR_MSG']) ){
     ?><li class="error"><?=$flags['EXTRA_ERROR_MSG']?></li>
     <?php 
@@ -201,7 +238,7 @@ if ( !empty($flags['FAULTY_INSTALL']) ){
 if ( !empty($flags['LOGGED_IN_NAME']) ){
     $flags['IS_UPGRADE_OR_REPAIR'] = true;
     ?><li class="warning">It appears you are already logged in as <b><?=$flags['LOGGED_IN_NAME']?></b> (<a href="../index.php?logout=1" target="_blank">logout</a>) <br>
-    Which most likely means 
+    Which most likely means you are doing an upgrade or repair instead of a first-time install.
     </li><?php
 }
 
@@ -217,7 +254,7 @@ if ( !empty($flags['DB_ERROR_NOCONNECT']) ) {
   <?php
 }else {
    ?><li class="success">
-      The database credentials have been verified.
+      The database was connected to have been verified.
    </li><?php
 
    if ( !empty($flags['DB_ERROR_NOTFOUND_TABLES']) ){
@@ -288,32 +325,19 @@ Config File Helper Form
     <div id="divaceconfigfile">
     </div>
     <textarea id="config_inc_file_gen">
-&lt;?PHP
-//create user 'USER'@'localhost' IDENTIFIED BY 'PASSWORD';
-define('CFG_DB_HOST', 'localhost'); 
-define('CFG_DB_USER', '');
-define('CFG_DB_PASS', '');
-define('CFG_DB', '');
-
-define('CFG_SITE_TITLE', 'Contractor\'s Work Log');
-define('CFG_BASE_URL', 'http://localhost/work_log/');
-define('CFG_USE_PHP_MAIL', false);
-define('CFG_EMAIL_FROM_HEADER', 'From: Contractor\'s Work Log <noreply@cworklog.com>');
-define('CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION', true);
-
-$config = array('CFG_DB_HOST'=>CFG_DB_HOST, 
-      'CFG_DB_USER'=>CFG_DB_USER, 'CFG_DB_PASS'=>CFG_DB_PASS,'CFG_DB'=>CFG_DB, 
-       'CFG_SITE_TITLE'=>CFG_SITE_TITLE, 
-       'CFG_BASE_URL'=>CFG_BASE_URL, 
-       'CFG_USE_PHP_MAIL'=>CFG_USE_PHP_MAIL, 'CFG_EMAIL_FROM_HEADER'=>CFG_EMAIL_FROM_HEADER,
-       'CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION'=>CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION,
- );
-
-return $config;
     </textarea>
     </div>
 </div>
-<button type="submit">Install</button>
+<?php 
+   if (empty($flags['DB_ERROR_NOCONNECT']) ) {
+      if (empty($flags['DB_ERROR_NOTFOUND_TABLES'])){
+         $label = 'Repair';
+      }else{
+         $label = 'Install';
+      }
+      ?><button type="submit" name="install_db" value="1"><?=$label?> Database</button><?php
+   }
+?>
 </form>
 </div>
 <script src="install.js"></script>
