@@ -36,8 +36,17 @@
 		?>
 		<!-- new jquery includes -->
 		<link href="css/jqueryui/themes/smoothness/jquery-ui-1.10.0.custom.min.css" rel="stylesheet" type="text/css"/>
-		<script src="js/jquery-1.9.0.js"></script>
+
+		<script src="js/jquery-1.11.0.min.js"></script>
+      <!-- begin-scripts for power-tip -->
+      <script type="text/javascript" src="js/jquery-powertip-1.2.0/jquery.powertip.js"></script>
+      <!-- end-scripts for power-tip -->
+
 	    <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
+
+      <script src="js/jquery.onTypeSomeKeys.js"></script>
+      
+  <link rel="stylesheet" type="text/css" href="js/jquery-powertip-1.2.0/css/jquery.powertip.css" />
         <style type="text/css">
          .ui-dialog , .ui-autocomplete{ font-size: 85%; }
         </style>

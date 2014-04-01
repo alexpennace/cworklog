@@ -90,10 +90,6 @@ table td.editable:hover{
 }
 table{ border-left: 1px solid #c7c7c7; } 
 </style>
-<!-- jquery includes -->
-<link href="css/jqueryui/themes/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css"/>
-<script src="js/jquery-1.8.0.min.js"></script>
-<script src="js/jquery-ui-1.8.23.custom.min.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
 </head>
 <body>

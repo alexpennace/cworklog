@@ -108,14 +108,36 @@ $result = $prep->execute();
           self::$last_error = 'Your plan can not have any more clients. Please upgrade or contact support';
           return false;
        }
-       $params = $ary;
+
+       $whitelist = array('user_id'=>'',
+              'name'=>'',
+              'street'=>'',
+              'street2'=>'',
+              'city'=>'',
+              'state'=>'',
+              'zip'=>'',
+              'country'=>'',
+              'phone'=>'',
+              'email'=>'',
+              'notes'=>'',
+              'default_hourly_rate'=>'',
+              );
+
+       $params = array_merge($whitelist, $ary);
+       foreach($params as $key => $value){
+          if (!isset($whitelist[$key])){ 
+              unset($params[$key]); 
+          }
+       }
        $params['user_id'] = $user_id;
        $params['default_hourly_rate'] = (float)$ary['default_hourly_rate'];
          
        $sql = "INSERT INTO company (id, user_id, name, street, street2, city, state, zip, country, phone, email, notes, default_hourly_rate) ".
                 "VALUES(NULL, :user_id, :name, :street, :street2, :city, :state, :zip, :country, :phone, :email, :notes, :default_hourly_rate);";
        $prep = $DBH->prepare($sql);
+       
        $result = $prep->execute($params);
+
        if ($result){
             $ary['company_id'] = $DBH->lastInsertId();
 			      return $ary['company_id'];

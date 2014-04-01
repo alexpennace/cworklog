@@ -17,7 +17,8 @@
 			   $result['timestamp'] = $result['is_valid']; 
 			}
 			$result['input_name'] = $_REQUEST['name'];
-		}else if ($_REQUEST['ajax'] == 'update'){
+
+		}else if ($_REQUEST['ajax'] == 'update' || $_REQUEST['ajax'] == 'timecheck'){
 		    $sql = "SELECT * FROM time_log JOIN work_log ON time_log.work_log_id = work_log.id WHERE user_id = ".
 			       (int)$_SESSION['user_id'].
 				   " AND time_log.id = ".(int)$_REQUEST['timelog_id'];
@@ -40,35 +41,49 @@ $res = $prep->execute();
 				  $st_or_sp = 'notes';
 			   }
 			   
-			   
+			   $stt = strtotime($_REQUEST['value']);
+			   if ($stt === false){
+			   		die(json_encode(array('error'=>'Invalid time string (parse error)')));
+			   }
+
 			   if ($st_or_sp == 'start_time'){
 			      $ipt_val = date("Y-m-d H:i:s", strtotime($_REQUEST['value']));
 			      if ($ipt_val >= $tl_row['stop_time']){
-				     die(json_encode(array('error'=>'Start time must be BEFORE stop time.')));
+				     die(json_encode(array('error'=>'Start '.$ipt_val
+				     	.' is not BEFORE '.$tl_row['stop_time']).' (stop time)'));
                   }				  
 			   }else if ($st_or_sp == 'stop_time'){
 			      $ipt_val = date("Y-m-d H:i:s", strtotime($_REQUEST['value']));
 			      if ($tl_row['start_time'] >= $ipt_val){
-				     die(json_encode(array('error'=>'Stop time must be AFTER start time.')));
+			      	 die(json_encode(array('error'=>'Stop '.$ipt_val
+				     	.' is not AFTER '.$tl_row['start_time']).' (start time)'));
                   }				  
 			   }else if ($st_or_sp == 'notes'){
 				  $ipt_val = $_REQUEST['value'];
 			   }
+
+			   if ($_REQUEST['ajax'] == 'timecheck'){
+			   		//time conversion seems to be ok
+			   	    $result['result_time'] = date("Y-m-d H:i:s", $stt);
+			   	    $result['result_seconds'] = strtotime($tl_row['stop_time']) - strtotime($tl_row['start_time']);
+			   	    $result['result_minutes'] = $result['result_seconds'] / 60;
+			   }else{ //actually updating
 			   
-			   $sql = "UPDATE time_log SET $st_or_sp = '".$ipt_val.
-			          "' WHERE id = ".(int)$_REQUEST['timelog_id'];  
-			   $prep = $DBH->prepare($sql);
-$res = $prep->execute();
-			   if ($res){
-			      $sql = "SELECT * FROM time_log WHERE id = ".(int)$_REQUEST['timelog_id'];
-				  $prep = $DBH->prepare($sql);
-$res = $prep->execute();
-				  $result['time_log'] = $prep->fetch();
-                  $result['time_log']['__calc_seconds__'] = strtotime($result['time_log']['stop_time']) - strtotime($result['time_log']['start_time']);
-			      $result['time_log']['__calc_minutes__'] = number_format($result['time_log']['__calc_seconds__'] / 60, 3); 
-                  $result['success'] = true;
-			   }else{
-			      $result['error'] = 'Could not update time log';
+				   $sql = "UPDATE time_log SET $st_or_sp = '".$ipt_val.
+				          "' WHERE id = ".(int)$_REQUEST['timelog_id'];  
+				   $prep = $DBH->prepare($sql);
+	$res = $prep->execute();
+				   if ($res){
+				      $sql = "SELECT * FROM time_log WHERE id = ".(int)$_REQUEST['timelog_id'];
+					  $prep = $DBH->prepare($sql);
+	$res = $prep->execute();
+					  $result['time_log'] = $prep->fetch();
+	                  $result['time_log']['__calc_seconds__'] = strtotime($result['time_log']['stop_time']) - strtotime($result['time_log']['start_time']);
+				      $result['time_log']['__calc_minutes__'] = number_format($result['time_log']['__calc_seconds__'] / 60, 3); 
+	                  $result['success'] = true;
+				   }else{
+				      $result['error'] = 'Could not update time log';
+				   }
 			   }
 			}else{
 			   $result['error'] = 'Invalid time log';
@@ -196,11 +211,12 @@ table td.editable:hover{
   cursor: pointer;
 }
 table{ border-left: 1px solid #c7c7c7; } 
+
+.tooltipdatetime {
+	font-size: .8em;
+	color: yellow;
+}
 </style>
-<!-- jquery includes -->
-<link href="css/jqueryui/themes/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css"/>
-<script src="js/jquery-1.8.0.min.js"></script>
-<script src="js/jquery-ui-1.8.23.custom.min.js"></script>
 <script src="js/jquery.dialogPrompt.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
 </head>
@@ -228,6 +244,8 @@ timelog_cancelChanges = function(ipt){
 		//alert('Error, cannot cancel changes');
 	}
 }
+
+
 timelog_saveOrCancelChanges = function(ipt){
     //if changed, save the changes!
             var querystr = '';
@@ -262,9 +280,9 @@ timelog_saveOrCancelChanges = function(ipt){
                     }
 					
 					var td_notes = document.getElementById('timelog[notes]['+msg.time_log.id+']');
-					if (td_notes){
+					if (td_notes && td_notes.innerHTML){
 						td_notes.innerHTML = msg.time_log.notes;
-						td_notes.setAttribute();
+						//td_notes.setAttribute();
 					}
 					//refresh the page for now (we can take this out if we update the duration properly)
                     window.location.href = window.location.href;
@@ -360,7 +378,7 @@ timelog_makeEditable = function(td, value, opts){
    td.setAttribute('old_innerHTML', td.innerHTML);
    var cellid = td.getAttribute('cellid');
    td.innerHTML = '<form name="frm_'+cellid+'" onsubmit="return timelog_OnFormSubmit(this);" style="display: inline;" method="POST" style="margin: 0px; padding: 0px;">' + 
-                  '<input type="text" title="'+value+'" id="id_'+cellid+'" tid="'+ td.getAttribute('rowid') +'" name="' + td.getAttribute('cellid') + '" value="'+value+'" '+ (opts.saveonblur ? 'onblur="timelog_saveOrCancelChanges(this);" ' : ' ') + 'onchange="timelog_saveOrCancelChanges(this);" onkeyup="if (event.keyCode == 27){ timelog_cancelChanges(this); }else if(event.keyCode == 13){ timelog_saveOrCancelChanges(this); }else{ '+(cellid.indexOf('notes') ? ';' : 'timelog_ajaxVerifyDate(this);')+' }" onchange="timelog_saveOrCancelChanges(this)" onblur="timelog_cancelChanges(this);"/>' + 
+                  '<input type="text" title="'+value+'" id="id_'+cellid+'" tid="'+ td.getAttribute('rowid') +'" name="' + td.getAttribute('cellid') + '" value="'+value+'" '+ (opts.saveonblur ? 'onblur="timelog_saveOrCancelChanges(this);" ' : ' ') + 'onchange="timelog_saveOrCancelChanges(this);" onkeyup="if (event.keyCode == 27){ timelog_cancelChanges(this); }else if(event.keyCode == 13){ timelog_saveOrCancelChanges(this); }else{ timelog_keyUp(this); '+(cellid.indexOf('notes') ? ';' : 'timelog_ajaxVerifyDate(this);')+' }" onchange="timelog_saveOrCancelChanges(this)" onblur="timelog_cancelChanges(this);" />' + 
 				  '</form>';
    var ipt = document.getElementById('id_'+cellid);
    if (ipt){
@@ -408,6 +426,9 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 <h2><?=$wl_row['title']?></h2>
 <h3>Billing To: <?=$wl_row['company_name']?></h3>
 
+
+<label><input type="checkbox" class="cbxAllNoneTimeLogs">All/None</label>
+
 <select id="selTimeLogsChecked">
 <option value="">With checked</option>
 <option value="move_to_worklog"> &nbsp; Move to another work log</option>
@@ -415,8 +436,14 @@ timelog_setDuration = function(rowindex, rowid, dtStartTime){
 
 
 
+
 <script>
 $(function(){
+	$('.cbxAllNoneTimeLogs').click(function(){
+		var checked = $('.cbxAllNoneTimeLogs').prop('checked');
+		$('.cbxTimeLog').prop('checked', checked).last().click();
+	});
+
    countCheckedTimeLogs = function(){
       return $('.cbxTimeLog:checked').length;
    };
@@ -430,10 +457,39 @@ $(function(){
        return s;
    }
    
+
    
    $('.cbxTimeLog').click(function(){
+   	   var $checked = $('.cbxTimeLog:checked');
+   	   var allchecked = $('.cbxTimeLog').length == $checked.length
+   	   $(".cbxAllNoneTimeLogs").prop("indeterminate", false);
+   	   if (allchecked){
+   	   	  	$(".cbxAllNoneTimeLogs").prop("checked", true);
+   	   }else if ($checked.length > 0){
+   	   	 	//some checked
+			$(".cbxAllNoneTimeLogs").prop("indeterminate", true);
+   	   }else{ //none checked
+   	   		$(".cbxAllNoneTimeLogs").prop("checked", false);
+   	   }
+
+       if (typeof(glbTimeLog) == 'undefined'){
+   			glbTimeLog = new TimeLog();
+   	   }
+   	   var min = glbTimeLog.sumMinutes();
+   	   var hr = min/60;
+   	   var tot_hr = hr.toFixed(2)+' hr';
+   	   var tot_min = min.toFixed(1) +' min'; 
+   	   //grab dollar hourly rate and remove all non digits or periods
+   	   var smoney = $('td#rate').text().replace(/[^\d.]/img, "");
+
+   	   var money = parseFloat(smoney);
+   	   var tot_money = '$'+(hr*money).toFixed(2);
+
        var count = countCheckedTimeLogs();
-       $('#selTimeLogsChecked option:eq(0)').text('With ('+count+') checked').prop('selected', true);
+       $('#selTimeLogsChecked option:eq(0)').text(
+       	     'With ('+count+' checked, Totals:' + tot_hr + ' => ' + tot_money + ')'
+       	     ).prop('selected', true);
+
    });
    
    
@@ -461,7 +517,7 @@ $(function(){
    ?>
    unlocked_worklog_options = <?=json_encode($unlocked_worklogs)?>;
     
-   doWithSelectedTimeLogs = {
+   doWithSelectedTimeLogs = {	
       move_to_worklog:function(){
          if (unlocked_worklog_options.length == 0){
             alert('You have no other unlocked work logs');
@@ -526,7 +582,7 @@ $(function(){
 <td class="editable" rowid="<?=$row['id']?>" cellid="timelog[start_time][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>');"><span id="spn_start_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', strtotime($row['start_time']))?></span></td>
 <?PHP
       $prep = $DBH->prepare("SELECT NOW()");
-$now_res = $prep->execute();
+	  $now_res = $prep->execute();
 	  $now_row = $prep->fetch(); 
 ?>
 <td class="editable" rowid="<?=$row['id']?>" cellid="timelog[stop_time][<?=$row['id']?>]" title="Double-Click to edit stop time" id="stop_time_<?=$i?>" <?=is_null($row['stop_time'])?'style="color: orange;"':''?> ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['stop_time']))?>');"><span style="display: none;"><input type="text" name="time[stop_time][<?=$row['id']?>]" value="<?=date('M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?>"/><br><a href="#save" onclick="alert('saved'); return false;">Save</a> <a href="#cancel" onclick="this.parentNode.style.display = 'none'; this.parentNode.parentNode.getElementsByTagName('SPAN')[1].style.display = 'inline'; return false;">Cancel</a>  </span><span id="spn_stop_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', !is_null($row['stop_time']) ? strtotime($row['stop_time']) : strtotime($now_row['NOW()']))?></span></td>
@@ -636,5 +692,6 @@ if (count($features) > 0){
 }
 ?>
 </div>
+<script src="js/timelog.js"></script>
 </body>
 </html>
