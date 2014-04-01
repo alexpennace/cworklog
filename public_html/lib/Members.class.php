@@ -170,7 +170,11 @@ $result = $prep->execute();
               </div>
             </div><?PHP
               if (self::IsLoggedIn()){
-                work_log::HtmlFormAddWorkLog(isset($_GET['company_id']) ? $_GET['company_id'] : 0);             
+                 $specific_id = isset($_GET['company_id']) ? $_GET['company_id'] : false;
+                 if (empty($specific_id) && isset($_GET['company'])){
+                    $specific_id = (int)$_GET['company'];
+                 }
+                 work_log::HtmlFormAddWorkLog($specific_id);             
               }
         }
         
