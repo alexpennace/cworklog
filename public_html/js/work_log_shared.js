@@ -236,6 +236,9 @@ poptastic = function(url, width, height){
 }
 
 function poptimer(url){
+  //since we are popping up a timer,
+  //go ahead and grab the latest running timer info
+  glbGrabRunningTimerInfo();  
   poptastic(url, 176, 195);
 }
 

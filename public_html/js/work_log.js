@@ -279,6 +279,37 @@ $(document).bind('keydown', function(e) {
      return s;
 }
 
+function glbGrabRunningTimerInfo(){
+  if (typeof(glbAjaxFetch) !== 'function'){
+        return false;
+  }
+  glbAjaxFetch('running_time_log', function(data){
+        console.log(data);
+        if (data.time_log === false){
+            return;
+        }
+        var min = data.time_log._diff_seconds_ / 60;
+        $('#running_time_log').html(min.toFixed(1) + ' min ');
+  });
+}
+
+//this is used in conjunction with the running timer above
+//just helps display the time currently increasing
+//MATHHELP: 6000 is 6 seconds which is .1 minutes 
+setInterval(function(){
+     var min = parseFloat($('#running_time_log').html());
+     if (isNaN(min)){ glbGrabRunningTimerInfo(); return; }
+     min += 0.1;
+     $('#running_time_log').html(min.toFixed(1) + ' min ');
+}, 6000);
+
+function glbAjaxFetch(f, callback){
+        $.get('/lib/ajax_fetch.php', {'f': f}, 
+        function (data){
+          if (typeof(callback) == 'function'){ callback(data); }
+        }, 'json');
+}
+
 function glbPostAction(action, csv_worklog_ids, callback){
         $.post('ajax_service.php', {'action': action, 'csv_worklog_ids':csv_worklog_ids}, 
         function (data){

@@ -264,16 +264,20 @@ $result = $prep->execute();
 			<br><br>
 		  <?PHP
 		}
-		public static function SessionForceLogin()
+
+		public static function SessionForceLogin($return_no_redirect = false)
 		{
-         session_set_cookie_params(3600*24*7); // sessions lasts 7 days
+       session_set_cookie_params(3600*24*7); // sessions lasts 7 days
 		   session_start();
 		   if (!self::IsLoggedIn()){
+          if ($return_no_redirect){ return false; }
+
 		      if (!empty($_GET['mobile'])){ $mobile = 'mobile=1&'; } else { $mobile = ''; }
             header('Location: index.php?'.$mobile.'goto='.urlencode(self::makeUrl($_SERVER['PHP_SELF'],$_SERVER['QUERY_STRING'])));
 			  exit;
 		   }else{
 		      //do nothing, user is logged in!
+          return true;
 		   }
 		}
 		

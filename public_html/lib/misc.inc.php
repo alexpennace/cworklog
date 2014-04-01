@@ -71,4 +71,22 @@
            return date('F Y', $ts);
        }
    }   
-?>
+
+  /**
+   * Quickly grab a $_GET variable returning a default value if not set
+   */
+  function GT($key, $default = null){
+    return isset($_GET[$key]) ? $_GET[$key] : $default;
+  }
+
+ 
+ /**
+  * Quickly die with a json encoded message
+  * @example
+  * jsdie('Error logging in');
+  */
+  function jsdie($msg, $key='error', $a = array()){
+    $a[$key] = $msg;
+    $js = json_encode($a);
+    die($js);
+  }
