@@ -70,3 +70,7 @@
         padding: 0.3em;
     }
     
+
+tr._in_progress_ td {
+    background-color: #FEFB81;
+}

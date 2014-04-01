@@ -672,10 +672,20 @@ YAHOO.util.Event.addListener(window, "load", function() {
                 var locked = oRecord.getData('locked') == '1';
                 var inprogress = oRecord.getData('_in_progress_');
                 var id = oRecord.getData('id');
+                var $tr = $(elLiner).closest('tr');
+
                 elLiner.innerHTML = '<input type=checkbox onclick="updateWLChecked(this, '+id+');" onchange="updateWLChecked(this, '+id+');" class="wlcbxes" name="cbx_wl_'+id+'" value="'+id+'"' + (oRecord.getData('__checked__') ? 'checked="checked"' : '') + '>&nbsp;';
                 elLiner.innerHTML += locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' 
-                                           : (inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar.png" /></a>' : ' <a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>');
+                                           : (inprogress ? ' <a href="#" onclick="poptimer(\'time_log.php?tid=latest&wid='+ id +'\'); return false;"><img border=0 title="In-Progress" src="images/progressbar_ani.gif" /></a>' : ' <a href="time_log.php?wid='+ id +'" onclick="poptimer(\'time_log.php?wid='+ id +'\'); return false;"><img border=0 title="Clock In" src="images/arrow_timer.png"/></a>');
                 elLiner.innerHTML += gen_jquery_uimenu(oRecord.getData('id'), locked, inprogress);
+
+                //show whole row in progress color
+                if (inprogress){
+                   $tr.addClass('_in_progress_');
+                }else{
+                   $tr.removeClass('_in_progress_');
+                }
+
                 return; //TODO: figure out something with previous little icons
                 
                 elLiner.innerHTML += locked ? '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',0, 1); return false;"><img border=0 title="Locked" src="images/lock_locked.gif" /></a>' : '<a href="#" onclick="glbAjaxUpdateWorkLog('+oRecord.getData('id')+',\'locked\',1, 0); return false;"><img border=0 title="Not locked" src="images/lock_unlock.png" /></a>';
