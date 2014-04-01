@@ -146,9 +146,10 @@
 	<div id="main">
 		<table id="tabulation">
 			<tr> <th class="first">Service<?=count($wl_ids) > 1 ? 's' : ''?></th> <th><?=count($wl_ids) > 1 ? 'Total ' : ''?>Hours</th> <th><?=count($wl_ids) > 1 ? 'Avg. ' : ''?>Rate</th> <th>Total</th> </tr>
-			<tr class="billable_item"> <td class="first"><?=($wl_final['description'])?></td> <td><?=!empty($wl_final['hours']) ? $wl_final['hours'] : number_format($wl_final['_calc_hours_'], 3)?></td> <td><?=$currency_symbol?><?=number_format($wl_final['rate'], 2)?></td> <td><?=$currency_symbol?><?=!empty($wl_final['amount_billed']) ? number_format($wl_final['amount_billed'], 2) : number_format($wl_final['_calc_amount_'], 2)?></td> </tr>
+			<tr class="billable_item"> <td class="first"><?=($wl_final['description'])?></td> <td><?=isset($wl_final['hours']) ? $wl_final['hours'] : number_format($wl_final['_calc_hours_'], 3)?></td> <td><?=$currency_symbol?><?=number_format($wl_final['rate'], 2)?></td> <td><?=$currency_symbol?><?=isset($wl_final['amount_billed']) ? number_format($wl_final['amount_billed'], 2) : number_format($wl_final['_calc_amount_'], 2)?></td> </tr>
 			<?PHP
-			   $total_amount = !empty($wl_final['amount_billed']) ? $wl_final['amount_billed'] : $wl_final['_calc_amount_'];
+
+			   $total_amount = isset($wl_final['amount_billed']) ? $wl_final['amount_billed'] : $wl_final['_calc_amount_'];
 			   $paid_amount = isset($_GET['paid_amount']) ? $_GET['paid_amount'] : 0.0;
 			   if ($paid_amount === 0.0 && !empty($wl_final['date_paid'])){
 			      $paid_amount = $total_amount;
