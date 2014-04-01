@@ -11,4 +11,4 @@ lib/config.inc.php
 releases/*
 
 #ignore the dompdf log file
-lib/dompdf/lib/fonts/log.*
+/public_html/lib/dompdf/lib/fonts/log.*
