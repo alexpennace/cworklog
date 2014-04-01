@@ -136,7 +136,8 @@
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
           <a href="downloads/WorkLogGUI.latest.zip" title="Got Windows? Download the GUI"><img border=0 style="width: <?=$width?>px; margin-top:5px;" src="images/windowsicon.png"></a>
           <a target="_blank" href="https://play.google.com/store/apps/details?id=com.cworklog.cworklog_client" title="Got Droid? Download the App"><img border=0 style="width: <?=($width >= 35) ? $width-10 : $width?>px;" src="images/anroid64x64.png"></a>
-          <a target="_blank" href="<?PHP if (!file_exists('issues.php')){ echo 'https://cworklog.com/'; }?>issues.php" title="Submit a bug or new feature"><img border=0 src="images/bug.png" style="width: 16px; height: auto;"></a>
+          
+          <a target="_blank" href="<?PHP if (!file_exists(__DIR__.'/../issues.php')){ echo 'https://github.com/relipse/cworklog'; }?>issues.php" title="Submit a bug or new feature"><img border=0 src="images/bug.png" style="width: 16px; height: auto;"></a>
           &nbsp; &nbsp; &nbsp; 
          <?PHP
       }
