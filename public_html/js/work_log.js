@@ -293,15 +293,17 @@ function glbGrabRunningTimerInfo(){
   });
 }
 
-//this is used in conjunction with the running timer above
-//just helps display the time currently increasing
-//MATHHELP: 6000 is 6 seconds which is .1 minutes 
-setInterval(function(){
+var glbGrabRunningTimerInfo_helper = function(){
      var min = parseFloat($('#running_time_log').html());
      if (isNaN(min)){ glbGrabRunningTimerInfo(); return; }
      min += 0.1;
      $('#running_time_log').html(min.toFixed(1) + ' min ');
-}, 6000);
+}
+//this is used in conjunction with the running timer above
+//just helps display the time currently increasing
+//MATHHELP: 6000 is 6 seconds which is .1 minutes 
+glbGrabRunningTimerInfo_helper();
+setInterval(glbGrabRunningTimerInfo_helper, 6000);
 
 function glbAjaxFetch(f, callback){
         $.get('/lib/ajax_fetch.php', {'f': f}, 
