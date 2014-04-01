@@ -124,6 +124,8 @@
          if (empty($width)){ $w = false; }else{ $w = true; }
          ?>
           <?PHP if (!$w){ $width = '26'; } ?>
+          <img id="ul_logo" style="width: 100px" src="images/Inr_hdr_logo.jpg">
+
           <a href="#" title="Refresh Content" onclick="window.location.href = window.location.href; return false"><img border=0 src="images/refresh.png" style="width: <?=$width?>px; margin-top:5px;" align="top"></a>
           <?PHP if (!$w){ $width = '24'; } ?>
           <?=$separator?><a title="Clients" href="companies.php"><img border=0 src="images/clients_26x26.png" style="width: <?=$width?>px; margin-top:5px;" align="top"></a>

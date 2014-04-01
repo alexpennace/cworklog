@@ -144,13 +144,10 @@ $result = $prep->execute();
 
 
 
-<div style="float:right;">
+            <div style="float:right;">
               <a href="settings.php" title="Settings"><img src="images/user_blue.png" alt="User Image" align="absmiddle"  /> Welcome <?=$name?></a>| <a href="settings.php"><img src="images/setting_icon.jpg" width="20" height="26" alt="Setting" align="absmiddle" /> Settings</a>| <a href="index.php?logout=1"><img src="images/logout_icon.jpg" width="18" height="26" alt="Logout" align="absmiddle" /> LogOut</a> </div>
               </div>
-
               <div id="logoblock">
-                <div class="Col11" ><a href="index.php"title="Work Logs"><img border=0 src="images/inner_logo.jpg" width="297" height="83" class="logost" /></a> </div>
-                <div class="Col12"> <a href="<?=$_SERVER['REQUEST_URI']?>" onclick="window.location.href = window.location.href; return false;"><img border=0 src="images/bgic_refresh.png" width="49" height="72"  /></a><a href="companies.php"><img border=0 src="images/bgic_clients.png" width="72" height="72" /></a><a href="work_log.php"><img border=0 src="images/bgic_work-logs.png" width="68" height="72" /></a><a href="#" onclick="$('#dlgAddWorkLog').dialog('open'); return false;"><img src="images/bgic_add-work-log.png" width="88" height="72" /></a> </div>
                 <div id="filterblock">
                   <div  style="float:left">
           <?PHP
