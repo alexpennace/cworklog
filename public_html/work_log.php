@@ -515,7 +515,8 @@ $result = $prep->execute();
 <form name="frmAddTime" method="POST" action="time_log_show.php" id="frmAddTime" onsubmit="this.action = 'time_log_show.php?wid='+this.wid.value;">
 <input type="hidden" name="wid" value="" />
 <input type="hidden" name="add_entry" value="1" />
-<input name="to_parse_time" value="15 min" />
+<label>Duration<input title="Enter string such as '15 min, 1:35, 1hr'" name="to_parse_time" value="15 min" /></label>
+<label>Notes<input name="notes" value="" /></label>
 <input type="submit" value="Add Time" />
 </form>
 </div>

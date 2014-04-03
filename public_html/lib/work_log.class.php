@@ -20,6 +20,11 @@ class work_log
       return $hms;
   }
   
+  /**
+   * Parse a String to hours and minutes
+   * @example
+   * "15 min", "1:35", "1hr"
+   */
   public static function ParseTimeToHrMin($str){
         preg_match_all('/(((?<hours>\d\d?)\s*(hr?|:))\s*)?((?<min>\d\d?)\s*(m?i?n?(utes?)?))?/im', $str, $result, PREG_SET_ORDER);
         $hours = 0;

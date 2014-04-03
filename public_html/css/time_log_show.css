@@ -1,0 +1,72 @@
+th {
+	font: bold 11px  Arial, Helvetica,sans-serif;
+	color: #fff;
+	border-right: 1px solid #c7c7c7; border-bottom: 1px solid #c7c7c7;
+	font-weight:bold;
+	
+	border-top: 1px solid #c7c7c7;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	text-align: left;
+	padding: 6px 6px 6px 12px;
+	background: url(../images/th_hd_bg.jpg) repeat-x left top!important ;
+}
+th.nobg {
+	border-top: 0;
+	border-left: 0;
+	border-right: 1px solid #c7c7c7;
+	background: none;
+}
+th.spec {	
+	border-left: 1px solid #c7c7c7;
+	border-top: 0;
+	background: #fff url(../images/bullet1.gif) no-repeat;
+	font: bold 14px  Arial, Helvetica,sans-serif;
+	color:#121212;
+}
+th.specalt {
+	border-left: 1px solid #c7c7c7;
+	border-top: 0;
+	background: #f5fafa url(../images/bullet2.gif) no-repeat;
+	font: bold 14px  Arial, Helvetica,	sans-serif;
+	color: #121212;
+}
+td {
+	border-right: 1px solid #c7c7c7;
+	border-bottom: 1px solid #c7c7c7;
+	background: #fff;
+	padding: 6px 6px 6px 12px;
+	color: #121212;
+	font-size: 14px;
+}
+td.alt {
+	background: #F5FAFA;
+	color: #B4AA9D;
+}
+td input[type=text] {
+  font-size: 14px;
+  width: 100%;
+  border: 1px solid silver;
+}
+table td.editable:hover{
+  background-color: #FCB279;
+  cursor: pointer;
+}
+
+table td.rowopts{
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+table{ border-left: 1px solid #c7c7c7; } 
+
+.tooltipdatetime {
+	font-size: .8em;
+	color: yellow;
+}
+
+/*each item/button/checkbox should be displayed inline*/
+td div.btn {
+	display: inline;
+}

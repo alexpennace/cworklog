@@ -52,8 +52,7 @@
         <div id="Header2">
           <div class="Row" >
 
-             <div style="float:left; line-height:37px; vertical-align:top;color:#fff" ><a href="index.php" title="Work Logs"><img border=0 src="images/Inr_hdr_logo.jpg" width="122" height="37" /></a>
-
+             <div style="float:left; line-height:37px; vertical-align:top;color:#fff" >
  				<?PHP if (self::IsLoggedIn()){
                   require_once(dirname(__FILE__).'/Site.class.php');
                   ?><?PHP

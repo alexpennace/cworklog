@@ -42,7 +42,7 @@ $res = $prep->execute();
 			   }
 			   
 			   $stt = strtotime($_REQUEST['value']);
-			   if ($stt === false){
+			   if ($st_or_sp !== 'notes' && $stt === false){
 			   		die(json_encode(array('error'=>'Invalid time string (parse error)')));
 			   }
 
@@ -128,10 +128,10 @@ $res = $prep->execute();
                  $starttime .= ' - INTERVAL '.((int)$total_min).' MINUTE ';
               }
            }
-           $sql = "INSERT INTO time_log (id, work_log_id, start_time, stop_time) 
-                                                   VALUES (NULL, :wid, $starttime, $stoptime);";
+           $sql = "INSERT INTO time_log (id, work_log_id, start_time, stop_time, notes) 
+                                                   VALUES (NULL, :wid, $starttime, $stoptime, :notes);";
            $prep = $DBH->prepare($sql);
-           if ($prep->execute(array(':wid'=>$wl_row['id']))){
+           if ($prep->execute(array(':wid'=>$wl_row['id'], ':notes'=>$_POST['notes']))){
              $success = 'Time log entry added for '.$total_min.' minutes, please double click to edit';
            }else{
              $error = 'Error adding time log entry: '.$sql;
@@ -155,68 +155,8 @@ $res = $prep->execute();
   Site::Css();
 ?>
 <link rel="stylesheet" type="text/css" href="css/theme.css" />
-<style>
-th {
-	font: bold 11px  Arial, Helvetica,sans-serif;
-	color: #fff;
-	border-right: 1px solid #c7c7c7; border-bottom: 1px solid #c7c7c7;
-	font-weight:bold;
-	
-	border-top: 1px solid #c7c7c7;
-	letter-spacing: 2px;
-	text-transform: uppercase;
-	text-align: left;
-	padding: 6px 6px 6px 12px;
-	background: url(images/th_hd_bg.jpg) repeat-x left top!important ;
-}
-th.nobg {
-	border-top: 0;
-	border-left: 0;
-	border-right: 1px solid #c7c7c7;
-	background: none;
-}
-th.spec {	
-	border-left: 1px solid #c7c7c7;
-	border-top: 0;
-	background: #fff url(images/bullet1.gif) no-repeat;
-	font: bold 14px  Arial, Helvetica,sans-serif;
-	color:#121212;
-}
-th.specalt {
-	border-left: 1px solid #c7c7c7;
-	border-top: 0;
-	background: #f5fafa url(images/bullet2.gif) no-repeat;
-	font: bold 14px  Arial, Helvetica,	sans-serif;
-	color: #121212;
-}
-td {
-	border-right: 1px solid #c7c7c7;
-	border-bottom: 1px solid #c7c7c7;
-	background: #fff;
-	padding: 6px 6px 6px 12px;
-	color: #121212;
-	font-size: 14px;
-}
-td.alt {
-	background: #F5FAFA;
-	color: #B4AA9D;
-}
-td input {
-  font-size: 14px;
-  width: 100%;
-  border: 1px solid silver;
-}
-table td.editable:hover{
-  background-color: #FCB279;
-  cursor: pointer;
-}
-table{ border-left: 1px solid #c7c7c7; } 
+<link rel="stylesheet" type="text/css" href="css/time_log_show.css" />
 
-.tooltipdatetime {
-	font-size: .8em;
-	color: yellow;
-}
-</style>
 <script src="js/jquery.dialogPrompt.js"></script>
 <script type="text/javascript" src="js/date.js"></script>
 </head>
@@ -378,7 +318,7 @@ timelog_makeEditable = function(td, value, opts){
    td.setAttribute('old_innerHTML', td.innerHTML);
    var cellid = td.getAttribute('cellid');
    td.innerHTML = '<form name="frm_'+cellid+'" onsubmit="return timelog_OnFormSubmit(this);" style="display: inline;" method="POST" style="margin: 0px; padding: 0px;">' + 
-                  '<input type="text" title="'+value+'" id="id_'+cellid+'" tid="'+ td.getAttribute('rowid') +'" name="' + td.getAttribute('cellid') + '" value="'+value+'" '+ (opts.saveonblur ? 'onblur="timelog_saveOrCancelChanges(this);" ' : ' ') + 'onchange="timelog_saveOrCancelChanges(this);" onkeyup="if (event.keyCode == 27){ timelog_cancelChanges(this); }else if(event.keyCode == 13){ timelog_saveOrCancelChanges(this); }else{ timelog_keyUp(this); '+(cellid.indexOf('notes') ? ';' : 'timelog_ajaxVerifyDate(this);')+' }" onchange="timelog_saveOrCancelChanges(this)" onblur="timelog_cancelChanges(this);" />' + 
+                  '<input type="text" title="'+value+'" id="id_'+cellid+'" tid="'+ td.getAttribute('rowid') +'" name="' + td.getAttribute('cellid') + '" value="'+value+'" '+ (opts.saveonblur ? 'onblur="timelog_saveOrCancelChanges(this);" ' : ' ') + 'onchange="timelog_saveOrCancelChanges(this);" onkeyup="if (event.keyCode == 27){ timelog_cancelChanges(this); }else if(event.keyCode == 13){ timelog_saveOrCancelChanges(this); }else{ '+(cellid.indexOf('notes') ? ';' : 'timelog_keyUp(this); timelog_ajaxVerifyDate(this);')+' }" onchange="timelog_saveOrCancelChanges(this)" onblur="timelog_cancelChanges(this);" />' + 
 				  '</form>';
    var ipt = document.getElementById('id_'+cellid);
    if (ipt){
@@ -574,10 +514,13 @@ $(function(){
 <tbody>
 <?PHP foreach($time_log as $i => $row){ ?>
 <tr>
-<td>
+<td class="rowopts">
+<div class="btn left">
 <input class="cbxTimeLog" type="checkbox" name="timelogs_checked[]" value="<?=$row['id']?>"/>
-
-<a title="Delete this time log entry" href="delete.php?time_log_id=<?=$row['id']?>"><img src="images/delete.png" style="border: 0px; width: 16px;"/></a>
+</div>
+<div class="btn right">
+<a class="deltimelog" title="Delete this time log entry" href="delete.php?time_log_id=<?=$row['id']?>"><img src="images/delete.png" style="border: 0px; width: 16px;"/></a>
+</div>
 </td>
 <td class="editable" rowid="<?=$row['id']?>" cellid="timelog[start_time][<?=$row['id']?>]" title="Double-Click to edit start time" ondblclick="timelog_makeEditable(this, '<?=date('M j, Y g:i:s A', strtotime($row['start_time']))?>');"><span id="spn_start_time_<?=$row['id']?>"><?=date('D, M j, Y g:i:s A', strtotime($row['start_time']))?></span></td>
 <?PHP

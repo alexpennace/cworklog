@@ -131,7 +131,7 @@ $(document).bind('keydown', function(e) {
   $(document).ready(function() {
         $("#dlgAddNote").dialog({ autoOpen: false, width: 240, height: 190 });
           $("#dlgAddFile").dialog({ autoOpen: false, width: 240, height: 345 });
-          $("#dlgAddTime").dialog({ autoOpen: false, width: 240, height: 130 });
+          $("#dlgAddTime").dialog({ autoOpen: false, width: 234, height: 207 });
          
                  function clearSelection() {
                       if(document.selection && document.selection.empty) {
