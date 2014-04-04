@@ -6,7 +6,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include_once(dirname(__FILE__).'/installhelper.class.php');
 
 
 //a variety of flags get set depending on the installation
@@ -32,6 +31,23 @@ include_once(dirname(__FILE__).'/installhelper.class.php');
   define("CWL_DEFAULT_CONFIG_FILE", dirname(__FILE__).'/../lib/config.default.inc.php');
   define("CWL_DB_INC_FILE", dirname(__FILE__).'/../lib/db.inc.php');
   define("DOT", dirname(__FILE__));
+
+if (isset($_GET['ajax_db_check'])){
+      define('CFG_DB_HOST', 'localhost');
+      define('CFG_DB_USER', $_REQUEST['CFG_DB_USER']);
+      define('CFG_DB_PASS', $_REQUEST['CFG_DB_PASS']);
+      define('CFG_DB', $_REQUEST['CFG_DB']);
+      try{
+         $cfg['no_inc_config'] = true;
+         include_once(CWL_DB_INC_FILE);
+         $result['DB_ERROR_NOCONNECT'] = false;
+      }catch(Exception $e){
+         $result['DB_ERROR_NOCONNECT'] = true;
+      }
+      die(json_encode($result));
+}
+
+include_once(dirname(__FILE__).'/installhelper.class.php');
 
  $tables_check_base = array('install','company','user','work_log','time_log','note_log','files_log');
 
@@ -60,6 +76,8 @@ include_once(dirname(__FILE__).'/installhelper.class.php');
         $VALS = array();
         $flags['INVALID_CONFIG_FILE'] = true;
      }
+
+     //if doing a db check we will modify db values to whatever sent via ajax
 
      try{
 
@@ -123,6 +141,7 @@ include_once(dirname(__FILE__).'/installhelper.class.php');
 
      }catch(Exception $e){
         $flags['DB_ERROR_NOCONNECT'] = true;
+        
      }
 
      try{
@@ -156,8 +175,6 @@ include_once(dirname(__FILE__).'/installhelper.class.php');
   if (!file_exists(DOT.'/install.schema.sql') ){
      $flags['DB_NO_INSTALL_SCHEMA'] = true;
   }
- 
-
 ?>
 <!doctype html>
 <html>
@@ -165,7 +182,7 @@ include_once(dirname(__FILE__).'/installhelper.class.php');
 <title>CWorkLog Install Kit</title>
 <link rel="stylesheet" href="style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="install.css" type="text/css" media="screen">
-<script src="../js/jquery-1.10.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery-1.11.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="../js/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
@@ -278,7 +295,7 @@ if (empty($VALS['CFG_EMAIL_FROM_HEADER'])){
 ?>
 <div class="round_box config_box">
 <div class="header">
-Config File Helper Form
+Config File Helper Form <p class="hint small">Begin typing values and we will generate a config file for you</p>
 </div>
     <div class="body">
 
@@ -290,8 +307,7 @@ Config File Helper Form
         <br>
        <label for="CFG_DB">Database:</label> 
       <input type="text" id="CFG_DB" name="CFG_DB" value="<?=val('CFG_DB')?>">
-      <br>
-      <br>
+      <div id="dbstatus" class="question"></div>
 
       <label for="CFG_SITE_TITLE">Site Title:</label> 
       <input type="text" id="CFG_SITE_TITLE" name="CFG_SITE_TITLE" value="<?=val('CFG_SITE_TITLE')?>">
@@ -308,12 +324,6 @@ Config File Helper Form
       <br>
        <label title="Recommended to help first-time users." for="CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION"><input id="CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION" type="checkbox" name="CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION" value="1" <?=!empty(val('CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION'))?'checked="checked" ':''?> >
            Insert a Mock-Company.</label>          
-
-      <?php
-         if (!empty($flags['ALLOW_REPLACE_CONFIG_FILE'])){
-            ?><br><button class="create_config_file" type="submit" name="create_config_file" value="<?=$flags['ALLOW_REPLACE_CONFIG_FILE']?>"><?=ucfirst($flags['ALLOW_REPLACE_CONFIG_FILE'])?> config file</button><?php 
-         }
-      ?>
     </div>
 </div>
 
@@ -328,6 +338,11 @@ Config File Helper Form
     </textarea>
     </div>
 </div>
+ <?php
+         if (!empty($flags['ALLOW_REPLACE_CONFIG_FILE'])){
+            ?><br><button class="create_config_file" type="submit" name="create_config_file" value="<?=$flags['ALLOW_REPLACE_CONFIG_FILE']?>"><?=ucfirst($flags['ALLOW_REPLACE_CONFIG_FILE'])?> config file</button><?php 
+         }
+      ?>
 <?php 
    if (empty($flags['DB_ERROR_NOCONNECT']) ) {
       if (empty($flags['DB_ERROR_NOTFOUND_TABLES'])){

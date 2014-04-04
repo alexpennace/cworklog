@@ -19,13 +19,17 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
  */
-  require_once(dirname(__FILE__).'/config.inc.php');
+  if (empty($cfg['no_inc_config'])){
+      require_once(dirname(__FILE__).'/config.inc.php');
+  }
 
+  
   if (!defined('CFG_DB_DSN')){
   	   if (!defined('CFG_DB_DRIVER')){
   	   	  define('CFG_DB_DRIVER', 'mysql');
   	   }
-  	   define('CFG_DB_DSN', CFG_DB_DRIVER.':host='.CFG_DB_HOST.';dbname='.CFG_DB);
+       $cfg['CFG_DB_DSN'] = CFG_DB_DRIVER.':host='.CFG_DB_HOST.';dbname='.CFG_DB;
+  	   define('CFG_DB_DSN', $cfg['CFG_DB_DSN']);
   }
 
   if (!isset($cfg['driver_options'])){
@@ -35,5 +39,5 @@
 		   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 		);  
   }
-  
+
   $DBH = new PDO(CFG_DB_DSN, CFG_DB_USER, CFG_DB_PASS, $cfg['driver_options']);

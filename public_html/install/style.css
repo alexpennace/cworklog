@@ -186,3 +186,22 @@ pre {
    font-size: 8px;
    font-family: 'Courier New';
 }
+
+#dbstatus.success {
+		background-image:url(images/check.png);
+		background-repeat:no-repeat;
+}
+
+#dbstatus.error {
+		background-image:url(images/x.png);
+		background-repeat:no-repeat;
+}
+
+#dbstatus {
+	padding-left: 17px;
+	background-position: 0px 3px;
+}
+
+.hint.small {
+	font-size: .75em;
+}
