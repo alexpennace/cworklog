@@ -20,3 +20,12 @@
 
       define('CWL_VERBOSE_DEBUGGING', false);   //verbose debugging will show SQL statements, etc
       
+      /* TO ENABLE EMAIL USING SMTP UNCOMMENT BELOW AND FILL
+      $cwl_config['smtp'] = array(
+            'server'=>'smtp.gmail.com', 
+            'port'=> 465, 
+            'protocol'=>'ssl',
+            'username'=> '', 
+            'password'=> '', 
+      );
+      */
