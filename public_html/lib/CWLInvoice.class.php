@@ -236,6 +236,31 @@ $result = $prep->execute();
         return $file;
     }
 
+    public function grab_contents($format = null){
+			$contents = $this->final_html;
+
+		    if (empty($format)){ $format = $this->opts['format']; }
+			if (empty($format)) {
+				$format = 'pdf';
+			}
+
+			if ($format == 'html'){
+			   return array($format, $contents);
+			}
+			else if ($this->opts['format'] == 'pdf')
+			{
+			   require_once(dirname(__FILE__)."/dompdf/dompdf_config.inc.php");
+			   
+			   set_time_limit (0);
+			   $dompdf = new DOMPDF();
+			   $dompdf->load_html($contents);
+			   //$dompdf->set_paper('paper', 'landscape');
+			   $dompdf->render();
+			   $output = $dompdf->output();
+			   return array($format, $output);
+			}
+    }
+
 	public function output($format = null){
 		    $contents = $this->final_html;
 

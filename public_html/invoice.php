@@ -45,4 +45,38 @@ require_once(dirname(__FILE__).'/lib/CWLInvoice.class.php');
 $ARY = array_merge($_GET, $_POST);
 $inv = new CWLInvoice($ARY);
 $inv->generate($wid, $template);
-$inv->output();
+
+if (!empty($_REQUEST['send_email_instead'])){
+   list($format, $output) = $inv->grab_contents();
+   $rand = md5(time()).mt_rand();
+   $filename = 'invoice'.$rand.".$format";
+
+   switch($format){
+   		case 'pdf': $mime = 'application/pdf'; break;
+   		case 'html': $mime = 'text/html'; break;
+   		default: 
+   		  $mime = 'text';
+   }
+
+    require_once(__DIR__.'/lib/cwl_email.class.php');
+
+    list($mailer, $message, $logger) = cwl_email::setup();
+
+	$message->setSubject('Invoice from '.Members::LoggedInEmail());
+	$message->setBody($_REQUEST['emailinvoice']['inline_message'], 'text/html');
+
+	$message->setFrom(Members::LoggedInEmail());
+   
+    $message->setTo(array($_REQUEST['emailinvoice']['email_to']=>''));
+	$message->setBcc(array(Members::LoggedInEmail()=>Members::LoggedInShortName()));
+     
+    $attachment = Swift_Attachment::newInstance($output, $filename, $mime);
+
+	$message->attach($attachment);
+	$result = $mailer->send($message);
+
+	echo 'Message sent server '.$cwl_config['smtp']['server'].' status: '.$result;
+
+}else{
+  $inv->output();
+}

@@ -23,7 +23,14 @@
   require_once(dirname(__FILE__).'/work_log.class.php');
 	class Members
 	{
-        public static function LoggedInShortName(){
+       
+        public static function LoggedInEmail(){
+           if (!self::IsLoggedIn()){ return false; }
+           $email = $_SESSION['user_row']['email'];
+           return $email;
+        }       
+
+         public static function LoggedInShortName(){
            if (!self::IsLoggedIn()){ return false; }
            $name = $_SESSION['user_row']['name'];
            if (empty($name)){

@@ -19,6 +19,7 @@ $OPTS['format'] = forcecheck('format', 'pdf');
 
 
    include_once(dirname(__FILE__).'/lib/Site.class.php');
+   include_once(__DIR__.'/lib/Members.class.php');
 
 ?>
 <!doctype html>
@@ -29,6 +30,7 @@ $OPTS['format'] = forcecheck('format', 'pdf');
 Site::CssJsJqueryIncludes();
 ?>
 <link href="css/invoicehelper.css" rel="stylesheet" type="text/css"/>
+<script src="js/invoicehelper.js"></script>
 </head>
 <body>
 
@@ -64,7 +66,7 @@ Site::CssJsJqueryIncludes();
 	})(); 
    </script>
 
-	<button type="submit">Update Invoice</button>
+	<button type="submit">Update Invoice</button> <button id="btnEmailInvoice" type="button">Email Invoice</button>
 
 	<div id="moreinvoiceoptions">
 	<div class="head">
@@ -85,7 +87,24 @@ Site::CssJsJqueryIncludes();
 		</label>
 	</div>
 	</div>
+
+
+		<div id="emailinvoice" class="emailinvoice">
+		  <label>Email to: <input type="text" name="emailinvoice[email_to]" value=""></label><br>
+		  <label>Email From: <input type="text" name="emailinvoice[email_from]" value="<?=Members::LoggedInEmail()?>" readonly="readonly"></label><br>
+		  <label>Message In Email <br>
+			<textarea name="emailinvoice[inline_message]">Attached is my invoice. Thank you</textarea>
+		  </label>
+		  <br>
+		  <p>A copy of the message will be sent to <?=Members::LoggedInEmail()?></p>
+	      <!--
+		  <label><input type="radio" name="emailinvoice[how_to_show]" value="attachpdf" checked="checked">Attach PDF</label>
+		  Additional:  <label><input type="checkbox" name="emailinvoice[mark_locked]" value="1" checked="checked">Mark Locked</label><label><input type="checkbox" name="emailinvoice[copy_hours_to_actual]" value="1" checked="checked">Copy Logged Hours to Actual Hours</label><label><input type="checkbox" name="emailinvoice[date_billed_today]" value="1" checked="checked">Set Date-Billed to Today</label><label><input type="checkbox" name="emailinvoice[amount_billed_invoice_total]" value="1" checked="checked">Set amount billed to invoice total</label>
+		  -->
+	      <button type="submit" name="send_email_instead" value="1" title="You may want to click Update first to preview the invoice">Update and Send now</button>
+		</div>
 	</form>
+
 	</div>
 	<div class="invoice">
 	<iframe name="invoice" src="invoice.php?invoice_wid=<?=$OPTS['wid']?>&format=<?=$OPTS['format']?>">
@@ -93,23 +112,5 @@ Site::CssJsJqueryIncludes();
 	</div>
 
 	</div>
-<script>
-$(function(){
-		$('#moreinvoiceoptions .head').click(function(){
-				var $body = $(this).parent().find('.body');
-				$body.toggle();
-				var invoice_top_helper_height;
-				
-				if ($body.is(":visible")){
-						invoice_top_helper_height = '140px';
-				}else{
-						invoice_top_helper_height = '70px';
-				}
-
-				$('.invoice_helper').css('height', invoice_top_helper_height);
-				$('.invoice').css('padding-top', invoice_top_helper_height);
-		}).click();
-});
-</script>
 </body>
 </html>
