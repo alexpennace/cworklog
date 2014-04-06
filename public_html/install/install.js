@@ -75,7 +75,7 @@ $(function(){
   $('input[type=text], input[type=password], input[type=checkbox]').on('change', function(){
   	glbGenerateConfigFileFromForm();
     if (this.name == 'CFG_DB_USER' || this.name == 'CFG_DB_PASS' || this.name == 'CFG_DB'){
-       var s = $('#CFG_DB').val() + $('#CFG_DB_USER').val() + $('#CFG_DB_PASS').val();
+       var s = $('#CFG_DB').val() + $('#CFG_DB_PASS').val();
        if (s.length > 0){
           glbCheckDBConnection();
        }
