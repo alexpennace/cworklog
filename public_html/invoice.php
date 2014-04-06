@@ -60,7 +60,7 @@ if (!empty($_REQUEST['send_email_instead'])){
 
     require_once(__DIR__.'/lib/cwl_email.class.php');
 
-    list($mailer, $message, $logger) = cwl_email::setup();
+    list($mailer, $message, $logger) = cwl_email::setup(true);
 
 	$message->setSubject('Invoice from '.Members::LoggedInEmail());
 	$message->setBody($_REQUEST['emailinvoice']['inline_message'], 'text/html');

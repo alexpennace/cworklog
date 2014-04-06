@@ -1,4 +1,5 @@
 <?php
+
 function forcecheck($key, $default=null, $ARRAY = null){
 	if (is_null($ARRAY)){ $ARRAY = $_GET; }
 	if (!isset($ARRAY[$key])){
@@ -20,7 +21,7 @@ $OPTS['format'] = forcecheck('format', 'pdf');
 
    include_once(dirname(__FILE__).'/lib/Site.class.php');
    include_once(__DIR__.'/lib/Members.class.php');
-
+   Members::SessionForceLogin();
 ?>
 <!doctype html>
 <html>
