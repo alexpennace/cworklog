@@ -74,8 +74,14 @@ if (!empty($_REQUEST['send_email_instead'])){
 
 	$message->attach($attachment);
 	$result = $mailer->send($message);
-
-	echo 'Message sent server '.$cwl_config['smtp']['server'].' status: '.$result;
+	
+	if (!$mailer->send($message, $failures))
+	{
+	  echo "Failures:";
+	  print_r($failures);
+	}else{
+	   echo 'Message sent server '.$cwl_config['smtp']['server'].' sent.';
+	}
 
 }else{
   $inv->output();
