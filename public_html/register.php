@@ -6,6 +6,7 @@ require_once(__DIR__.'/lib/Members.class.php');
 require_once(__DIR__.'/lib/misc.inc.php');
 require_once(__DIR__.'/lib/Site.class.php');
 require_once(__DIR__.'/lib/work_log.class.php');
+require_once(__DIR__.'/lib/cwl_email.class.php');
 
 Members::SessionAllowLogin();
 
