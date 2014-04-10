@@ -22,7 +22,7 @@
  */
  error_reporting(E_ALL);
  ini_set('display_errors', 1);
- 
+
 require_once(dirname(__FILE__).'/lib/db.inc.php');
 require_once(dirname(__FILE__).'/lib/Members.class.php');
 Members::SessionForceLogin();
@@ -62,7 +62,7 @@ if (!empty($_REQUEST['send_email_instead'])){
 
     require_once(__DIR__.'/lib/cwl_email.class.php');
 
-    list($mailer, $message, $logger) = cwl_email::setup(true);
+    list($mailer, $message, $logger) = cwl_email::setup(false);
 
 	$message->setSubject('Invoice from '.Members::LoggedInEmail());
 	$message->setBody($_REQUEST['emailinvoice']['inline_message'], 'text/html');
@@ -75,10 +75,9 @@ if (!empty($_REQUEST['send_email_instead'])){
     $attachment = Swift_Attachment::newInstance($output, $filename, $mime);
 
 	$message->attach($attachment);
-	$result = $mailer->send($message);
+	$mailed = $mailer->send($message, $failures);
 	
-	if (!$mailer->send($message, $failures))
-	{
+	if (!$mailed){
 	  echo "Failures:";
 	  print_r($failures);
 	}else{
