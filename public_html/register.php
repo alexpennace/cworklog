@@ -1,7 +1,7 @@
 <?PHP
  error_reporting(E_ALL);
  ini_set('display_errors', 1);
- 
+
 require_once('lib/Members.class.php');
 require_once('lib/misc.inc.php');
 require_once('lib/Site.class.php');
@@ -16,7 +16,6 @@ $registration_complete = false;
 
 if (isset($_GET['ajax'])){
    if (isset($_GET['username_check'])){
-		$error = username_check($_GET['username_check']);
 		if ($error){
 		 die(json_encode(array('error'=>$error)));
 		}
@@ -35,10 +34,8 @@ if (isset($_GET['ajax'])){
 
 if (isset($_POST['username']) && isset($_POST['email']))
 {
-   if ($error = username_check($_POST['username'])){
-      $error_field = 'username';
-   }
-   else if (Members::GetUserByUsername($_POST['username']))
+   
+   if (Members::GetUserByUsername($_POST['username']))
    {
 	  $error = 'This username is not available';
       $error_field = 'username';
