@@ -20,8 +20,12 @@
  *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
  */
 
-   require_once(dirname(__FILE__).'/config.inc.php');
-   Site::$cwl_config = $cwl_config;
+   try{
+     include(dirname(__FILE__).'/config.inc.php');
+     Site::$cwl_config = $cwl_config;
+   }catch(Exception $e){
+
+   }
 
    
    class Site
