@@ -1,7 +1,7 @@
 <?PHP
  error_reporting(E_ALL);
  ini_set('display_errors', 1);
- 
+
    require_once('lib/db.inc.php');
    require_once('lib/Members.class.php');
    require_once('lib/Site.class.php');
@@ -48,7 +48,7 @@ $result2 = $prep->execute();
    }else if (isset($_GET['resetpwcode'])){
             $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(email) = LOWER('%s')";
             $prep = $DBH->prepare(sprintf($sql, $_GET['resetpwcode'], $_GET['email']));
-$result = $prep->execute();
+            $result = $prep->execute();
             if ($result && $row = $prep->fetch()){
                 $resetpw_user = $row;
                 if (!empty($_POST)){
@@ -71,9 +71,9 @@ $result = $prep->execute();
                           $error_field = 'password';
                        }else{
                           
-                            $sql2 = "UPDATE user SET status = 1, password = MD5('%s'), verify_code = '', verify_param = '' WHERE id = %d";
+                            $sql2 = "UPDATE user SET status = 1, password = MD5(%s), verify_code = '', verify_param = '' WHERE id = %d";
                             $prep = $DBH->prepare(sprintf($sql2, $DBH->quote($_POST['password']), $resetpw_user['id']));
-$result2 = $prep->execute();
+                            $result2 = $prep->execute();
                             if ($result2){
                                $success = 'Thank you for verifying your new email address, your account has been updated';
                             }else{
