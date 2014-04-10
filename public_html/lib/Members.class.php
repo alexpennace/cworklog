@@ -291,6 +291,7 @@ $result = $prep->execute();
 		
 		public static function GetUserByUsername($username)
 		{
+        global $DBH;
 		   $sql = "SELECT * FROM user WHERE LOWER(username) = LOWER('%s')";
 		   $prep = $DBH->prepare(sprintf($sql, $username));
 $result = $prep->execute();
