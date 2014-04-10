@@ -1,7 +1,9 @@
 <?php
 class cwl_email{
    public static function setup($log = false){
-   	    require_once(__DIR__.'/config.inc.php');
+   		require_once(__DIR__.'/Site.class.php');
+   	    $cwl_config = Site::GetConfig();
+
    	  	require_once(__DIR__.'/Swift-5.1.0/lib/swift_required.php');
 
 	    if (empty($cwl_config['smtp'])){
@@ -24,7 +26,8 @@ class cwl_email{
 
 
 		$message = Swift_Message::newInstance();
-
+		//by default use this from email address
+        $message->setFrom('noreply@'.$cwl_config['domain']);
 		return array($mailer, $message, $logger);
 	}
 }

@@ -1,13 +1,25 @@
 <?PHP
    require_once(dirname(__FILE__).'/config.inc.php');
+   Site::$cwl_config = $cwl_config;
    class Site
    {
+      public static $cwl_config = null;
       public static $title = CFG_SITE_TITLE;
       public static $base_url = CFG_BASE_URL;
       public static $use_php_mail = CFG_USE_PHP_MAIL;
       public static $email_from_header = CFG_EMAIL_FROM_HEADER;
       public static $insert_mock_company_upon_registration = CFG_INSERT_MOCK_COMPANY_UPON_REGISTRATION;
       
+      public static function GetConfig($key=null, $default = null){
+          $cfg = &self::$cwl_config;
+          if (is_null($key)){ return $cfg; }
+
+          if (isset($cfg[$key])){
+             return $cfg[$key];
+          }
+          return $default;
+      }
+
       public static function CssJsYuiIncludes(){
 		  //$YUI_JS_SOURCE = 'http://yui.yahooapis.com';
 		  $YUI_JS_SOURCE = 'js/yui';

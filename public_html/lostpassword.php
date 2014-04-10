@@ -23,12 +23,21 @@ $result = $prep->execute();
       if ($result){
            if ($prep->rowCount() == 1){
               if (Site::$use_php_mail){
-                 $mailed = mail($_POST['email'], 'Contractor\'s Work Log Reset Password', 
-                    "Please reset your password by going to the link below:\r\n".
-                    Site::$base_url.'verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 
-                    Site::$email_from_header);
-                 
-                 if ($mailed){
+                  require_once(__DIR__.'/lib/cwl_email.class.php');
+
+                    list($mailer, $message, $logger) = cwl_email::setup(true);
+
+                    $message->setSubject('Contractor\'s Work Log Reset Password');
+                    $message->setBody("Please reset your password by going to the link below:\r\n".
+                      Site::$base_url.'verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 'text/html');
+
+                     
+                    $message->setTo(array($_POST['email']));
+                    $message->setBcc(array('cworklog@gmail.com'));
+                
+                    $result = $mailer->send($message);
+                  
+                  if ($mailer->send($message, $failures)){
                     $lostyourpw_done = true;                    
                  }else{
                     $error = 'There was an error with your email address, please contact an adminstrator for a link to reset your passowrd.';
