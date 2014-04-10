@@ -38,9 +38,10 @@ $result = $prep->execute();
                     $result = $mailer->send($message);
                   
                   if ($mailer->send($message, $failures)){
-                    $lostyourpw_done = true;                    
+                    $lostyourpw_done = true;
+                    $error = 'There was NOT an error';                    
                  }else{
-                    $error = 'There was an error with your email address, please contact an adminstrator for a link to reset your passowrd.';
+                    $error = 'There was an error with your email address, please contact an adminstrator for a link to reset your passowrd.'.$failures;
                  }
               }else{
                  $error = ('This site does not support sending emails, please contact the administrator for your reset your password link.');
