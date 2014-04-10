@@ -2,10 +2,10 @@
  error_reporting(E_ALL);
  ini_set('display_errors', 1);
 
-require_once('lib/Members.class.php');
-require_once('lib/misc.inc.php');
-require_once('lib/Site.class.php');
-require_once('lib/work_log.class.php');
+require_once(__DIR__.'/lib/Members.class.php');
+require_once(__DIR__.'/lib/misc.inc.php');
+require_once(__DIR__.'/lib/Site.class.php');
+require_once(__DIR__.'/lib/work_log.class.php');
 
 Members::SessionAllowLogin();
 
@@ -86,11 +86,17 @@ if (isset($_POST['username']) && isset($_POST['email']))
 
         if (Site::$use_php_mail)
         {
-            $mailed = mail($_POST['email'], 'Work Log Registration', 
-              "Please verify your account by clicking the link below\r\n".
-              Site::$base_url.'verify.php?code='.$verify_code.'&email='.urlencode($_POST['email']), 
-              Site::$email_from_header);
             
+           list($mailer, $message, $logger) = cwl_email::setup(false);
+
+            $message->setSubject('Contractor\'s Work Log Registration');
+            $message->setBody("Please verify your account by clicking the link below\r\n".
+                Site::$base_url.'verify.php?code='.$verify_code.'&email='.urlencode($_POST['email']), 'text/html');
+             
+            $message->setTo(array($_POST['email']));
+        
+            $mailed = $mailer->send($message);
+
             if (!$mailed){
                 $error = 'There was an error with your email address, please try again';
                 $error_field = 'email';
