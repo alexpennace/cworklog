@@ -304,6 +304,7 @@ $result = $prep->execute();
 		
 		public static function GetUserByEmail($email)
 		{
+       global $DBH;
 		   $sql = "SELECT * FROM user WHERE LOWER(email) = LOWER('%s')";
 		   $prep = $DBH->prepare(sprintf($sql, $email));
 $result = $prep->execute();
