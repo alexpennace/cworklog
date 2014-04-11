@@ -85,14 +85,14 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		$verify_code = random_string(25);
         
 
-        if (Site::$use_php_mail)
+        if (Site::cfg('use_php_mail'))
         {
             
            list($mailer, $message, $logger) = cwl_email::setup(false);
 
             $message->setSubject('Contractor\'s Work Log Registration');
             $message->setBody("Please verify your account by clicking the link below\r\n".
-                Site::$base_url.'verify.php?code='.$verify_code.'&email='.urlencode($_POST['email']), 'text/html');
+                Site::cfg('base_url').'verify.php?code='.$verify_code.'&email='.urlencode($_POST['email']), 'text/html');
              
             $message->setTo(array($_POST['email']));
         
@@ -118,8 +118,8 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		}
         
         //now a new feature is to insert a mock-up 
-        if (Site::$insert_mock_company_upon_registration){
-            $ins_work_log = work_log::Add(array('title'=>'My First Work Log','description'=>'Learning the ins and outs of '.Site::$title,
+        if (Site::cfg('insert_mock_company_upon_registration')){
+            $ins_work_log = work_log::Add(array('title'=>'My First Work Log','description'=>'Learning the ins and outs of '.Site::cfg('title'),
                 'user_id'=> $DBH->lastInsertId(),
                 'company_id'=>'new',
                 'name'=>'My First Company',
@@ -146,7 +146,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <title><?=Site::$title?> - Registration</title>
+        <title><?=Site::cfg('title')?> - Registration</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <?PHP
           Site::CssJsYuiIncludes();

@@ -1,7 +1,4 @@
 <?PHP
-   error_reporting(E_ALL);
-   ini_set('display_errors',1);
-   
    require_once(dirname(__FILE__).'/lib/db.inc.php');
    require_once(dirname(__FILE__).'/lib/Members.class.php');
    Members::SessionForceLogin();

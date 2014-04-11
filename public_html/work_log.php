@@ -96,7 +96,7 @@
        //if we made it down here, then everything is ok
        $sql = "UPDATE work_log SET $field = :value WHERE id = :work_log_id LIMIT 1";
        $prep = $DBH->prepare($sql);
-       if (CWL_VERBOSE_DEBUGGING) { echo $sql; }
+       if (Site::cfg('verbose_debugging')) { echo $sql; }
 
        $result_upd =  $prep->execute(array('work_log_id'=>$wid, 'value'=>$value));
        if ($result_upd){
@@ -216,7 +216,7 @@
    
    $sql .= $sql_where." ORDER BY work_log.id DESC";
 
-   if (CWL_VERBOSE_DEBUGGING){
+   if (Site::cfg('verbose_debugging')){
    		echo $sql;
    }
 
@@ -228,7 +228,7 @@
    $super_total_seconds = 0;
    $super_total_amount = 0.0;
    if (!$result){
-      if (CWL_VERBOSE_DEBUGGING){ echo $sql.$DBH->errorInfo(); }
+      if (Site::cfg('verbose_debugging')){ echo $sql.$DBH->errorInfo(); }
    }
    $cal_events = array();
    while ($row = $prep->fetch()){

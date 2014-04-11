@@ -10,7 +10,10 @@ require_once(dirname(__FILE__).'/lib/CWLUser.class.php');
 require_once(dirname(__FILE__).'/lib/CWLPlans.class.php');
 require_once(dirname(__FILE__).'/lib/stripelib/Stripe.php');
 require_once(dirname(__FILE__).'/lib/config.inc.php');
-Stripe::setApiKey(CFG_STRIPE_APIKEY);
+
+if (Site::cfg('stripe_apikey')){
+   Stripe::setApiKey(Site::cfg('stripe_apikey'));
+}
 
 Members::SessionForceLogin();
 $cwluser = new CWLUser($_SESSION['user_id']);
@@ -132,14 +135,19 @@ $result = $prep->execute();
                                          verify_param = '".$_POST['email_new']."' 
                          WHERE id = ".(int)$_SESSION['user_id'];
                  $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+                  $result = $prep->execute();
                  if (!$result){
                     $error = 'Error performing email address change, try again later.';
                  }else{ //everything so far so good
-                     $mailed = mail($_POST['email_new'], 'New email address confirmation - '.Site::$title, 
-                      "Please verify your new email address by clicking the link below\r\n".
-                      Site::$base_url.'verify.php?code='.$verify_code.'&new_email='.urlencode($_POST['email_new']), 
-                      Site::$email_from_header);
+                     list($mailer, $message, $logger) = cwl_email::setup(false);
+
+                      $message->setSubject('New email confirmation - '.Site::cfg('title'));
+                      $message->setBody("Please verify your new email address by clicking the link below\r\n".
+                      Site::cfg('base_url').'verify.php?code='.$verify_code.'&new_email='.urlencode($_POST['email_new']), 'text/html');
+                       
+                      $message->setTo(array($_POST['email_new']));
+                  
+                      $mailed = $mailer->send($message);
                       
                     if (!$mailed){
                        $error = 'Error sending mail to new email address';
@@ -178,7 +186,7 @@ $result = $prep->execute();
 
 <html>
 <head>
-<title>Settings - <?=Site::$title?></title>
+<title>Settings - <?=Site::cfg('title')?></title>
 <?PHP
   Site::CssJsYuiIncludes();
   Site::CssJsJqueryIncludes();

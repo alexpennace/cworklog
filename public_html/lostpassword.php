@@ -42,14 +42,14 @@ if (!empty($_POST)){
 $result = $prep->execute();
       if ($result){
            if ($prep->rowCount() == 1){
-              if (Site::$use_php_mail){
+              if (Site::cfg('use_php_mail')){
                   require_once(__DIR__.'/lib/cwl_email.class.php');
 
                     list($mailer, $message, $logger) = cwl_email::setup(false);
 
                     $message->setSubject('Contractor\'s Work Log Reset Password');
                     $message->setBody("Please reset your password by going to the link below:\r\n".
-                      Site::$base_url.'verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 'text/html');
+                      Site::cfg('base_url').'verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 'text/html');
                      
                     $message->setTo(array($_POST['email']));
                 
@@ -82,7 +82,7 @@ $result = $prep->execute();
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <title><?=Site::$title?> - Lost your password?</title>
+        <title><?=Site::cfg('title')?> - Lost your password?</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <?PHP
           Site::CssJsYuiIncludes();

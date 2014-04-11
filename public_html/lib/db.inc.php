@@ -19,17 +19,16 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
  */
-  if (empty($cfg['no_inc_config'])){
-      require_once(dirname(__FILE__).'/config.inc.php');
-  }
+  require_once(__DIR__.'/Site.class.php');
 
-  
-  if (!defined('CFG_DB_DSN')){
-  	   if (!defined('CFG_DB_DRIVER')){
-  	   	  define('CFG_DB_DRIVER', 'mysql');
-  	   }
-       $cfg['CFG_DB_DSN'] = CFG_DB_DRIVER.':host='.CFG_DB_HOST.';dbname='.CFG_DB;
-  	   define('CFG_DB_DSN', $cfg['CFG_DB_DSN']);
+  $cfg = Site::cfg();
+
+  if (empty($cfg['db_dsn'])){
+  	   if (empty($cfg['db_driver'])){
+          $cfg['db_driver'] = 'mysql';
+       }
+
+       $cfg['db_dsn'] = $cfg['db_driver'].':host='.$cfg['db_host'].';dbname='.$cfg['db'];
   }
 
   if (!isset($cfg['driver_options'])){
@@ -40,4 +39,9 @@
 		);  
   }
 
-  $DBH = new PDO(CFG_DB_DSN, CFG_DB_USER, CFG_DB_PASS, $cfg['driver_options']);
+  $DBH = new PDO($cfg['db_dsn'], $cfg['db_user'], $cfg['db_pass'], $cfg['driver_options']);
+
+  function pdo(){
+     global $DBH;
+     return $DBH;
+  }

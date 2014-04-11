@@ -180,7 +180,7 @@ else if (isset($_REQUEST['company_id'])){
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
 <head>
-<title>Confirm Permanent Delete - <?=Site::$title?></title>
+<title>Confirm Permanent Delete - <?=Site::cfg('title')?></title>
 <?PHP
   Site::CssJsYuiIncludes();
   Site::CssJsJqueryIncludes();
