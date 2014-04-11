@@ -20,6 +20,8 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
  */
+error_reporting(E_ALL);
+ini_set('display_errors',1);
 
 require_once(dirname(__FILE__).'/lib/db.inc.php');
 require_once(dirname(__FILE__).'/lib/Members.class.php');
