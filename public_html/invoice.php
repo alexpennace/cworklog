@@ -51,7 +51,7 @@ $inv->generate($wid, $template);
 if (!empty($_REQUEST['send_email_instead'])){
    list($format, $output) = $inv->grab_contents();
    $rand = md5(time()).mt_rand();
-   $filename = 'invoice'.$rand.".$format";
+   $filename = 'Invoice-'.date('Y-m-d').".$format";
 
    switch($format){
    		case 'pdf': $mime = 'application/pdf'; break;
