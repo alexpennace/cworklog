@@ -78,10 +78,10 @@ if (!empty($_REQUEST['send_email_instead'])){
 	$mailed = $mailer->send($message, $failures);
 	
 	if (!$mailed){
-	  echo "Failures:";
+	  echo "Failure Sending to:";
 	  print_r($failures);
 	}else{
-	   echo 'Message sent server '.$cwl_config['smtp']['server'].' sent.';
+	   echo 'Message sent.';
 	}
 
 }else{
