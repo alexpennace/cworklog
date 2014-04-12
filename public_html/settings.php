@@ -9,7 +9,6 @@ require_once(dirname(__FILE__).'/lib/work_log.class.php');
 require_once(dirname(__FILE__).'/lib/CWLUser.class.php');
 require_once(dirname(__FILE__).'/lib/CWLPlans.class.php');
 require_once(dirname(__FILE__).'/lib/stripelib/Stripe.php');
-require_once(dirname(__FILE__).'/lib/config.inc.php');
 
 if (Site::cfg('stripe_apikey')){
    Stripe::setApiKey(Site::cfg('stripe_apikey'));

@@ -80,7 +80,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
 		  $sql = "INSERT INTO user (id,	username,	password,	email,	phone,	name,	street,	street2,	city,	state,	zip,	country,	status,	verify_code, date_created)
 		        VALUES (NULL, :username, MD5(:password), 
 				:email, :phone, 
-				:name, :street, :street2, :city, :state, :zip, :country, 
+				:name, :street1, :street2, :city, :state, :zip, :country, 
 				:status, :verify_code, NOW());";
 	   	
       $verify_code = random_string(25);
@@ -110,7 +110,7 @@ if (isset($_POST['username']) && isset($_POST['email']))
         }
           
           $exec_ary = array('username'=>$_POST['username'], 'password'=>$_POST['password'], 'email'=>$_POST['email'], 'phone'=>$_POST['phone'], 'name'=>$_POST['fullname'], 'street1'=>$_POST['street1'], 'street2'=>$_POST['street2'], 'city'=>$_POST['city'], 'state'=>$_POST['state'], 'zip'=>$_POST['zip'],'country'=>$_POST['country'], 'status'=>0, 'verify_code'=>$verify_code);
-          
+
 		      $prep = $DBH->prepare($sql); 
           $result =  $prep->execute($exec_ary);
       		if (!$result){
