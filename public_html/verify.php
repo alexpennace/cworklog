@@ -11,14 +11,16 @@
    if (isset($_GET['code']))
    {
         if (isset($_GET['email'])){
-            $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(email) = LOWER('%s')";
-            $prep = $DBH->prepare(sprintf($sql, $_GET['code'], $_GET['email']));
-$result = $prep->execute();
+            $sql = "SELECT * FROM user WHERE verify_code = :verify_code AND LOWER(email) = LOWER(:email)";
+            $exec_ary = array('verify_code'=>$_GET['code'], 'email'=>$_GET['email']); 
+            $prep = $DBH->prepare($sql);
+            $result = $prep->execute($exec_ary);
             if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
-                $sql2 = "UPDATE user SET status = 1, verify_code = '', verify_param = '' WHERE id = %d";
-                $prep = $DBH->prepare(sprintf($sql2, $verify_user['id']));
-$result2 = $prep->execute();
+                $sql2 = "UPDATE user SET status = 1, verify_code = '', verify_param = '' WHERE id = :id";
+                $prep = $DBH->prepare();
+                $exec_ary = array('id'=>$verify_user['id']);
+                $result2 = $prep->execute($exec_ary);
                 if ($result2){
                    $success = 'Thank you for verifying your email address, your account has been updated';
                 }else{
@@ -28,14 +30,15 @@ $result2 = $prep->execute();
                 $error = 'Invalid verification code, please try again';
             }
        }else if (isset($_GET['new_email'])){
-            $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(verify_param) = LOWER('%s')";
-            $prep = $DBH->prepare(sprintf($sql, $DBH->quote($_GET['code']), $DBH->quote($_GET['new_email'])));
-$result = $prep->execute();         
+            $sql = "SELECT * FROM user WHERE verify_code = :verify_code AND LOWER(verify_param) = LOWER(:verify_param)";
+            $prep = $DBH->prepare(); //sprintf($sql, $DBH->quote($_GET['code']), $DBH->quote($_GET['new_email'])));
+            $result = $prep->execute(array('verify_code'=>$_GET['code'], 'verify_param'=>$_GET['new_email']));         
             if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
-                $sql2 = "UPDATE user SET status = 1, email = '%s', verify_code = '', verify_param = '' WHERE id = %d";
-                $prep = $DBH->prepare(sprintf($sql2, $DBH->quote($_GET['new_email']), $verify_user['id']));
-$result2 = $prep->execute();
+                $sql2 = "UPDATE user SET status = 1, email = :email, verify_code = '', verify_param = '' WHERE id = :id";
+                $prep = $DBH->prepare($sql2);
+                $exec_ary = array('email'=>$_GET['new_email'], 'id'=> $verify_user['id']);
+                $result2 = $prep->execute($exec_ary);
                 if ($result2){
                    $success = 'Thank you for verifying your new email address, your account has been updated';
                 }else{
@@ -46,9 +49,10 @@ $result2 = $prep->execute();
           $error = 'Invalid verification action';
        }
    }else if (isset($_GET['resetpwcode'])){
-            $sql = "SELECT * FROM user WHERE verify_code = '%s' AND LOWER(email) = LOWER('%s')";
-            $prep = $DBH->prepare(sprintf($sql, $_GET['resetpwcode'], $_GET['email']));
-            $result = $prep->execute();
+            $sql = "SELECT * FROM user WHERE verify_code = :verify_code AND LOWER(email) = LOWER(:email)";
+            $prep = $DBH->prepare(); 
+            $exec_ary = array('verify_code'=> $_GET['resetpwcode'], 'email'=> $_GET['email']);
+            $result = $prep->execute($exec_ary);
             if ($result && $row = $prep->fetch()){
                 $resetpw_user = $row;
                 if (!empty($_POST)){
@@ -70,10 +74,10 @@ $result2 = $prep->execute();
                           $error = 'Password is too long (must be 4 to 15 characters)';
                           $error_field = 'password';
                        }else{
-                          
-                            $sql2 = "UPDATE user SET status = 1, password = MD5(%s), verify_code = '', verify_param = '' WHERE id = %d";
-                            $prep = $DBH->prepare(sprintf($sql2, $DBH->quote($_POST['password']), $resetpw_user['id']));
-                            $result2 = $prep->execute();
+                            $sql2 = "UPDATE user SET status = 1, password = MD5(:password), verify_code = '', verify_param = '' WHERE id = :id";
+                            $prep = $DBH->prepare(); //sprintf($sql2, $DBH->quote($_POST['password']), $resetpw_user['id']));
+                            $exec_ary = array('password'=>$_POST['password'], 'id'=>$resetpw_user['id']);
+                            $result2 = $prep->execute($exec_ary);
                             if ($result2){
                                $success = 'Thank you for verifying your new email address, your account has been updated';
                             }else{
