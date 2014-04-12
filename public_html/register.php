@@ -77,12 +77,13 @@ if (isset($_POST['username']) && isset($_POST['email']))
    }
    else
    {
-		$sql = "INSERT INTO user (id,	username,	password,	email,	phone,	name,	street,	street2,	city,	state,	zip,	country,	status,	verify_code, date_created)
-		        VALUES (NULL, '%s', MD5('%s'), 
-				'%s', '%s', 
-				'%s', '%s', '%s', '%s', '%s', '%s', '%s', 
-				%d, '%s', NOW());";
-		$verify_code = random_string(25);
+		  $sql = "INSERT INTO user (id,	username,	password,	email,	phone,	name,	street,	street2,	city,	state,	zip,	country,	status,	verify_code, date_created)
+		        VALUES (NULL, :username, MD5(:password), 
+				:email, :phone, 
+				:name, :street, :street2, :city, :state, :zip, :country, 
+				:status, :verify_code, NOW());";
+	   	
+      $verify_code = random_string(25);
         
 
         if (Site::cfg('use_php_mail'))
@@ -108,14 +109,13 @@ if (isset($_POST['username']) && isset($_POST['email']))
            //whatever
         }
           
-		$prep = $DBH->prepare(sprintf($sql, $_POST['username'], $_POST['password'], 
-		                    $_POST['email'], $_POST['phone'], 
-							$_POST['fullname'], $_POST['street1'], $_POST['street2'], $_POST['city'], $_POST['state'], $_POST['zip'], $_POST['country'],
-							0, $verify_code));
-                $result =  $prep->execute();
-		if (!$result){
-		   $error = 'There was a server error, please try again later';
-		}
+          $exec_ary = array('username'=>$_POST['username'], 'password'=>$_POST['password'], 'email'=>$_POST['email'], 'phone'=>$_POST['phone'], 'name'=>$_POST['fullname'], 'street1'=>$_POST['street1'], 'street2'=>$_POST['street2'], 'city'=>$_POST['city'], 'state'=>$_POST['state'], 'zip'=>$_POST['zip'],'country'=>$_POST['country'], 'status'=>0, 'verify_code'=>$verify_code);
+          
+		      $prep = $DBH->prepare($sql); 
+          $result =  $prep->execute($exec_ary);
+      		if (!$result){
+      		   $error = 'There was a server error, please try again later';
+      		}
         
         //now a new feature is to insert a mock-up 
         if (Site::cfg('insert_mock_company_upon_registration')){
