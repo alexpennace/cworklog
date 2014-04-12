@@ -43,8 +43,8 @@ if (!empty($_POST)){
       $exec_ary['verify_code'] = $code;
       $exec_ary['id'] = $user_by_username['id'];
 
-      $prep = $DBH->prepare($exec_ary);
-      $result = $prep->execute();
+      $prep = $DBH->prepare($sql);
+      $result = $prep->execute($exec_ary);
       if ($result){
            if ($prep->rowCount() == 1){
               if (Site::cfg('use_php_mail')){
