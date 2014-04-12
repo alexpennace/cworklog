@@ -99,16 +99,16 @@ if (isset($_POST)){
          $error_field ='pw_new';
       }else{ //passwords match, do more error checking
 
-          $sql = "SELECT * FROM user WHERE id = %d AND MD5('%s') = password";
-          $sql = sprintf($sql, $_SESSION['user_id'], $_POST['pw_current']);
+          $sql = "SELECT * FROM user WHERE id = :id AND MD5(:password) = password";
+          $exec_ary = array('id'=>$_SESSION['user_id'], 'password'=> $_POST['pw_current']);
           $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+          $result = $prep->execute($exec_ary);
           if ($row = $prep->fetch()){
              //current password matches
-             $sql = "UPDATE user SET password = MD5('%s') WHERE id = %d";
-             $sql = sprintf($sql, $_POST['pw_new'], $_SESSION['user_id']);
+             $sql = "UPDATE user SET password = MD5(:password) WHERE id = :id";
+             $exec_ary = array('id'=>$_SESSION['user_id'], 'password'=> $_POST['pw_new']);
              $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+             $result = $prep->execute($exec_ary);
              if (!$result){
                 $error = 'Your password could not be changed';
              }else{
@@ -120,10 +120,10 @@ $result = $prep->execute();
           }
       }
    }else if (isset($_POST['email_new'])){ 
-          $sql = "SELECT * FROM user WHERE id = %d AND MD5('%s') = password";
-          $sql = sprintf($sql, $_SESSION['user_id'], $_POST['pw_current']);
+          $sql = "SELECT * FROM user WHERE id = :id AND MD5(:password) = password";
+          $exec_ary = array('id'=>$_SESSION['user_id'], 'password'=> $_POST['pw_current']);
           $prep = $DBH->prepare($sql);
-$result = $prep->execute();
+          $result = $prep->execute($exec_ary);
           if ($row = $prep->fetch()){
              if (!filter_var($_POST['email_new'], FILTER_VALIDATE_EMAIL)){
                   $error = 'Email is not valid';
@@ -131,11 +131,12 @@ $result = $prep->execute();
              }else{
                  $verify_code = random_string(25);
                  $sql = "UPDATE user SET verify_command = 'change_email', 
-                                         verify_code = '".$verify_code."', 
-                                         verify_param = '".$_POST['email_new']."' 
-                         WHERE id = ".(int)$_SESSION['user_id'];
+                                         verify_code = :verify_code, 
+                                         verify_param = :email_new 
+                         WHERE id = :id";
                  $prep = $DBH->prepare($sql);
-                  $result = $prep->execute();
+                 $exec_ary = array('id'=>$_SESSION['user_id'], 'verify_code'=> $verify_code, 'email_new'=>$_POST['email_new']);
+                 $result = $prep->execute();
                  if (!$result){
                     $error = 'Error performing email address change, try again later.';
                  }else{ //everything so far so good
