@@ -135,7 +135,7 @@ if (isset($_POST)){
                          WHERE id = :id";
                  $prep = $DBH->prepare($sql);
                  $exec_ary = array('id'=>$_SESSION['user_id'], 'verify_code'=> $verify_code, 'email_new'=>$_POST['email_new']);
-                 $result = $prep->execute();
+                 $result = $prep->execute($exec_ary);
                  if (!$result){
                     $error = 'Error performing email address change, try again later.';
                  }else{ //everything so far so good
