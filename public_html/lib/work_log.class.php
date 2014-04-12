@@ -214,11 +214,11 @@ $result = $prep->execute();
   
   public function getFiles($optional_feature_name = null){
     global $DBH;
-
-     $sql = "SELECT * FROM files_log WHERE work_log_id = ".(int)$this->wid;
+    $exec_ary = array();
+    $sql = "SELECT * FROM files_log WHERE work_log_id = ".(int)$this->wid;
 	 if (!is_null($optional_feature_name)){
-		$sql .= " AND feature = '%s'";
-		$sql = sprintf($sql, $optional_feature_name);
+		$sql .= " AND feature = :feature";
+		    $exec_ary['feature'] = $optional_feature_name;
 	 }
 	 if (is_null($optional_feature_name)){
 	    $sql .= ' ORDER BY feature, date_modified ';
@@ -227,7 +227,7 @@ $result = $prep->execute();
      }
 	 
    $prep = $DBH->prepare($sql);
-   $result = $prep->execute();
+   $result = $prep->execute($exec_ary);
 	 $files = array();
 	 while ($row = $prep->fetch()){
 		$files[] = $row;
