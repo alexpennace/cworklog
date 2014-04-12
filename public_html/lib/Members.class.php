@@ -67,10 +67,10 @@
                   
                   
                         $sql = "SELECT * FROM time_log JOIN work_log ON work_log_id = work_log.id 
-                                WHERE stop_time IS NULL AND work_log.user_id = ".(int)$_SESSION['user_id'];
+                                WHERE stop_time IS NULL AND work_log.user_id = :user_id";
                         $prep = $DBH->prepare($sql);
-$result = $prep->execute();
-                       $time_logs_unfinished = array();
+						$result = $prep->execute(array(':user_id'=>$_SESSION['user_id']));
+                        $time_logs_unfinished = array();
                         if ($result){
                          
                            echo '<div id="unfinished" style="float:left"> &nbsp; ';
