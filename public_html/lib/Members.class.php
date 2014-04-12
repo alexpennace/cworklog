@@ -291,10 +291,10 @@ $result = $prep->execute();
 		
 		public static function GetUserByUsername($username)
 		{
-        global $DBH;
-		   $sql = "SELECT * FROM user WHERE LOWER(username) = LOWER('%s')";
-		   $prep = $DBH->prepare(sprintf($sql, $username));
-$result = $prep->execute();
+           global $DBH;
+		   $sql = "SELECT * FROM user WHERE LOWER(username) = LOWER(:username)";
+		   $prep = $DBH->prepare($sql);
+		   $result = $prep->execute(array('username'=>$username));
 		   if ($result && $row = $prep->fetch()){
 		      return $row;
 		   }else{
@@ -304,10 +304,10 @@ $result = $prep->execute();
 		
 		public static function GetUserByEmail($email)
 		{
-       global $DBH;
-		   $sql = "SELECT * FROM user WHERE LOWER(email) = LOWER('%s')";
-		   $prep = $DBH->prepare(sprintf($sql, $email));
-$result = $prep->execute();
+       	   global $DBH;
+		   $sql = "SELECT * FROM user WHERE LOWER(email) = LOWER(:email)";
+		   $prep = $DBH->prepare($sql);
+		   $result = $prep->execute(array('email'=>$email));
 		   if ($result && $row = $prep->fetch()){
 		      return $row;
 		   }else{
@@ -316,18 +316,22 @@ $result = $prep->execute();
 		}
 		
       public static function SuperLogin($username_or_email_or_id){
-		   $sql = "SELECT * FROM user WHERE ";
-		   if (is_numeric($username_or_email_or_id)){
-             $sql .= ' id = %d ';
+		 $sql = "SELECT * FROM user WHERE ";
+		 $exec_ary = array();
+		 if (is_numeric($username_or_email_or_id)){
+             $sql .= ' id = :id ';
+             $exec_ary['id'] = $username_or_email_or_id;
          }
          else if (strpos($username_or_email_or_id, '@') !== false){
-			      $sql .= "LOWER(email) = '%s'";
+			      $sql .= "LOWER(email) = :email";
+			      $exec_ary['email'] = $username_or_email_or_id;
 			}else{
-				  $sql .= "LOWER(username) = '%s'";
+				  $sql .= "LOWER(username) = :username";
+				  $exec_ary['username'] = $username_or_email_or_id;
 			}
 			$sql .= " LIMIT 1";
-			$prep = $DBH->prepare(sprintf($sql, strtolower($username_or_email_or_id)));
-$result = $prep->execute();
+			$prep = $DBH->prepare($sql);
+			$result = $prep->execute($exec_ary);
 			if ($result && $row = $prep->fetch()){
 				$_SESSION['user_row'] = $row;
 				$_SESSION['user_id'] = $row['id'];
@@ -339,22 +343,24 @@ $result = $prep->execute();
       
       public static function CheckUsernamePassword($username_or_email, $password)
       {
-        global $DBH;
-		    $sql = "SELECT * FROM user WHERE password = MD5('%s') AND ";
+        	global $DBH;
+		    $sql = "SELECT * FROM user WHERE password = MD5(:password) AND ";
+		    $exec_ary = array('password'=>$password);
 		    if (strpos($username_or_email, '@') !== false){
-			      $sql .= "LOWER(email) = '%s'";
+			      $sql .= "LOWER(email) =  :email";
+			      $exec_ary['email'] = $username_or_email;
 			}else{
-				  $sql .= "LOWER(username) = '%s'";
+				  $sql .= "LOWER(username) = :username";
+				   $exec_ary['username'] = $username_or_email;
 			}
 			$sql .= " LIMIT 1";
-			$prep = $DBH->prepare(sprintf($sql, $password, strtolower($username_or_email)));
-$result = $prep->execute();
+			$prep = $DBH->prepare($sql);
+			$result = $prep->execute($exec_ary);
 			if ($result && $row = $prep->fetch()){
             return $row;
          }else{
             return false;
          }
-       
       }
       
 		public static function Login($username_or_email, $password)
