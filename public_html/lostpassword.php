@@ -35,11 +35,16 @@ if (!empty($_POST)){
    $user_by_email = Members::GetUserByEmail($_POST['email']);
    
    if ($user_by_username && $user_by_email && $user_by_username['id'] == $user_by_email['id']){
+      $exec_ary = array();
       $code = random_string(25);
-      $sql = "UPDATE user SET verify_command = 'reset_password', verify_code = '%s', verify_param = '' 
-              WHERE id = %d LIMIT 1";
-      $prep = $DBH->prepare(sprintf($sql, $code, $user_by_username['id']));
-$result = $prep->execute();
+      $sql = "UPDATE user SET verify_command = 'reset_password', verify_code = :verify_code, verify_param = '' 
+              WHERE id = :id LIMIT 1";
+      
+      $exec_ary['verify_code'] = $code;
+      $exec_ary['id'] = $user_by_username['id'];
+
+      $prep = $DBH->prepare($exec_ary);
+      $result = $prep->execute();
       if ($result){
            if ($prep->rowCount() == 1){
               if (Site::cfg('use_php_mail')){
