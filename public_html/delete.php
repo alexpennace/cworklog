@@ -63,7 +63,7 @@ if (isset($_REQUEST['remove_my_account'])){
    
    if (isset($_POST['delete']) && $_POST['delete'] == 'my_account' && $_POST['num_worklogs'] == count($work_logs)){
       $pw = isset($_POST['password']) ? $_POST['password'] : '';
-      if ($_SESSION['superlogin'] || Members::CheckUsernamePassword($_SESSION['user_row']['username'], $pw)){
+      if (!empty($_SESSION['superlogin']) || Members::CheckUsernamePassword($_SESSION['user_row']['username'], $pw)){
 
          //somehow delete the full account
          foreach($work_logs as $wl){
