@@ -1,4 +1,6 @@
 <?php
+      //$cfg['admin_email'] = 'ADMIN_EMAIL@example.com';
+
       //this file needs to be defined and then renamed to config.inc.php in order for the server to work
       //create user 'USER'@'localhost' IDENTIFIED BY 'PASSWORD';
       $cfg['db_host'] = 'localhost';
