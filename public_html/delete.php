@@ -1,8 +1,28 @@
 <?PHP
 /** 
- * This page is to permanently delete things, it serves as a confirmation page
+ *  This page is to permanently delete things, it serves as a confirmation page
+ * 
+ *  Coders/Contractors Work Log - A time tracking/invoicing app 
+ *  Copyright (C) 2014 Jim A Kinsman (cworklog.com) relipse@gmail.com github.com/relipse 
+ *
+ *  LICENSES - GPL 3. (If you need a different commercial license please contact Jim)
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License.
+ * 
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *  
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
  */
  
+  error_reporting(E_ALL);
+ ini_set('display_errors', 1);
+
 require_once(dirname(__FILE__).'/lib/Members.class.php');
 require_once(dirname(__FILE__).'/lib/misc.inc.php');
 require_once(dirname(__FILE__).'/lib/Site.class.php');
