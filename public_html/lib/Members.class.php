@@ -316,6 +316,7 @@ $result = $prep->execute();
 		}
 		
       public static function SuperLogin($username_or_email_or_id){
+          global $DBH;
 		 $sql = "SELECT * FROM user WHERE ";
 		 $exec_ary = array();
 		 if (is_numeric($username_or_email_or_id)){
