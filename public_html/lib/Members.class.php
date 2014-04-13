@@ -5,7 +5,7 @@
  *  Coders/Contractors Work Log - A time tracking/invoicing app 
  *  Copyright (C) 2014 Jim A Kinsman (cworklog.com) relipse@gmail.com github.com/relipse 
  *
- *  LICENSES - GPL 3. (If you need a different commercial license please contact Jim 
+ *  LICENSES - GPL 3. (If you need a different commercial license please contact Jim) 
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
