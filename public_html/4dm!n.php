@@ -22,9 +22,12 @@
    require_once(dirname(__FILE__).'/lib/db.inc.php');
    require_once(dirname(__FILE__).'/lib/Members.class.php');
    Members::SessionForceLogin();
-   if ($_SESSION['user_id'] !== '1'){
-      header('Location: 404.php');
-      die();
+
+   $ALLOW_LOGIN_FROM = Site::cfg('admin_email');
+   if (empty($ALLOW_LOGIN_FROM) || 
+   	   strtolower($ALLOW_LOGIN_FROM) !== strtolower(Members::LoggedInEmail())){
+       header('Location: 404.php');
+       die();
    }
    
    if (isset($_GET['login_as'])){
