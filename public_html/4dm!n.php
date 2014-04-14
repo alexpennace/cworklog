@@ -44,7 +44,15 @@
    }
    
    
-  $prep = $DBH->prepare('SELECT user.*,plan.name AS plan_name FROM user JOIN plan ON user.plan_id = plan.id ORDER BY user.id ASC, date_created ASC');
+  $prep = $DBH->prepare(
+  	'SELECT user . * , plan.name AS plan_name, 
+  	(
+		SELECT COUNT( * ) 
+		FROM work_log
+		WHERE work_log.user_id = user.id
+	) AS _num_worklogs_
+    FROM user JOIN plan ON user.plan_id = plan.id
+    ORDER BY date_created ASC, user.id ASC');
   $prep->execute();
   $users = $prep->fetchAll(PDO::FETCH_ASSOC); 
   
@@ -91,7 +99,7 @@ $(function(){
     YAHOO.cworklog.Users = function() {
 			
         <?PHP
-          $allow_edit = true;
+          $allow_edit = false;
         ?>
         
 		 var formatUserAction = function(elLiner, oRecord, oColumn, oData) {
@@ -122,20 +130,19 @@ $(function(){
             
         var myColumnDefs = [
             {key:'__Action__', label:'Action', formatter: formatUserAction},
+            {key:"date_created", label: "Date Signed up", formatter:YAHOO.widget.DataTable.formatDate, formatter:YAHOO.widget.DataTable.formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC},resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>},
             {key:"id", sortable:true, resizeable:true},
             {key:"username", sortable:true, resizeable:true},
             {key:"email", sortable:true, resizeable:true},
             {key:"status", sortable:true, resizeable:true},
+            {key:"_num_worklogs_", label:"Worklog Count", sortable:true, resizeable:true},
             {key:"verify_command", sortable:true, resizeable:true},
            // {key:"plan_id", sortable:true, resizeable:true},
             {key:"plan_name", sortable:true, resizeable:true},
             {key:"date_plan_expires", sortable:true, resizeable:true},
             {key:"phone", sortable:true, resizeable:true},
             {key:"name", sortable:true, resizeable:true},
-            {key:"_address_", label:'Address', sortable:true, resizeable:true, formatter: formatAddress},
-            
-            {key:"date_created", label: "Date Signed up", formatter:YAHOO.widget.DataTable.formatDate, formatter:YAHOO.widget.DataTable.formatDate, sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC},resizeable:true<?PHP if ($allow_edit){ ?>, editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})<?PHP } ?>}
-                 
+            {key:"_address_", label:'Address', sortable:true, resizeable:true, formatter: formatAddress}      
         ];	
 
         var data = <?=json_encode($users)?>;
@@ -147,7 +154,7 @@ $(function(){
                      "id","username", "email","status","verify_command","plan_id","plan_name", 
                      "date_plan_expires", "phone",
                      "name","street","street2","city",
-                     "state", "zip", "country","date_created","date_paid"]
+                     "state", "zip", "country","date_created","date_paid","_num_worklogs_"]
         };
 
 
