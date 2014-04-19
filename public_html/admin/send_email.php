@@ -123,8 +123,8 @@
                 $template = new CWLAdminEmailTemplate($body);
                 $nwbody = $template->replaceAll($user_row);
 
-                $message->setBody(strip_tags($_POST['body']));
-                $message->addPart($_POST['body'], 'text/html');
+                $message->setBody(strip_tags($nwbody, 'a'));
+                $message->addPart($nwbody, 'text/html');
                  
                 $message->setTo(array($user_row['email']));
             
