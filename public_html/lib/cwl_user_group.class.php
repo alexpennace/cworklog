@@ -31,6 +31,7 @@ class cwl_user_group{
     private $groups = array(
     	 'ALL'=>'',
     	 'ZEROSTATUS'=>'WHERE user.status = 0',
+         'GREATERTHAN31'=>'WHERE user.id >= 31',
     );
 
     private $rows = null;

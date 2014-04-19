@@ -118,26 +118,34 @@
 
 
             foreach($rows as $i => $user_row) {
-                
+                try{
+                  $message->setSubject($_POST['subject']);
 
-                $message->setSubject($_POST['subject']);
+                  $body = $_POST['body'];
 
-                $body = $_POST['body'];
+                  $template = new CWLAdminEmailTemplate($body);
+                  $nwbody = $template->replaceAll($user_row);
 
-                $template = new CWLAdminEmailTemplate($body);
-                $nwbody = $template->replaceAll($user_row);
-
-                $message->setBody(strip_tags($nwbody, 'a'));
-                $message->addPart($nwbody, 'text/html');
-                 
-                $message->setTo(array($user_row['email']));
-            
-                $mailed = $mailer->send($message);
-        
+                  $message->setBody(strip_tags($nwbody, 'a'));
+                  $message->addPart($nwbody, 'text/html');
+                   
+                  $message->setTo(array($user_row['email']));
+              
+                  if (!empty($_POST['actually_send_email'])){
+                    $mailed = $mailer->send($message);
+                    $msg = '';
+                  }else{
+                    $mailed = false;
+                    $msg = 'Uncheck the "Actually Send Emails" box';
+                  }
+                }catch(Exception $e){
+                  $mailed = false;
+                  $msg = $e->getMessage();
+                }
                 //echo $body;
                 echo ($i+1).'. ';
                 if (!$mailed){
-                    $error = 'There was an error with the email address '.$user_row['email'].', please try again';
+                    $error = 'There was an error '.$msg.' with the email address '.$user_row['email'].', please try again';
                     $error_field = 'to';
                     echo 'Email not sent: '.$error.'<br> body:<br>'.$nwbody.'<br>ENDBODY';
                 }else{
@@ -236,6 +244,8 @@
                </td></tr><tr>
                <td><b>To</b></td><td>
                <select name="to">
+               <option>-- Choose Recipient(s)--</option>
+               <option value="GREATERTHAN31">GREATERTHAN31</option>
                <option value="ALL">ALL</option>
                <option value="ZEROSTATUS">ZEROSTATUS</option>
                <?php
@@ -273,7 +283,7 @@
                ?>     
                </div>
  
-               
+               <label><input type="checkbox" name="actually_send_email" value="1">Actually send emails</label>
                <br>
                <button class="btn btn-large btn-primary" type="submit">Send Email</button>
       </form>

@@ -293,7 +293,7 @@ $result = $prep->execute();
           if ($return_no_redirect){ return false; }
 
 		      if (!empty($_GET['mobile'])){ $mobile = 'mobile=1&'; } else { $mobile = ''; }
-            header('Location: index.php?'.$mobile.'goto='.urlencode(self::makeUrl($_SERVER['PHP_SELF'],$_SERVER['QUERY_STRING'])));
+            header('Location: '.Site::cfg('base_url').'/index.php?'.$mobile.'goto='.urlencode(self::makeUrl($_SERVER['PHP_SELF'],$_SERVER['QUERY_STRING'])));
 			  exit;
 		   }else{
 		      //do nothing, user is logged in!
