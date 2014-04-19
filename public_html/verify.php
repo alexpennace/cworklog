@@ -50,7 +50,7 @@
        }
    }else if (isset($_GET['resetpwcode'])){
             $sql = "SELECT * FROM user WHERE verify_code = :verify_code AND LOWER(email) = LOWER(:email)";
-            $prep = $DBH->prepare(); 
+            $prep = $DBH->prepare($sql); 
             $exec_ary = array('verify_code'=> $_GET['resetpwcode'], 'email'=> $_GET['email']);
             $result = $prep->execute($exec_ary);
             if ($result && $row = $prep->fetch()){
@@ -75,7 +75,7 @@
                           $error_field = 'password';
                        }else{
                             $sql2 = "UPDATE user SET status = 1, password = MD5(:password), verify_code = '', verify_param = '' WHERE id = :id";
-                            $prep = $DBH->prepare();
+                            $prep = $DBH->prepare($sql2);
                             $exec_ary = array('password'=>$_POST['password'], 'id'=>$resetpw_user['id']);
                             $result2 = $prep->execute($exec_ary);
                             if ($result2){
