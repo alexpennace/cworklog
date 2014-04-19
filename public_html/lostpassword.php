@@ -54,8 +54,8 @@ if (!empty($_POST)){
 
                     $message->setSubject('Contractor\'s Work Log Reset Password');
                     $message->setBody("Please reset your password by going to the link below:\r\n".
-                      Site::cfg('base_url').'verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 'text/html');
-                     
+                      Site::cfg('base_url').'/verify.php?resetpwcode='.$code.'&email='.urlencode($_POST['email']), 'text/html');
+                    //verify.php?resetpwcode=xYnMUSupKmflhhCcfX53QgCvN&email=jakinsman@gmail.com
                     $message->setTo(array($_POST['email']));
                 
                     $result = $mailer->send($message);

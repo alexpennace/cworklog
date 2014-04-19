@@ -24,6 +24,8 @@
       $cfg['domain'] = 'cworklog.com';
 
       $cfg['default_from_email'] = 'noreply@'.$cfg['domain'];
+
+      //DO NOT INCLUDE TRAILING SLASH SO VERIFY LINKS WILL WORK ETC
       $cfg['base_url'] = 'http://cworklog.com';
 
       /* TO ENABLE EMAIL USING SMTP UNCOMMENT BELOW AND FILL

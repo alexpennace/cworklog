@@ -163,7 +163,7 @@ if (isset($_POST)){
 
                       $message->setSubject('New email confirmation - '.Site::cfg('title'));
                       $message->setBody("Please verify your new email address by clicking the link below\r\n".
-                      Site::cfg('base_url').'verify.php?code='.$verify_code.'&new_email='.urlencode($_POST['email_new']), 'text/html');
+                      Site::cfg('base_url').'/verify.php?code='.$verify_code.'&new_email='.urlencode($_POST['email_new']), 'text/html');
                        
                       $message->setTo(array($_POST['email_new']));
                   
