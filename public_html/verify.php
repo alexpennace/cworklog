@@ -18,7 +18,7 @@
             if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
                 $sql2 = "UPDATE user SET status = 1, verify_code = '', verify_param = '' WHERE id = :id";
-                $prep = $DBH->prepare();
+                $prep = $DBH->prepare($sql2);
                 $exec_ary = array('id'=>$verify_user['id']);
                 $result2 = $prep->execute($exec_ary);
                 if ($result2){
@@ -31,7 +31,7 @@
             }
        }else if (isset($_GET['new_email'])){
             $sql = "SELECT * FROM user WHERE verify_code = :verify_code AND LOWER(verify_param) = LOWER(:verify_param)";
-            $prep = $DBH->prepare();
+            $prep = $DBH->prepare($sql);
             $result = $prep->execute(array('verify_code'=>$_GET['code'], 'verify_param'=>$_GET['new_email']));         
             if ($result && $row = $prep->fetch()){
                 $verify_user = $row;
