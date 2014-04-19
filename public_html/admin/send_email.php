@@ -99,7 +99,8 @@
             }
          }
          list($mailer, $message, $logger) = cwl_email::setup(false);
-            
+         $message->setFrom($_POST['from']);
+
             if (isset($_REQUEST['to'])){
               if (is_numeric($_REQUEST['to'])){
                 $prep = pdo()->prepare('SELECT * FROM user WHERE user.id = :id');
@@ -115,7 +116,10 @@
               $rows = array();
             }
 
+
             foreach($rows as $i => $user_row) {
+                
+
                 $message->setSubject($_POST['subject']);
 
                 $body = $_POST['body'];
