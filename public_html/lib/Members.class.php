@@ -268,10 +268,27 @@ $result = $prep->execute();
 		  <?PHP
 		}
 
-		public static function SessionForceLogin($return_no_redirect = false)
+		public static function SessionForceLogin($return_no_redirect = false, $allow_verify_code_login = false)
 		{
        session_set_cookie_params(3600*24*7); // sessions lasts 7 days
 		   session_start();
+       if ($allow_verify_code_login && !empty($_REQUEST['code'])){
+            $prep = pdo()->prepare('SELECT * FROM user WHERE verify_code = :verify_code');
+            $prep->execute(array('verify_code'=>$_REQUEST['code']));
+            $matching_users = $prep->fetchAll();
+            if (count($matching_users) === 1){
+                $row = $matching_users[0];
+
+                $_SESSION['user_row'] = $row;
+                $_SESSION['user_id'] = $row['id'];
+
+                //mark that it has been verified
+                $prep2 = pdo()->prepare('UPDATE user SET status = 1 AND verify_code = \'\' WHERE user.id = :id');
+                $result = $prep2->execute(array('id'=>$row['id']));
+                $_SESSION['verify_code_result'] = $result;
+            }
+       }
+
 		   if (!self::IsLoggedIn()){
           if ($return_no_redirect){ return false; }
 

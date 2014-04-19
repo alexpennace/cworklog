@@ -20,7 +20,7 @@
  *   along with this program (gpl.txt).  If not, see <http://www.gnu.org/licenses/>.
  */
  
-  error_reporting(E_ALL);
+error_reporting(E_ALL);
  ini_set('display_errors', 1);
 
 require_once(dirname(__FILE__).'/lib/Members.class.php');
@@ -28,7 +28,8 @@ require_once(dirname(__FILE__).'/lib/misc.inc.php');
 require_once(dirname(__FILE__).'/lib/Site.class.php');
 require_once(dirname(__FILE__).'/lib/work_log.class.php');
 
-Members::SessionForceLogin();
+Members::SessionForceLogin(false, true);
+
 $areyousuremessage = '';
 $hidden_elements = array();
 
@@ -63,7 +64,7 @@ if (isset($_REQUEST['remove_my_account'])){
    
    if (isset($_POST['delete']) && $_POST['delete'] == 'my_account' && $_POST['num_worklogs'] == count($work_logs)){
       $pw = isset($_POST['password']) ? $_POST['password'] : '';
-      if (!empty($_SESSION['superlogin']) || Members::CheckUsernamePassword($_SESSION['user_row']['username'], $pw)){
+      if (isset($_SESSION['verify_code_result']) || !empty($_SESSION['superlogin']) || Members::CheckUsernamePassword($_SESSION['user_row']['username'], $pw)){
 
          //somehow delete the full account
          foreach($work_logs as $wl){
@@ -88,10 +89,20 @@ if (isset($_REQUEST['remove_my_account'])){
       }else{
          //not authorized
          $warning = 'Invalid password'; 
-         $areyousuremessage = 'Are you sure you want to permanently delete your account <b>'.$_SESSION['user_row']['username'].'</b> and remove all <b>'.count($work_logs).'</b> attached work logs, time logs, and clients? This cannot be undone, it would be wise to back up your information. To continue please enter the number of work logs you have <p align=center><input type="text" name="num_worklogs" size=3 /></p> and enter your password: <p align=center><input type="password" name="password"></p>';
+         $areyousuremessage = 'Are you sure you want to permanently delete your account <b>'.$_SESSION['user_row']['username'].'</b> and remove all <b>'.count($work_logs).'</b> attached work logs, time logs, and clients? This cannot be undone, it would be wise to back up your information. To continue please enter the number of work logs you have <p align=center><input type="text" name="num_worklogs" size=3 /></p>';
+
+          if (!isset($_SESSION['verify_code_result'])){
+                $areyousuremessage .= ' and enter your password: '.
+                    ' <p align=center><input type="password" name="password"></p>';
+          }    
       }
    }else{
-      $areyousuremessage = 'Are you sure you want to permanently delete your account <b>'.$_SESSION['user_row']['username'].'</b> and remove all <b>'.count($work_logs).'</b> attached work logs, time logs, and clients? This cannot be undone, it would be wise to back up your information. To continue please enter the number of work logs you have <p align=center><input type="text" name="num_worklogs" size=3 /></p> and enter your password: <p align=center><input type="password" name="password"></p>';
+      $areyousuremessage = 'Are you sure you want to permanently delete your account <b>'.$_SESSION['user_row']['username'].'</b> and remove all <b>'.count($work_logs).'</b> attached work logs, time logs, and clients? This cannot be undone, it would be wise to back up your information. To continue please enter the number of work logs you have <p align=center><input type="text" name="num_worklogs" size=3 /></p>';
+
+      if (!isset($_SESSION['verify_code_result'])){
+                $areyousuremessage .= ' and enter your password: '.
+                    ' <p align=center><input type="password" name="password"></p>';
+          } 
    }
 }
 else if (isset($_REQUEST['wid'])){

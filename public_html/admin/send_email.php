@@ -101,10 +101,18 @@
          list($mailer, $message, $logger) = cwl_email::setup(false);
             
             if (isset($_REQUEST['to'])){
-              $users = new cwl_user_group($_REQUEST['to']);
-              $rows = $users->fetch();
+              if (is_numeric($_REQUEST['to'])){
+                $prep = pdo()->prepare('SELECT * FROM user WHERE user.id = :id');
+                $prep->execute(array('id'=>$_REQUEST['to']));
+                $rows = $prep->fetchAll();
+              }else{
+
+                $users = new cwl_user_group($_REQUEST['to']);
+                $rows = $users->fetch();
+
+               }
             }else{
-              //$rows = array(array('email'=>$_POST['to']));
+              $rows = array();
             }
 
             foreach($rows as $user_row) {
@@ -123,7 +131,7 @@
                 $mailed = $mailer->send($message);
         
                 echo $body;
-                
+
                 if (!$mailed){
                     $error = 'There was an error with the email address '.$user_row['email'].', please try again';
                     $error_field = 'to';
@@ -221,7 +229,20 @@
                <table>
                <tr><td><b>From</b></td><td><input type="text" name="from" class="input-block-level" size="50" placeholder="From" value="<?=!empty($chosen_template_info['from']) ? htmlentities($chosen_template_info['from']) : ''?>" />
                </td></tr><tr>
-               <td><b>To</b></td><td><input type="text" name="to" class="input-block-level" size="50" placeholder="To" value="<?=!empty($_GET['to']) ? htmlentities($_GET['to']) : ''?>" />
+               <td><b>To</b></td><td>
+               <select name="to">
+               <option value="ALL">ALL</option>
+               <option value="ZEROSTATUS">ZEROSTATUS</option>
+               <?php
+                 $prep = pdo()->prepare('SELECT * FROM user ORDER BY id ASC');
+                 if ($prep->execute()){
+                   while ($row = $prep->fetch(PDO::FETCH_ASSOC)) {
+                         ?><option value="<?=$row['id']?>"><?=htmlentities($row['email'])?> (<?=$row['id']?>)</option>
+                         <?php
+                   }
+                 }
+               ?>
+               </select>
                </tr>
                <tr><td>
                <b>Subject</b></td><td><input type="text" name="subject" class="input-block-level" placeholder="Subject" value="<?=!empty($chosen_template_info['subject']) ? htmlentities($chosen_template_info['subject']) : ''?>" size=100 />

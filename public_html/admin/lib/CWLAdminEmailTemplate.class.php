@@ -33,10 +33,10 @@ require_once(__DIR__.'/../../lib/Site.class.php');
          $this->content = $content;
 
          $this->variables = array(
-          'USERNAME'=> function($user){ 
+          'USERNAME'=> function(&$user){ 
                return $user['username'];
           },
-          'NW_VALIDATE_ACCOUNT_URL'=> function(&$user){
+          'VALIDATE_ACCOUNT_URL'=> function(&$user){
              if (strlen($user['verify_code']) < 10){
                 $code = random_string(25);
                 $prep = pdo()->prepare('UPDATE user SET verify_code = :verify_code, verify_command = :verify_command WHERE user.id = :user_id');
@@ -49,7 +49,7 @@ require_once(__DIR__.'/../../lib/Site.class.php');
              $url = Site::cfg('base_url').'/verify.php?code='.urlencode($user['verify_code']).'&email='.urlencode($user['email']);
              return $url;
           },
-          'DELETE_ACCOUNT_URL'=>function($user){
+          'DELETE_ACCOUNT_URL'=>function(&$user){
              if (strlen($user['verify_code']) < 10){
                 $code = random_string(25);
                 $prep = pdo()->prepare('UPDATE user SET verify_code = :verify_code, verify_command = :verify_command WHERE user.id = :user_id');
@@ -59,7 +59,7 @@ require_once(__DIR__.'/../../lib/Site.class.php');
                 $user['verify_param'] = 'initial_email_check';
              }
              
-             $url = Site::cfg('base_url').'/delete.php?code='.urlencode($user['verify_code']).'&email='.urlencode($user['email']);
+             $url = Site::cfg('base_url').'/delete.php?remove_my_account=1&code='.urlencode($user['verify_code']).'&email='.urlencode($user['email']);
              return $url;
           }
         );
@@ -75,7 +75,7 @@ require_once(__DIR__.'/../../lib/Site.class.php');
           for ($i = 0; $i < count($result[0]); $i++) {
             # Matched text = $result[0][$i];
               if ($this->isVar($result[1][$i])){
-                  $replace_with = call_user_func_array($this->variables[$result[1][$i]], array($user));
+                  $replace_with = call_user_func_array($this->variables[$result[1][$i]], array(&$user));
                   $content = str_replace($result[0][$i], $replace_with, $content);
               }
           }

@@ -3,7 +3,7 @@ Hello {USERNAME},
 Thank you so much for trying out CWorkLog. 
 At this time, we are trimming down unused accounts.<br> 
 <b>Please click one of 2 links below to take action</b>
-<br><a href="{NW_VALIDATE_ACCOUNT_URL}">Keep/Verify my account</a> &nbsp; &nbsp; <a href="{DELETE_ACCOUNT_URL}">Delete my account</a>
+<br><a href="{VALIDATE_ACCOUNT_URL}">Keep and Verify my account</a> &nbsp; &nbsp; <a href="{DELETE_ACCOUNT_URL}">Delete my account</a>
 </p>
 
 <p style="text-align: left;">Thanks,<br>
