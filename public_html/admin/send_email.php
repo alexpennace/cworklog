@@ -115,7 +115,7 @@
               $rows = array();
             }
 
-            foreach($rows as $user_row) {
+            foreach($rows as $i => $user_row) {
                 $message->setSubject($_POST['subject']);
 
                 $body = $_POST['body'];
@@ -130,15 +130,16 @@
             
                 $mailed = $mailer->send($message);
         
-                echo $body;
-
+                //echo $body;
+                echo ($i+1).'. ';
                 if (!$mailed){
                     $error = 'There was an error with the email address '.$user_row['email'].', please try again';
                     $error_field = 'to';
-                    echo 'Email not sent: '.$error.'<br>';
+                    echo 'Email not sent: '.$error.'<br> body:<br>'.$nwbody.'<br>ENDBODY';
                 }else{
                   echo 'Email sent to '.$user_row['email'].' body:<br>'.$nwbody.'<br>ENDBODY';
                 }
+                echo '<br>';
             }
             exit;
       }

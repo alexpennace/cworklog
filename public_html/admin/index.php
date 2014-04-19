@@ -71,6 +71,8 @@
 <script type="text/javascript" src="../js/work_log_shared.js"></script>
 </head>
 <body class="yui-skin-sam">
+<a href="send_email.php">Send Mass Email</a>
+
 <div class="dataBlk">
 
 <?PHP
