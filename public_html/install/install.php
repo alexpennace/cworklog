@@ -3,6 +3,8 @@
  * This file is used for a somewhat automated install of cworklog
  */
 
+die('Automatic installation is disabled, Manually you need to create the /config/config.inc.php file and then run install.schema.sql');
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
