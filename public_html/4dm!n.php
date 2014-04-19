@@ -135,7 +135,7 @@ $(function(){
             {key:"username", sortable:true, resizeable:true},
             {key:"email", sortable:true, resizeable:true},
             {key:"status", sortable:true, resizeable:true},
-            {key:"_num_worklogs_", label:"Worklog Count", sortable:true, resizeable:true},
+            {key:"_num_worklogs_", label:"Worklogs", sortable:true, resizeable:true},
             {key:"verify_command", sortable:true, resizeable:true},
            // {key:"plan_id", sortable:true, resizeable:true},
             {key:"plan_name", sortable:true, resizeable:true},
