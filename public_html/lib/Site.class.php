@@ -41,9 +41,9 @@ class Site
       return $default;
   }
 
-  public static function CssJsYuiIncludes(){
+  public static function CssJsYuiIncludes($prefix = ''){
   //$YUI_JS_SOURCE = 'http://yui.yahooapis.com';
-  $YUI_JS_SOURCE = 'js/yui';
+  $YUI_JS_SOURCE = $prefix.'js/yui';
 ?>
 <link rel="stylesheet" type="text/css" href="<?=$YUI_JS_SOURCE?>/2.9.0/build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="<?=$YUI_JS_SOURCE?>/2.9.0/build/datatable/assets/skins/sam/datatable.css" />
@@ -65,21 +65,21 @@ class Site
 }
 
 
-public static function CssJsJqueryIncludes(){
+public static function CssJsJqueryIncludes($prefix=''){
 ?>
 <!-- new jquery includes -->
-<link href="css/jqueryui/themes/smoothness/jquery-ui-1.10.0.custom.min.css" rel="stylesheet" type="text/css"/>
+<link href="<?=$prefix?>css/jqueryui/themes/smoothness/jquery-ui-1.10.0.custom.min.css" rel="stylesheet" type="text/css"/>
 
-<script src="js/jquery-1.11.0.min.js"></script>
+<script src="<?=$prefix?>js/jquery-1.11.0.min.js"></script>
   <!-- begin-scripts for power-tip -->
-  <script type="text/javascript" src="js/jquery-powertip-1.2.0/jquery.powertip.js"></script>
+  <script type="text/javascript" src="<?=$prefix?>js/jquery-powertip-1.2.0/jquery.powertip.js"></script>
   <!-- end-scripts for power-tip -->
 
-  <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
+  <script src="<?=$prefix?>js/jquery-ui-1.10.0.custom.min.js"></script>
 
-  <script src="js/jquery.onTypeSomeKeys.js"></script>
+  <script src="<?=$prefix?>js/jquery.onTypeSomeKeys.js"></script>
   
-<link rel="stylesheet" type="text/css" href="js/jquery-powertip-1.2.0/css/jquery.powertip.css" />
+<link rel="stylesheet" type="text/css" href="<?=$prefix?>js/jquery-powertip-1.2.0/css/jquery.powertip.css" />
     <style type="text/css">
      .ui-dialog , .ui-autocomplete{ font-size: 85%; }
     </style>
@@ -109,9 +109,9 @@ public static function CssJsJqueryIncludes(){
     <?PHP
 }
 
-public static function Css(){
+public static function Css($prefix = ''){
     ?>
-    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" />
+    <link rel="stylesheet" type="text/css" href="<?=$prefix?>css/stylesheet.css" />
     <style>
     body { font-family: Arial; }
    .imgLinkTable a:hover{ text-decoration: none; }

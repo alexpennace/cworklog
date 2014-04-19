@@ -22,8 +22,8 @@
    error_reporting(E_ALL);
    ini_set('display_errors', 1);
 
-   require_once(dirname(__FILE__).'/lib/db.inc.php');
-   require_once(dirname(__FILE__).'/lib/Members.class.php');
+   require_once(dirname(__FILE__).'/../lib/db.inc.php');
+   require_once(dirname(__FILE__).'/../lib/Members.class.php');
    Members::SessionForceLogin();
 
    $ALLOW_LOGIN_FROM = Site::cfg('admin_email');
@@ -57,18 +57,18 @@
   $users = $prep->fetchAll(PDO::FETCH_ASSOC); 
   
   
-  include_once(dirname(__FILE__).'/lib/Site.class.php');
+  include_once(dirname(__FILE__).'/../lib/Site.class.php');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <title>Admin - Contractor's Work Log</title>
 <?PHP
-  Site::CssJsYuiIncludes();
-  Site::CssJsJqueryIncludes();
-  Site::Css();
+  Site::CssJsYuiIncludes('../');
+  Site::CssJsJqueryIncludes('../');
+  Site::Css('../');
 ?>
-<script type="text/javascript" src="js/work_log_shared.js"></script>
+<script type="text/javascript" src="../js/work_log_shared.js"></script>
 </head>
 <body class="yui-skin-sam">
 <div class="dataBlk">
