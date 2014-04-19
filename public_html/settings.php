@@ -43,7 +43,7 @@ if (isset($_POST)){
     $error = false;
     $error_field = false;
     
-    if (isset($_POST['plan'])){
+    if (Site::cfg('stripe_apikey') && isset($_POST['plan'])){
         
          $payable_plans = array('betastarter','betapro');
          if (in_array($_POST['plan'], $payable_plans)){
@@ -63,11 +63,12 @@ if (isset($_POST)){
                // Get the credit card details submitted by the form
                $token = $_POST['stripeToken'];
 
-               $customer = Stripe_Customer::create(array(
-                 "card" => $token,
-                 "plan" => $_POST['plan'],
-                 "email" => $user['email'])
-               );
+             
+                 $customer = Stripe_Customer::create(array(
+                   "card" => $token,
+                   "plan" => $_POST['plan'],
+                   "email" => $user['email'])
+                 );
                
                $sql = "UPDATE  `user` SET  
                     `stripe_id` =  :stripe_id 
@@ -259,7 +260,7 @@ $result = $prep->execute();
     $curplan = $cwluser->getPlan();
     $num_clients = $cwluser->countClients();
     $num_worklogs = $cwluser->countUnlockedWorkLogs();
-    if (!empty($user_row['stripe_id'])){
+    if (Site::cfg('stripe_apikey') && !empty($user_row['stripe_id'])){
       try{
         $stripe_customer = Stripe_Customer::retrieve($user_row['stripe_id']);
          //echo $stripe_customer['subscription']['plan']['id'];
@@ -487,12 +488,14 @@ $result = $prep->execute();
      <input type="hidden" name="plan" value="free" />
      <input type="submit" name="change_plan" value="Downgrade Plan"/>
   </form>
-  
+  <?php if (Site::cfg('stripe_apikey')){ ?>
   <form class="settings" method="POST" id="frmChangeToPayPlan" style="display: none">
   <input type="hidden" name="plan" value="" />
-  <div id="plan_cc_info" style="display:none">
+  
+    <div id="plan_cc_info" style="display:none">
         <span class="payment-errors"><?= $error ?></span>
         <span class="payment-success"><?= $success ?></span>
+        
         Please enter your credit card information to change plans.
         <h3>Credit Card Information</h3>
             <div class="form-row">
@@ -509,11 +512,21 @@ $result = $prep->execute();
                 <span> / </span>
                 <input type="text" size="4" class="card-expiry-year"/>
             </div>
+        
+       
   </div>
   <input type="submit" name="change_plan" value="Change Plan"/>
-  </form>
+  </form> 
+  <?php }else{ ?>
+          You may not upgrade plans at this time because the credit card system is disabled, please contact the administrator.
+  <?php } ?>
   </div>
   <?PHP } ?>
+
+  <?PHP 
+  //DISABLE TIMEZONES FOR NOW UNTIL WE GET WORKING
+  if (false){ 
+  ?>
   <h3><strong>Update Time Zone</strong></h3>
   <div style="height: 55px;">
     <form class="settings" method="POST">
@@ -532,6 +545,7 @@ $result = $prep->execute();
     <input type="submit" value="Change Timezone"/>
     </form>
   </div>
+  <?php } ?>
   <h3><strong>Change Password</strong></h3>
     <div>
         <form class="settings" method="POST" id="formsetting">
