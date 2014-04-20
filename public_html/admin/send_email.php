@@ -98,8 +98,6 @@
                }
             }
          }
-         list($mailer, $message, $logger) = cwl_email::setup(false);
-         $message->setFrom($_POST['from']);
 
             if (isset($_REQUEST['to'])){
               if (is_numeric($_REQUEST['to'])){
@@ -119,6 +117,9 @@
 
             foreach($rows as $i => $user_row) {
                 try{
+                  list($mailer, $message, $logger) = cwl_email::setup(false);
+                  $message->setFrom($_POST['from']);
+
                   $message->setSubject($_POST['subject']);
 
                   $body = $_POST['body'];
